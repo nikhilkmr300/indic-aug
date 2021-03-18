@@ -1,7 +1,7 @@
 #! /bin/bash
 
-SRC="en"
-TGT="hi"
+SRC=$(grep "SRC=" ../../.config | cut -d '=' -f 2)
+TGT=$(grep "TGT=" ../../.config | cut -d '=' -f 2)
 
 DOC_LIMIT=50000     # Stops concatenation when these many documents are reached.
 
@@ -10,14 +10,11 @@ train_path="$root_path/train"
 dev_path="$root_path/dev"
 test_path="$root_path/test"
 
-rm -rf concat
-mkdir concat
+touch train.$SRC train.$TGT
+touch dev.$SRC dev.$TGT
+touch test.$SRC test.$TGT
 
-touch concat/train.$SRC concat/train.$TGT
-touch concat/dev.$SRC concat/dev.$TGT
-touch concat/test.$SRC concat/test.$TGT
-
-echo "Concatenating $SRC-$TGT datasets in $root_path. This may take a few minutes..."
+echo "Concatenating $SRC-$TGT datasets in $root_path..."
 
 num_docs=0          # Number of docs in concat file.
 for repo in $train_path/*/$SRC-$TGT; do
@@ -33,15 +30,15 @@ for repo in $train_path/*/$SRC-$TGT; do
     # First sed replaces \t with space (clashes with sep of pd.read_csv).
     # Second sed deletes double quotes (clashes with Python ").
     # Third sed remove empty lines (Pandas skips empty lines).
-    cat "$repo/train.$SRC" | sed 's/\t\t*/ /g' | sed 's/"//g' | sed '/^[[:space:]]*$/d' >> concat/train.$SRC
-    cat "$repo/train.$TGT" | sed 's/\t\t*/ /g' | sed 's/"//g' | sed '/^[[:space:]]*$/d' >> concat/train.$TGT
-    printf "\tAdded $repo/train.[$SRC,$TGT] to concat/train.[$SRC,$TGT].\n"
+    cat "$repo/train.$SRC" | sed 's/\t\t*/ /g' | sed 's/"//g' | sed '/^[[:space:]]*$/d' >> train.$SRC
+    cat "$repo/train.$TGT" | sed 's/\t\t*/ /g' | sed 's/"//g' | sed '/^[[:space:]]*$/d' >> train.$TGT
+    printf "\tAdded $repo/train.[$SRC,$TGT] to train.[$SRC,$TGT].\n"
 done
 
-cat "$dev_path/dev.$SRC" | sed 's/\t\t*/ /g' | sed 's/"//g' | sed '/^[[:space:]]*$/d' >> concat/dev.$SRC
-cat "$dev_path/dev.$TGT" | sed 's/\t\t*/ /g' | sed 's/"//g' | sed '/^[[:space:]]*$/d' >> concat/dev.$TGT
-printf "\tAdded $dev_path/dev.[$SRC,$TGT] to concat/dev.[$SRC,$TGT].\n"
+cat "$dev_path/dev.$SRC" | sed 's/\t\t*/ /g' | sed 's/"//g' | sed '/^[[:space:]]*$/d' >> dev.$SRC
+cat "$dev_path/dev.$TGT" | sed 's/\t\t*/ /g' | sed 's/"//g' | sed '/^[[:space:]]*$/d' >> dev.$TGT
+printf "\tAdded $dev_path/dev.[$SRC,$TGT] to dev.[$SRC,$TGT].\n"
 
-cat "$test_path/test.$SRC" | sed 's/\t\t*/ /g' | sed 's/"//g' | sed '/^[[:space:]]*$/d' >> concat/test.$SRC
-cat "$test_path/test.$TGT" | sed 's/\t\t*/ /g' | sed 's/"//g' | sed '/^[[:space:]]*$/d' >> concat/test.$TGT
-printf "\tAdded $test_path/test.[$SRC,$TGT] to concat/test.[$SRC,$TGT].\n"
+cat "$test_path/test.$SRC" | sed 's/\t\t*/ /g' | sed 's/"//g' | sed '/^[[:space:]]*$/d' >> test.$SRC
+cat "$test_path/test.$TGT" | sed 's/\t\t*/ /g' | sed 's/"//g' | sed '/^[[:space:]]*$/d' >> test.$TGT
+printf "\tAdded $test_path/test.[$SRC,$TGT] to test.[$SRC,$TGT].\n"
