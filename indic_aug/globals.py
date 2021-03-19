@@ -1,4 +1,14 @@
 import os
+from abc import ABC, abstractmethod
+
+class Augmentor(ABC):
+    @abstractmethod
+    def set_random_state(self, random_state):
+        raise NotImplementedError
+
+    @abstractmethod
+    def augment(self, idx):
+        raise NotImplementedError
 
 def path2lang(path):
     """Returns language code from extension of path.
@@ -42,5 +52,8 @@ ERRORS = {
     'func': f'funcs must be a str or list of values in {*PREPROC_FUNCS,} or \'all\'.',
 
     # Mismatch in number of source and target sentences in a preprocessing batch.
-    'batch_shape': f'Shape of source and target batches do not match. Check that raw input corpora do not contain any characters among {*INVALID_CHARS,} nor any empty lines.'
+    'batch_shape': f'Shape of source and target batches do not match. Check that raw input corpora do not contain any characters among {*INVALID_CHARS,} nor any empty lines.',
+
+    # Ensure that root is at index 0 for dependency parsing tree.
+    'root_at_0': f'<root> must be at index 0. Ensure that you have prepended dummy <root> to the list of words returned by stanza.models.common.doc.Sentence.words to account for stanza using 1-based indexing for words in sentence.'
 }

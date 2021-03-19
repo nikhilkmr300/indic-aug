@@ -13,7 +13,7 @@ from indicnlp.normalize.indic_normalize import DevanagariNormalizer, TamilNormal
 from sacremoses.normalize import MosesPunctNormalizer
 from tqdm import tqdm
 
-from ..globals import path2lang, ERRORS, LANGS, PREPROC_FUNCS
+from .globals import path2lang, ERRORS, LANGS, PREPROC_FUNCS
 
 def pretokenize_sent(sent, lang):
     """Returns tokenized form of a sentence.
@@ -42,7 +42,7 @@ def normalize_sent(sent, lang):
     :param sent: Sentence to be tokenized.
     :type sent: str
     :param lang: Language code (refer globals.py) of sentence.
-    :type sent: str.
+    :type lang: str.
 
     :return: Normalized sentence.
     :rtype: str
