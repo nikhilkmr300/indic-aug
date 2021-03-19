@@ -4,7 +4,7 @@ import shutil
 import os
 
 sys.path.append(os.path.join('..', '..'))
-from indic_aug.preprocess.preprocess import Preprocess
+from indic_aug.preprocess import Preprocess
 
 if __name__ == '__main__':
     config_dir = os.path.join('..')                     # Relative path to directory containing .config.

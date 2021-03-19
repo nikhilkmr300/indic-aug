@@ -13,7 +13,8 @@ from indicnlp.normalize.indic_normalize import DevanagariNormalizer, TamilNormal
 from sacremoses.normalize import MosesPunctNormalizer
 from tqdm import tqdm
 
-from .globals import path2lang, ERRORS, LANGS, PREPROC_FUNCS
+from .globals import ERRORS, LANGS, PREPROC_FUNCS
+from .utils import path2lang
 
 def pretokenize_sent(sent, lang):
     """Returns tokenized form of a sentence.

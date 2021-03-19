@@ -6,7 +6,7 @@ import sys
 import sentencepiece as spm
 
 sys.path.append(os.path.join('..', '..'))
-from indic_aug.preprocess.vocab import *
+from indic_aug.vocab import *
 
 if __name__ == '__main__':
     config_dir = os.path.join('..')                     # Relative path to directory containing .config.

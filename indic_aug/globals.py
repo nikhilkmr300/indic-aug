@@ -10,18 +10,6 @@ class Augmentor(ABC):
     def augment(self, idx):
         raise NotImplementedError
 
-def path2lang(path):
-    """Returns language code from extension of path.
-
-    :param path: File whose language code is to be extracted. Note that the file must have extension as language code, for example, `train.en` for English. Refer LANGS below for language codes.
-    :type path: str
-
-    :return: Language code.
-    :rtype: str
-    """
-
-    return os.path.splitext(path)[-1].strip('.')
-
 # Supported languages.
 LANGS = [
     'en',   # English
@@ -40,9 +28,27 @@ PREPROC_FUNCS = [
 
 # Make sure raw input corpora are rid of these characters.
 INVALID_CHARS = [
-    '\t',   # Tabs clash with sep argument used in pandas.read_csv.
-    '"'     # Clashes with Python double quotes.
+    '\t',                   # Tabs clash with sep argument used in pandas.read_csv.
+    '"'                     # Clashes with Python double quotes.
 ]
+
+# Special tokens. Using sentencepiece defaults where applicable.
+SOS_TOKEN = '<s>'
+EOS_TOKEN = '</s>'
+BLANK_TOKEN = '<blank>'
+UNK_TOKEN = '<unk>'
+
+# Valid augmentation modes for each type of augmentation.
+VALID_AUG_MODES = {
+    'depparse': [           # Valid modes for dependency parsing augmentation.
+        'blank',            # Replaces word with <blank>.
+        'dropout',          # Delete word.
+        'replace'           # Replaces word with another word with most similar unigram frequency.
+    ],
+    'embedding': [          # Valid modes for embedding augmentation.
+        'replace'           # Replaces word with another word with most similar embedding.
+    ]
+}
 
 ERRORS = {
     # Invalid language code.
@@ -55,5 +61,11 @@ ERRORS = {
     'batch_shape': f'Shape of source and target batches do not match. Check that raw input corpora do not contain any characters among {*INVALID_CHARS,} nor any empty lines.',
 
     # Ensure that root is at index 0 for dependency parsing tree.
-    'root_at_0': f'<root> must be at index 0. Ensure that you have prepended dummy <root> to the list of words returned by stanza.models.common.doc.Sentence.words to account for stanza using 1-based indexing for words in sentence.'
+    'root_at_0': f'<root> must be at index 0. Ensure that you have prepended dummy <root> to the list of words returned by stanza.models.common.doc.Sentence.words to account for stanza using 1-based indexing for words in sentence.',
+
+    # Invalid augmentation mode.
+    'invalid_aug_mode': f'Invalid augmentation mode. Refer to globals for allowed values.',
+
+    # Word not found.
+    'word_not_found': 'Word not found in vocabulary.'
 }

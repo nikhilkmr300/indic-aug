@@ -1,6 +1,12 @@
+import warnings
+
 import numpy as np
+import pandas as pd
 from scipy.special import softmax
 import stanza
+
+from .globals import VALID_AUG_MODES, ERRORS, SOS_TOKEN, EOS_TOKEN, BLANK_TOKEN
+from .utils import stanza2list
 
 class DepParseTree:
     """Represents a dependency parsing tree."""
@@ -11,7 +17,11 @@ class DepParseTree:
         text = '<root>'
 
     def __init__(self, sent):
-        """Constructor method."""
+        """Constructor method.
+
+        :param sent: Sentence for which dependency parse tree is to be created. Do NOT pass a `str`.
+        :type sent: `stanza.models.common.doc.Sentence`
+        """
 
         self.words = sent.words                 # Words in sentence
         # Appending a dummy root as stanza uses 1-based indexing for words in sentence.
@@ -65,6 +75,12 @@ class DepParseTree:
         # Converting softmax output to scores (note that scores need not sum to 1).
         self.scores = alpha * self.softmaxed_probs * (len(self.words) - 1)
 
+        # Equation given in the paper allows values greater than 1.
+        if (self.scores > 1).any():
+            warnings.warn(f'Raw score out of range [0, 1]. You might want to consider reducing alpha. Clipping scores to range [0, 1].')
+        # Clipping values to range [0, 1] as score is used as a probability.
+        self.scores = np.clip(self.scores, 0, 1)
+
         # Sanity check
         assert len(self.scores) == len(self.depths) == len(self.words)
 
@@ -98,14 +114,13 @@ class DepParseTree:
                 f'fontcolor={fontcolor}];\n'
             ]))
             f.write(f'\tedge [color={edgecolor}];\n')
-            for word in self.words:
-                this_text = word.text
-                if this_text == '<root>':
+            for word_idx in range(len(self.words)):
+                if word_idx == 0:
+                    # Root has no parent.
                     continue
-                parent_text = self.words[word.head].text
-                f.write(f'\t{parent_text} -> {this_text};\n')
-            for idx in range(len(self.words)):
-                f.write(f'\t{self.index2word(idx)} [label="{idx}:{self.index2word(idx)}"];\n')
+                f.write(f'\t{self.words[word_idx].head} -> {word_idx};\n')
+            for word_idx in range(len(self.words)):
+                f.write(f'\t{word_idx} [label="{word_idx}:{self.index2word(word_idx)}"];\n')
             f.write('}')
 
     def index2word(self, idx):
@@ -140,3 +155,116 @@ class DepParseTree:
         """
 
         return [[idx, self.index2word(idx), self.scores[idx]] for idx in range(len(self.words))]
+
+def closest_freq(word, freq_dict):
+    if not word in freq_dict.keys():
+        raise ERRORS['word_not_found']
+
+    # Converting frequency dictionary to dataframe for easier handling.
+    freq_df = pd.DataFrame(
+        [[word, freq] for word, freq in freq_dict.items()],
+        columns=['word', 'freq']
+    ).sort_values(by='freq', ascending=False).reset_index(drop=True)
+
+    # Index of desired word
+    word_idx = freq_df[freq_df['word'] == word].index
+
+    # Since freq_df is sorted, word of closest frequency will either be previous word or next word.
+    if word_idx == 0:
+        return freq_df.loc[word_idx + 1, 'word'].values[0]
+    elif word_idx == len(freq_df) - 1:
+        return freq_df.loc[word_idx - 1, 'word'].values[0]
+    else:
+        word_minus_freq = freq_df.loc[word_idx - 1, 'freq'].values[0]
+        word_freq = freq_df.loc[word_idx, 'freq'].values[0]
+        word_plus_freq = freq_df.loc[word_idx + 1, 'freq'].values[0]
+
+        if word_minus_freq - word_freq < word_freq - word_plus_freq:
+            # Previous word is closer.
+            return freq_df.loc[word_idx - 1, 'word'].values[0]
+        else:
+            # Next word is closer.
+            return freq_df.loc[word_idx + 1, 'word'].values[0]
+
+def depparse_aug(src_sent, tgt_sent, mode, alpha, src_freq_dict=None, tgt_freq_dict=None):
+    """Performs dependency parsing augmentation (refer :cite:p`duan2020syntax) on source and target sentences.
+
+    `src_freq_dict` and `tgt_freq_dict` are required only if `mode` is 'replace', ignored otherwise.
+
+    :param src_sent: Source sentence to be augmented. Do NOT pass a str.
+    :type src_sent: `stanza.models.common.doc.Sentence`
+    :param tgt_sent: Corresponding target sentence to be augmented. Do NOT pass a str.
+    :type tgt_sent: `stanza.models.common.doc.Sentence`
+    :param mode: Action to perform after scores are extracted. Valid values are given in globals.py.
+    :type mode: str
+    :param alpha: Same as for `DepParseTree.score`.
+    :type alpha: float
+    :param src_freq_dict: Dictionary of source word-frequency pairs as returned by `vocab.score2freq_vocab`, defaults to None.
+    :type src_freq_dict: dict, optional
+    :param tgt_freq_dict: Dictionary of target word-frequency pairs as returned by `vocab.score2freq_vocab`, defaults to None.
+    :type tgt_freq_dict: dict, optional
+    """
+
+    def apply_mode(sent, scores, mode, freq_dict=None):
+        """Performs the actual step of blank/dropout/replace.
+
+        Again, `freq_dict` is required only when `mode` is 'replace'.
+
+        :param sent: Sentence to be augmented. Pass a list of tokens as returned by `utils.stanza2list`, NOT `stanza.models.common.Sentence`.
+        :type sent: list
+        :param scores: Array of scores corresponding to each word.
+        :type scores: `arraylike`
+        :param mode: One of 'blank', 'dropout' and 'replace'.
+        :type mode: str
+        :param freq_dict: Dictionary of word-frequency pairs as returned by `vocab.score2freq_vocab`, defaults to None.
+        :type freq_dict: dict
+
+        :return: Augmented sentences as a tuple of str.
+        :rtype: tuple
+        """
+
+        for idx, word in enumerate(sent):
+            # Not replacing start of sentence and end of sentence tokens.
+            if word in {SOS_TOKEN, EOS_TOKEN}:
+                continue
+
+            if np.random.uniform() < scores[idx]:
+                if mode == 'blank':
+                    # Blanking with probability src_scores[idx].
+                    sent[idx] = BLANK_TOKEN
+                elif mode == 'dropout':
+                    # Dropping word with probability src_scores[idx].
+                    sent[idx] = ''
+                elif mode == 'replace':
+                    # Replacing word with probability src_scores[idx].
+                    sent[idx] = closest_freq(word, freq_dict)
+
+        # Stripping any extra whitespace that has been introduced by dropout.
+        sent = list(filter(lambda x: x != '', sent))
+
+        return ' '.join(sent)
+
+    if mode == 'replace' and (src_freq_dict is None or tgt_freq_dict is None):
+        raise ValueError(f'Passing freq_dict is compulsory with mode=\'replace\'.')
+
+    src_tree = DepParseTree(src_sent)               # Dependency parse tree for source sentence.
+    src_tree.score(alpha=alpha)
+    tgt_tree = DepParseTree(tgt_sent)               # Dependency parse tree for target sentence.
+    tgt_tree.score(alpha=alpha)
+
+    # Converting stanza sentences to simple list as we no longer need the extra stuff.
+    src_sent = stanza2list(src_sent)
+    tgt_sent = stanza2list(tgt_sent)
+
+    src_scores = src_tree.scores[1:]                # Dropping score related to root as it is not required.
+    # Sanity check
+    assert len(src_scores) == len(src_sent)         # After removing score for <root>, lengths should match.
+
+    tgt_scores = tgt_tree.scores[1:]                # Dropping score related to root as it is not required.
+    # Sanity check
+    assert len(tgt_scores) == len(tgt_sent)         # After removing score for <root>, lengths should match.
+
+    src_sent = apply_mode(src_sent, src_scores, mode, src_freq_dict)
+    tgt_sent = apply_mode(tgt_sent, tgt_scores, mode, tgt_freq_dict)
+
+    return src_sent, tgt_sent
