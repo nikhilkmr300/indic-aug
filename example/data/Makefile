@@ -1,11 +1,11 @@
 .SILENT:
 
-vocab: make_vocab.py preprocessed
+vocab: make_vocab.py preprocessed ../.config
 	python3 make_vocab.py
-	# Do not need preprocessed once we have vocab.
-	rm -rf preprocessed
+	# Do not need raw once we have vocab.
+	cd raw && make mostlyclean
 
-preprocessed: make_preprocessed.py
+preprocessed: make_preprocessed.py ../.config
 	cd raw && make
 	python3 make_preprocessed.py
 

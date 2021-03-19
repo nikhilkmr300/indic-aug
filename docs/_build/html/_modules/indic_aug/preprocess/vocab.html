@@ -1,0 +1,210 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>indic_aug.preprocess.vocab &#8212; indic-aug  documentation</title>
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for indic_aug.preprocess.vocab</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">configparser</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">sentencepiece</span> <span class="k">as</span> <span class="nn">spm</span>
+
+<span class="kn">from</span> <span class="nn">..globals</span> <span class="kn">import</span> <span class="n">path2lang</span><span class="p">,</span> <span class="n">ERRORS</span><span class="p">,</span> <span class="n">LANGS</span>
+
+<div class="viewcode-block" id="build_vocab"><a class="viewcode-back" href="../../../docs/indic_aug.preprocess.html#indic_aug.preprocess.vocab.build_vocab">[docs]</a><span class="k">def</span> <span class="nf">build_vocab</span><span class="p">(</span><span class="n">src_input_path</span><span class="p">,</span> <span class="n">tgt_input_path</span><span class="p">,</span> <span class="n">src_vocab_size</span><span class="p">,</span> <span class="n">tgt_vocab_size</span><span class="p">,</span> <span class="n">output_dirpath</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generates vocabulary from preprocessed corpus. Use `preprocess.Preprocess` to preprocess raw corpus. Outputs *.model and *.vocab files compatible with `sentencepiece`.</span>
+
+<span class="sd">    :param src_input_path: Path to preprocessed source corpus.</span>
+<span class="sd">    :type src_input_path: str</span>
+<span class="sd">    :param tgt_input_path: Path to preprocessed source corpus.</span>
+<span class="sd">    :type src_input_path: str</span>
+<span class="sd">    :param src_vocab_size: Max number of tokens in source vocabulary. Pass -1 to use all tokens.</span>
+<span class="sd">    :type src_vocab_size: int</span>
+<span class="sd">    :param tgt_vocab_size: Max number of tokens in target vocabulary. Pass -1 to use all tokens.</span>
+<span class="sd">    :type tgt_vocab_size: int</span>
+<span class="sd">    :param output_dirpath: Path to directory where to write *.model and *.vocab files.</span>
+<span class="sd">    :type output_dirpath: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">src_lang</span> <span class="o">=</span> <span class="n">path2lang</span><span class="p">(</span><span class="n">src_input_path</span><span class="p">)</span>
+    <span class="n">tgt_lang</span> <span class="o">=</span> <span class="n">path2lang</span><span class="p">(</span><span class="n">tgt_input_path</span><span class="p">)</span>
+    <span class="n">loglevel</span> <span class="o">=</span> <span class="mi">0</span>                            <span class="c1"># Corresponds to INFO logging level (refer: https://github.com/google/sentencepiece/blob/master/src/common.h).</span>
+    <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">src_lang</span> <span class="ow">in</span> <span class="n">LANGS</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">tgt_lang</span> <span class="ow">in</span> <span class="n">LANGS</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">ERRORS</span><span class="p">[</span><span class="s1">&#39;lang&#39;</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">src_vocab_size</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="c1"># Using all words as vocabulary.</span>
+        <span class="n">spm</span><span class="o">.</span><span class="n">SentencePieceTrainer</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;--input=</span><span class="si">{</span><span class="n">src_input_path</span><span class="si">}</span><span class="s1"> --model_prefix=</span><span class="si">{</span><span class="n">src_lang</span><span class="si">}</span><span class="s1"> --model_type=word --use_all_vocab=true --normalization_rule_name=nmt_nfkc --minloglevel=</span><span class="si">{</span><span class="n">loglevel</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">spm</span><span class="o">.</span><span class="n">SentencePieceTrainer</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;--input=</span><span class="si">{</span><span class="n">src_input_path</span><span class="si">}</span><span class="s1"> --model_prefix=</span><span class="si">{</span><span class="n">src_lang</span><span class="si">}</span><span class="s1"> --model_type=word --vocab_size=</span><span class="si">{</span><span class="n">src_vocab_size</span><span class="si">}</span><span class="s1"> --normalization_rule_name=nmt_nfkc --minloglevel=</span><span class="si">{</span><span class="n">loglevel</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">tgt_vocab_size</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="c1"># Using all words as vocabulary.</span>
+        <span class="n">spm</span><span class="o">.</span><span class="n">SentencePieceTrainer</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;--input=</span><span class="si">{</span><span class="n">tgt_input_path</span><span class="si">}</span><span class="s1"> --model_prefix=</span><span class="si">{</span><span class="n">tgt_lang</span><span class="si">}</span><span class="s1"> --model_type=word --use_all_vocab=true --normalization_rule_name=nmt_nfkc --minloglevel=</span><span class="si">{</span><span class="n">loglevel</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">spm</span><span class="o">.</span><span class="n">SentencePieceTrainer</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;--input=</span><span class="si">{</span><span class="n">tgt_input_path</span><span class="si">}</span><span class="s1"> --model_prefix=</span><span class="si">{</span><span class="n">tgt_lang</span><span class="si">}</span><span class="s1"> --model_type=word --vocab_size=</span><span class="si">{</span><span class="n">tgt_vocab_size</span><span class="si">}</span><span class="s1"> --normalization_rule_name=nmt_nfkc --minloglevel=</span><span class="si">{</span><span class="n">loglevel</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">src_lang</span><span class="si">}</span><span class="s1">.model&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dirpath</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">src_lang</span><span class="si">}</span><span class="s1">.model&#39;</span><span class="p">))</span>
+    <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">src_lang</span><span class="si">}</span><span class="s1">.vocab&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dirpath</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">src_lang</span><span class="si">}</span><span class="s1">.vocab&#39;</span><span class="p">))</span>
+    <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tgt_lang</span><span class="si">}</span><span class="s1">.model&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dirpath</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tgt_lang</span><span class="si">}</span><span class="s1">.model&#39;</span><span class="p">))</span>
+    <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tgt_lang</span><span class="si">}</span><span class="s1">.vocab&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dirpath</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tgt_lang</span><span class="si">}</span><span class="s1">.vocab&#39;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="read_vocab"><a class="viewcode-back" href="../../../docs/indic_aug.preprocess.html#indic_aug.preprocess.vocab.read_vocab">[docs]</a><span class="k">def</span> <span class="nf">read_vocab</span><span class="p">(</span><span class="n">vocab_path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Reads tokens in vocabulary into a list.</span>
+
+<span class="sd">    :param vocab_path: Path to the *.vocab file to read.</span>
+<span class="sd">    :type vocab_path: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">vocab</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">vocab_path</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">vocab</span> <span class="o">=</span> <span class="n">vocab</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;▁&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>      <span class="c1"># Note: &#39;▁&#39; is NOT the same as underscore (&#39;_&#39;).</span>
+
+    <span class="k">return</span> <span class="n">vocab</span></div>
+
+<div class="viewcode-block" id="score2freq"><a class="viewcode-back" href="../../../docs/indic_aug.preprocess.html#indic_aug.preprocess.vocab.score2freq">[docs]</a><span class="k">def</span> <span class="nf">score2freq</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">words</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Converts negative log likelihood score returned by `sentencepiece` to frequency of occurrence of tokens in corpus.</span>
+
+<span class="sd">    :param model: `sentencepiece.SentencePieceProcessor` object on which `load` method has been called with a *.model file.</span>
+<span class="sd">    :type model: `sentencepiece.SentencePieceProcessor`</span>
+<span class="sd">    :param words: List of words whose frequencies are to be returned.</span>
+<span class="sd">    :type words: list</span>
+
+<span class="sd">    :return: Dictionary of word to frequency pairs.</span>
+<span class="sd">    :rtype: dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">word_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">word</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">words</span><span class="p">]</span>
+
+    <span class="n">freq_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">word_id</span> <span class="ow">in</span> <span class="n">word_ids</span><span class="p">:</span>
+        <span class="n">word</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">IdToPiece</span><span class="p">(</span><span class="n">word_id</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;▁&#39;</span><span class="p">)</span>
+        <span class="n">score</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">GetScore</span><span class="p">(</span><span class="n">word_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">score</span><span class="p">:</span>
+            <span class="c1"># sentencepiece maps unseen tokens (&lt;unk&gt;, &lt;s&gt;, &lt;/s&gt;) to 0 ==&gt; freq = 1, when their freq should be 0.</span>
+            <span class="n">freq_dict</span><span class="p">[</span><span class="n">word</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># sentencepiece outputs negative log likelihood as score. Taking exponent to convert it to frequency.</span>
+            <span class="n">freq_dict</span><span class="p">[</span><span class="n">word</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">score</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">freq_dict</span></div>
+
+<div class="viewcode-block" id="score2freq_vocab"><a class="viewcode-back" href="../../../docs/indic_aug.preprocess.html#indic_aug.preprocess.vocab.score2freq_vocab">[docs]</a><span class="k">def</span> <span class="nf">score2freq_vocab</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="n">vocab_path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns frequencies of all words in the vocabulary, given a *.vocab file.</span>
+
+<span class="sd">    :param model_path: Path to *.model file compatible with `sentencepiece`.</span>
+<span class="sd">    :type model_path: str</span>
+<span class="sd">    :param vocab_path: Path to *.vocab file compatible with `sentencepiece`, corresponding to model at `model_path`.</span>
+<span class="sd">    :type vocab_path: str</span>
+
+<span class="sd">    :return: Dictionary of word to frequency pairs.</span>
+<span class="sd">    :rtype: dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">model_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">vocab_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;model_path and vocab_path must correspond to the same language.&#39;</span><span class="p">)</span>
+
+    <span class="n">model</span> <span class="o">=</span> <span class="n">spm</span><span class="o">.</span><span class="n">SentencePieceProcessor</span><span class="p">()</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">model_path</span><span class="p">)</span>
+
+    <span class="n">vocab</span> <span class="o">=</span> <span class="n">read_vocab</span><span class="p">(</span><span class="n">vocab_path</span><span class="p">)</span>
+
+    <span class="n">freq_dict</span> <span class="o">=</span> <span class="n">score2freq</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">vocab</span><span class="p">)</span>
+    <span class="c1"># If you are using all the words as vocabulary, this should sum to 1.</span>
+    <span class="k">assert</span> <span class="nb">sum</span><span class="p">(</span><span class="n">freq_dict</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">&lt;=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">freq_dict</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">indic-aug</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Nikhil Kumar.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

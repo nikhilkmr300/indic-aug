@@ -1,0 +1,243 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>indic_aug.preprocess package &#8212; indic-aug  documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">indic-aug  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">indic_aug.preprocess package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="indic-aug-preprocess-package">
+<h1>indic_aug.preprocess package<a class="headerlink" href="#indic-aug-preprocess-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-indic_aug.preprocess.preprocess">
+<span id="indic-aug-preprocess-preprocess-module"></span><h2>indic_aug.preprocess.preprocess module<a class="headerlink" href="#module-indic_aug.preprocess.preprocess" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="indic_aug.preprocess.preprocess.Preprocess">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">indic_aug.preprocess.preprocess.</span></code><code class="sig-name descname"><span class="pre">Preprocess</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src_input_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tgt_input_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/indic_aug/preprocess/preprocess.html#Preprocess"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.preprocess.preprocess.Preprocess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Preprocessing raw input.</p>
+<dl class="py method">
+<dt id="indic_aug.preprocess.preprocess.Preprocess.preprocess">
+<code class="sig-name descname"><span class="pre">preprocess</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src_output_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tgt_output_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">funcs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/indic_aug/preprocess/preprocess.html#Preprocess.preprocess"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.preprocess.preprocess.Preprocess.preprocess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs preprocessing of input corpus.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src_output_path</strong> (<em>str</em>) – Path to preprocessed source corpus.</p></li>
+<li><p><strong>tgt_output_path</strong> (<em>str</em>) – Path to preprocessed target corpus.</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em>) – Number of documents to be brought into memory at a time.</p></li>
+<li><p><strong>funcs</strong> (<em>str</em><em>, </em><em>list</em>) – Preprocessing functions to apply to raw corpus (refer globals.py for allowed functions).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="indic_aug.preprocess.preprocess.normalize_sent">
+<code class="sig-prename descclassname"><span class="pre">indic_aug.preprocess.preprocess.</span></code><code class="sig-name descname"><span class="pre">normalize_sent</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/indic_aug/preprocess/preprocess.html#normalize_sent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.preprocess.preprocess.normalize_sent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns normalized form of sentence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sent</strong> (<em>str.</em>) – Sentence to be tokenized.</p></li>
+<li><p><strong>lang</strong> – Language code (refer globals.py) of sentence.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Normalized sentence.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="indic_aug.preprocess.preprocess.pretokenize_sent">
+<code class="sig-prename descclassname"><span class="pre">indic_aug.preprocess.preprocess.</span></code><code class="sig-name descname"><span class="pre">pretokenize_sent</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/indic_aug/preprocess/preprocess.html#pretokenize_sent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.preprocess.preprocess.pretokenize_sent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns tokenized form of a sentence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sent</strong> (<em>str</em>) – Sentence to be tokenized.</p></li>
+<li><p><strong>lang</strong> (<em>str</em>) – Language code (refer globals.py) of sentence.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Tokenized sentence.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-indic_aug.preprocess.vocab">
+<span id="indic-aug-preprocess-vocab-module"></span><h2>indic_aug.preprocess.vocab module<a class="headerlink" href="#module-indic_aug.preprocess.vocab" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="indic_aug.preprocess.vocab.build_vocab">
+<code class="sig-prename descclassname"><span class="pre">indic_aug.preprocess.vocab.</span></code><code class="sig-name descname"><span class="pre">build_vocab</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src_input_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tgt_input_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src_vocab_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tgt_vocab_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dirpath</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/indic_aug/preprocess/vocab.html#build_vocab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.preprocess.vocab.build_vocab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates vocabulary from preprocessed corpus. Use <cite>preprocess.Preprocess</cite> to preprocess raw corpus. Outputs <a href="#id1"><span class="problematic" id="id2">*</span></a>.model and <a href="#id3"><span class="problematic" id="id4">*</span></a>.vocab files compatible with <cite>sentencepiece</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src_input_path</strong> (<em>str</em>) – Path to preprocessed source corpus.</p></li>
+<li><p><strong>tgt_input_path</strong> – Path to preprocessed source corpus.</p></li>
+<li><p><strong>src_vocab_size</strong> (<em>int</em>) – Max number of tokens in source vocabulary. Pass -1 to use all tokens.</p></li>
+<li><p><strong>tgt_vocab_size</strong> (<em>int</em>) – Max number of tokens in target vocabulary. Pass -1 to use all tokens.</p></li>
+<li><p><strong>output_dirpath</strong> (<em>str</em>) – Path to directory where to write <a href="#id5"><span class="problematic" id="id6">*</span></a>.model and <a href="#id7"><span class="problematic" id="id8">*</span></a>.vocab files.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="indic_aug.preprocess.vocab.read_vocab">
+<code class="sig-prename descclassname"><span class="pre">indic_aug.preprocess.vocab.</span></code><code class="sig-name descname"><span class="pre">read_vocab</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vocab_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/indic_aug/preprocess/vocab.html#read_vocab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.preprocess.vocab.read_vocab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads tokens in vocabulary into a list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>vocab_path</strong> (<em>str</em>) – Path to the <a href="#id9"><span class="problematic" id="id10">*</span></a>.vocab file to read.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="indic_aug.preprocess.vocab.score2freq">
+<code class="sig-prename descclassname"><span class="pre">indic_aug.preprocess.vocab.</span></code><code class="sig-name descname"><span class="pre">score2freq</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">words</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/indic_aug/preprocess/vocab.html#score2freq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.preprocess.vocab.score2freq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts negative log likelihood score returned by <cite>sentencepiece</cite> to frequency of occurrence of tokens in corpus.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<cite>sentencepiece.SentencePieceProcessor</cite>) – <cite>sentencepiece.SentencePieceProcessor</cite> object on which <cite>load</cite> method has been called with a <a href="#id11"><span class="problematic" id="id12">*</span></a>.model file.</p></li>
+<li><p><strong>words</strong> (<em>list</em>) – List of words whose frequencies are to be returned.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dictionary of word to frequency pairs.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="indic_aug.preprocess.vocab.score2freq_vocab">
+<code class="sig-prename descclassname"><span class="pre">indic_aug.preprocess.vocab.</span></code><code class="sig-name descname"><span class="pre">score2freq_vocab</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vocab_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/indic_aug/preprocess/vocab.html#score2freq_vocab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.preprocess.vocab.score2freq_vocab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns frequencies of all words in the vocabulary, given a <a href="#id13"><span class="problematic" id="id14">*</span></a>.vocab file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_path</strong> (<em>str</em>) – Path to <a href="#id15"><span class="problematic" id="id16">*</span></a>.model file compatible with <cite>sentencepiece</cite>.</p></li>
+<li><p><strong>vocab_path</strong> (<em>str</em>) – Path to <a href="#id17"><span class="problematic" id="id18">*</span></a>.vocab file compatible with <cite>sentencepiece</cite>, corresponding to model at <cite>model_path</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dictionary of word to frequency pairs.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-indic_aug.preprocess">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-indic_aug.preprocess" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">indic_aug.preprocess package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-indic_aug.preprocess.preprocess">indic_aug.preprocess.preprocess module</a></li>
+<li><a class="reference internal" href="#module-indic_aug.preprocess.vocab">indic_aug.preprocess.vocab module</a></li>
+<li><a class="reference internal" href="#module-indic_aug.preprocess">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/docs/indic_aug.preprocess.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">indic-aug  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">indic_aug.preprocess package</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Nikhil Kumar.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.2.
+    </div>
+  </body>
+</html>

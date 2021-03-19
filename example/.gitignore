@@ -3,3 +3,4 @@ data/raw/finalrepo
 data/raw/*.en
 data/raw/*.hi
 data/vocab
+data/preprocessed

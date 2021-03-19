@@ -1,3 +1,17 @@
+import os
+
+def path2lang(path):
+    """Returns language code from extension of path.
+
+    :param path: File whose language code is to be extracted. Note that the file must have extension as language code, for example, `train.en` for English. Refer LANGS below for language codes.
+    :type path: str
+
+    :return: Language code.
+    :rtype: str
+    """
+
+    return os.path.splitext(path)[-1].strip('.')
+
 # Supported languages.
 LANGS = [
     'en',   # English
