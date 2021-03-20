@@ -7,7 +7,8 @@ import numpy as np
 import pandas as pd
 import sentencepiece as spm
 
-from .globals import ERRORS, LANGS, SOS_TOKEN, EOS_TOKEN, UNK_TOKEN
+from .globals import ERRORS, LANGS
+from .globals import PAD_TOKEN, PAD_ID, UNK_TOKEN, UNK_ID, SOS_TOKEN, SOS_ID, EOS_TOKEN, EOS_ID, BLANK_TOKEN
 from .utils import path2lang
 
 def build_vocab(src_input_path, tgt_input_path, src_vocab_size, tgt_vocab_size, output_dirpath):
@@ -33,15 +34,15 @@ def build_vocab(src_input_path, tgt_input_path, src_vocab_size, tgt_vocab_size, 
 
     if src_vocab_size == -1:
         # Using all words as vocabulary.
-        spm.SentencePieceTrainer.train(f'--input={src_input_path} --model_prefix={src_lang} --model_type=word --use_all_vocab=true --normalization_rule_name=nmt_nfkc --bos_piece={SOS_TOKEN} --eos_piece={EOS_TOKEN} --unk_piece={UNK_TOKEN} --minloglevel={loglevel}')
+        spm.SentencePieceTrainer.train(f'--input={src_input_path} --model_prefix={src_lang} --model_type=word --use_all_vocab=true --normalization_rule_name=nmt_nfkc --pad_id={PAD_ID} --pad_piece={PAD_TOKEN} --unk_id={UNK_ID} --unk_piece={UNK_TOKEN} --bos_id={SOS_ID} --bos_piece={SOS_TOKEN} --eos_id={EOS_ID} --eos_piece={EOS_TOKEN} --control_symbols={BLANK_TOKEN} --minloglevel={loglevel}')
     else:
-        spm.SentencePieceTrainer.train(f'--input={src_input_path} --model_prefix={src_lang} --model_type=word --vocab_size={src_vocab_size} --normalization_rule_name=nmt_nfkc --bos_piece={SOS_TOKEN} --eos_piece={EOS_TOKEN} --unk_piece={UNK_TOKEN} --minloglevel={loglevel}')
+        spm.SentencePieceTrainer.train(f'--input={src_input_path} --model_prefix={src_lang} --model_type=word --vocab_size={src_vocab_size} --normalization_rule_name=nmt_nfkc --pad_id={PAD_ID} --pad_piece={PAD_TOKEN} --unk_id={UNK_ID} --unk_piece={UNK_TOKEN} --bos_id={SOS_ID} --bos_piece={SOS_TOKEN} --eos_id={EOS_ID} --eos_piece={EOS_TOKEN} --control_symbols={BLANK_TOKEN} --minloglevel={loglevel}')
 
     if tgt_vocab_size == -1:
         # Using all words as vocabulary.
-        spm.SentencePieceTrainer.train(f'--input={tgt_input_path} --model_prefix={tgt_lang} --model_type=word --use_all_vocab=true --normalization_rule_name=nmt_nfkc --bos_piece={SOS_TOKEN} --eos_piece={EOS_TOKEN} --unk_piece={UNK_TOKEN} --minloglevel={loglevel}')
+        spm.SentencePieceTrainer.train(f'--input={tgt_input_path} --model_prefix={tgt_lang} --model_type=word --use_all_vocab=true --normalization_rule_name=nmt_nfkc --pad_id={PAD_ID} --pad_piece={PAD_TOKEN} --unk_id={UNK_ID} --unk_piece={UNK_TOKEN} --bos_id={SOS_ID} --bos_piece={SOS_TOKEN} --eos_id={EOS_ID} --eos_piece={EOS_TOKEN} --control_symbols={BLANK_TOKEN} --minloglevel={loglevel}')
     else:
-        spm.SentencePieceTrainer.train(f'--input={tgt_input_path} --model_prefix={tgt_lang} --model_type=word --vocab_size={tgt_vocab_size} --normalization_rule_name=nmt_nfkc --bos_piece={SOS_TOKEN} --eos_piece={EOS_TOKEN} --unk_piece={UNK_TOKEN} --minloglevel={loglevel}')
+        spm.SentencePieceTrainer.train(f'--input={tgt_input_path} --model_prefix={tgt_lang} --model_type=word --vocab_size={tgt_vocab_size} --normalization_rule_name=nmt_nfkc --pad_id={PAD_ID} --pad_piece={PAD_TOKEN} --unk_id={UNK_ID} --unk_piece={UNK_TOKEN} --bos_id={SOS_ID} --bos_piece={SOS_TOKEN} --eos_id={EOS_ID} --eos_piece={EOS_TOKEN} --control_symbols={BLANK_TOKEN} --minloglevel={loglevel}')
 
     shutil.move(f'{src_lang}.model', os.path.join(output_dirpath, f'{src_lang}.model'))
     shutil.move(f'{src_lang}.vocab', os.path.join(output_dirpath, f'{src_lang}.vocab'))

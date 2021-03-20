@@ -1,15 +1,6 @@
 import os
 from abc import ABC, abstractmethod
 
-class Augmentor(ABC):
-    @abstractmethod
-    def set_random_state(self, random_state):
-        raise NotImplementedError
-
-    @abstractmethod
-    def augment(self, idx):
-        raise NotImplementedError
-
 # Supported languages.
 LANGS = [
     'en',   # English
@@ -28,25 +19,26 @@ PREPROC_FUNCS = [
 
 # Make sure raw input corpora are rid of these characters.
 INVALID_CHARS = [
-    '\t',                   # Tabs clash with sep argument used in pandas.read_csv.
-    '"'                     # Clashes with Python double quotes.
+    '\t',                           # Tabs clash with sep argument used in pandas.read_csv.
+    '"'                             # Clashes with Python double quotes.
 ]
 
-# Special tokens. Using sentencepiece defaults where applicable.
-SOS_TOKEN = '<s>'
-EOS_TOKEN = '</s>'
-BLANK_TOKEN = '<blank>'
-UNK_TOKEN = '<unk>'
+# Special tokens and their IDs.
+PAD_TOKEN = '<pad>'; PAD_ID = 0
+UNK_TOKEN = '<unk>'; UNK_ID = 1
+SOS_TOKEN = '<s>'; SOS_ID = 2
+EOS_TOKEN = '</s>'; EOS_ID = 3
+BLANK_TOKEN = '<blank>';            # sentencepiece will assign the next available ID to <blank>.
 
 # Valid augmentation modes for each type of augmentation.
 VALID_AUG_MODES = {
-    'depparse': [           # Valid modes for dependency parsing augmentation.
-        'blank',            # Replaces word with <blank>.
-        'dropout',          # Delete word.
-        'replace'           # Replaces word with another word with most similar unigram frequency.
+    'depparse': [                   # Valid modes for dependency parsing augmentation.
+        'blank',                    # Replaces word with <blank>.
+        'dropout',                  # Delete word.
+        'replace'                   # Replaces word with another word with most similar unigram frequency.
     ],
-    'embedding': [          # Valid modes for embedding augmentation.
-        'replace'           # Replaces word with another word with most similar embedding.
+    'embedding': [                  # Valid modes for embedding augmentation.
+        'replace'                   # Replaces word with another word with most similar embedding.
     ]
 }
 

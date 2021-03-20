@@ -1,1 +1,1 @@
-('Jack hit ball bat', 'जैक ने गेंद को बल्ले मारा')
+('<blank> hit <blank> <blank> <blank> <blank> <blank>', '<blank> <blank> <blank> <blank> बल्ले <blank> मारा')
