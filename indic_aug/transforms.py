@@ -12,15 +12,15 @@ class DepParseTree:
     """Represents a dependency parsing tree."""
 
     class Root:
-        """Representation of <root> as class with static attribute text for compatibility with `stanza.models.common.doc.Word`."""
+        """Representation of <root> as class with static attribute text for compatibility with ``stanza.models.common.doc.Word``."""
 
         text = '<root>'
 
     def __init__(self, sent):
         """Constructor method.
 
-        :param sent: Sentence for which dependency parse tree is to be created. Do NOT pass a `str`.
-        :type sent: `stanza.models.common.doc.Sentence`
+        :param sent: Sentence for which dependency parse tree is to be created. Do NOT pass a ``str``.
+        :type sent: ``stanza.models.common.doc.Sentence``
         """
 
         self.words = sent.words                 # Words in sentence
@@ -42,7 +42,7 @@ class DepParseTree:
     def _get_depth(self, idx):
         """Returns depth of node in dependency parse tree.
 
-        :param idx: Index of word in `self.words` whose depth is to be found.
+        :param idx: Index of word in ``self.words`` whose depth is to be found.
         :type idx: int
 
         :return: Depth of node.
@@ -55,7 +55,7 @@ class DepParseTree:
         return 1 + self._get_depth(self.words[idx].head)
 
     def score(self, alpha=0.1):
-        """Calculates score of node in dependency parse tree in accordance with :cite:p:`duan2020syntax`.
+        """Calculates score of node in dependency parse tree in accordance with :cite:t:`duan2020syntax`.
 
         :param alpha: Hyperparameter which controls likelihood of changing, defaults to 0.1.
         :type alpha: float, optional
@@ -126,7 +126,7 @@ class DepParseTree:
     def index2word(self, idx):
         """Returns word corresponding to an index.
 
-        :param idx: Index for array `self.words`.
+        :param idx: Index for array ``self.words``.
         :type idx: int
         """
 
@@ -139,19 +139,19 @@ class DepParseTree:
         return [[idx, self.index2word(idx), self.depths[idx]] for idx in range(len(self.words))]
 
     def qprobs2list(self):
-        """Returns q-probabilities (refer :cite:p:`duan2020syntax`) of all nodes in tree as a list. Each element in the list is itself a list in the format [<word_index>, <word>, <q_probability>].
+        """Returns q-probabilities (refer :cite:t:`duan2020syntax`) of all nodes in tree as a list. Each element in the list is itself a list in the format [<word_index>, <word>, <q_probability>].
         """
 
         return [[idx, self.index2word(idx), self.q_probs[idx]] for idx in range(len(self.words))]
 
     def softmax2list(self):
-        """Returns softmax output (refer :cite:p:`duan2020syntax`) of all nodes in tree as a list. Each element in the list is itself a list in the format [<word_index>, <word>, <softmax_output>].
+        """Returns softmax output (refer :cite:t:`duan2020syntax`) of all nodes in tree as a list. Each element in the list is itself a list in the format [<word_index>, <word>, <softmax_output>].
         """
 
         return [[idx, self.index2word(idx), self.softmaxed_probs[idx]] for idx in range(len(self.words))]
 
     def scores2list(self):
-        """Returns score (refer :cite:p:`duan2020syntax`) of all nodes in tree as a list. Each element in the list is itself a list in the format [<word_index>, <word>, <score>].
+        """Returns score (refer :cite:t:`duan2020syntax`) of all nodes in tree as a list. Each element in the list is itself a list in the format [<word_index>, <word>, <score>].
         """
 
         return [[idx, self.index2word(idx), self.scores[idx]] for idx in range(len(self.words))]
@@ -187,36 +187,36 @@ def closest_freq(word, freq_dict):
             return freq_df.loc[word_idx + 1, 'word'].values[0]
 
 def depparse_aug(src_sent, tgt_sent, mode, alpha, src_freq_dict=None, tgt_freq_dict=None):
-    """Performs dependency parsing augmentation (refer :cite:p`duan2020syntax) on source and target sentences.
+    """Performs dependency parsing augmentation (refer :cite:t:`duan2020syntax`) on source and target sentences.
 
-    `src_freq_dict` and `tgt_freq_dict` are required only if `mode` is 'replace', ignored otherwise.
+    ``src_freq_dict`` and ``tgt_freq_dict`` are required only if ``mode`` is 'replace', ignored otherwise.
 
     :param src_sent: Source sentence to be augmented. Do NOT pass a str.
-    :type src_sent: `stanza.models.common.doc.Sentence`
+    :type src_sent: ``stanza.models.common.doc.Sentence``
     :param tgt_sent: Corresponding target sentence to be augmented. Do NOT pass a str.
-    :type tgt_sent: `stanza.models.common.doc.Sentence`
+    :type tgt_sent: ``stanza.models.common.doc.Sentence``
     :param mode: Action to perform after scores are extracted. Valid values are given in globals.py.
     :type mode: str
-    :param alpha: Same as for `DepParseTree.score`.
+    :param alpha: Same as for ``DepParseTree.score``.
     :type alpha: float
-    :param src_freq_dict: Dictionary of source word-frequency pairs as returned by `vocab.score2freq_vocab`, defaults to None.
+    :param src_freq_dict: Dictionary of source word-frequency pairs as returned by ``vocab.score2freq_vocab``, defaults to None.
     :type src_freq_dict: dict, optional
-    :param tgt_freq_dict: Dictionary of target word-frequency pairs as returned by `vocab.score2freq_vocab`, defaults to None.
+    :param tgt_freq_dict: Dictionary of target word-frequency pairs as returned by ``vocab.score2freq_vocab``, defaults to None.
     :type tgt_freq_dict: dict, optional
     """
 
     def apply_mode(sent, scores, mode, freq_dict=None):
         """Performs the actual step of blank/dropout/replace.
 
-        Again, `freq_dict` is required only when `mode` is 'replace'.
+        Again, ``freq_dict`` is required only when ``mode`` is 'replace'.
 
-        :param sent: Sentence to be augmented. Pass a list of tokens as returned by `utils.stanza2list`, NOT `stanza.models.common.Sentence`.
+        :param sent: Sentence to be augmented. Pass a list of tokens as returned by ``utils.stanza2list``, NOT ``stanza.models.common.Sentence``.
         :type sent: list
         :param scores: Array of scores corresponding to each word.
-        :type scores: `arraylike`
+        :type scores: ``arraylike``
         :param mode: One of 'blank', 'dropout' and 'replace'.
         :type mode: str
-        :param freq_dict: Dictionary of word-frequency pairs as returned by `vocab.score2freq_vocab`, defaults to None.
+        :param freq_dict: Dictionary of word-frequency pairs as returned by ``vocab.score2freq_vocab``, defaults to None.
         :type freq_dict: dict
 
         :return: Augmented sentences as a tuple of str.

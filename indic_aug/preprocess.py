@@ -98,9 +98,9 @@ class Preprocess:
         """Preprocesses corpus file in batches, useful for corpora with large number of documents.
 
         :param src_batch: Batch of source sentences.
-        :type src_batch: `pandas.Series`
+        :type src_batch: ``pandas.Series``
         :param tgt_batch: Batch of target sentences.
-        :type tgt_batch: `pandas.Series`
+        :type tgt_batch: ``pandas.Series``
         :param funcs: Preprocessing functions to apply, refer globals.py for allowed functions.
         :type funcs: list
         :param batch_num: Current batch being processed, 1-indexed.

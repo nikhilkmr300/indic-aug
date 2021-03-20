@@ -12,7 +12,7 @@ from .globals import PAD_TOKEN, PAD_ID, UNK_TOKEN, UNK_ID, SOS_TOKEN, SOS_ID, EO
 from .utils import path2lang
 
 def build_vocab(src_input_path, tgt_input_path, src_vocab_size, tgt_vocab_size, output_dirpath):
-    """Generates vocabulary from preprocessed corpus. Use `preprocess.Preprocess` to preprocess raw corpus. Outputs \*.model and \*.vocab files compatible with `sentencepiece`.
+    """Generates vocabulary from preprocessed corpus. Use ``preprocess.Preprocess`` to preprocess raw corpus. Outputs \*.model and \*.vocab files compatible with ``sentencepiece``.
 
     :param src_input_path: Path to preprocessed source corpus.
     :type src_input_path: str
@@ -62,10 +62,10 @@ def read_vocab(vocab_path):
     return vocab
 
 def score2freq(model, words):
-    """Converts negative log likelihood score returned by `sentencepiece` to frequency of occurrence of tokens in corpus.
+    """Converts negative log likelihood score returned by ``sentencepiece`` to frequency of occurrence of tokens in corpus.
 
-    :param model: `sentencepiece.SentencePieceProcessor` object on which `load` method has been called with a \*.model file.
-    :type model: `sentencepiece.SentencePieceProcessor`
+    :param model: ``sentencepiece.SentencePieceProcessor`` object on which ``load`` method has been called with a \*.model file.
+    :type model: ``sentencepiece.SentencePieceProcessor``
     :param words: List of words whose frequencies are to be returned.
     :type words: list
 
@@ -91,9 +91,9 @@ def score2freq(model, words):
 def score2freq_vocab(model_path, vocab_path):
     """Returns frequencies of all words in the vocabulary, given a \*.vocab file.
 
-    :param model_path: Path to \*.model file compatible with `sentencepiece`.
+    :param model_path: Path to \*.model file compatible with ``sentencepiece``.
     :type model_path: str
-    :param vocab_path: Path to \*.vocab file compatible with `sentencepiece`, corresponding to model at `model_path`.
+    :param vocab_path: Path to \*.vocab file compatible with ``sentencepiece``, corresponding to model at ``model_path``.
     :type vocab_path: str
 
     :return: Dictionary of word to frequency pairs.
