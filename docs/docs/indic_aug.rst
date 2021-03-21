@@ -50,8 +50,3 @@ indic\_aug.vocab module
    :members:
    :undoc-members:
    :show-inheritance:
-
-References
-==========
-
-.. bibliography::

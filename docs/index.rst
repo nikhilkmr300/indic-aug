@@ -10,3 +10,10 @@ Welcome to indic-aug's documentation!
    :maxdepth: 2
 
    docs/indic_aug
+
+* :ref:`genindex`
+
+.. toctree::
+   :maxdepth: 2
+
+   docs/references

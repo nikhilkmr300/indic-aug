@@ -5,7 +5,7 @@ import pandas as pd
 from scipy.special import softmax
 import stanza
 
-from .globals import VALID_AUG_MODES, ERRORS, SOS_TOKEN, EOS_TOKEN, BLANK_TOKEN
+from .globals import VALID_AUG_MODES, ERRORS, PAD_TOKEN, UNK_TOKEN, SOS_TOKEN, EOS_TOKEN, BLANK_TOKEN
 from .utils import stanza2list
 
 class DepParseTree:
@@ -27,17 +27,12 @@ class DepParseTree:
         # Appending a dummy root as stanza uses 1-based indexing for words in sentence.
         self.words = [self.Root] + self.words
 
-        self.depths = np.array([self._get_depth(idx) for idx in range(1, len(self.words))])
-        # Prepending a 0 depth for root.
-        self.depths = np.insert(self.depths, 0, 0)
+        self.depths = np.array([self._get_depth(idx) for idx in range(len(self.words))])
 
         # Sanity check
         assert len(self.depths) == len(self.words)
 
-        # Unpopulated until self.score has been called.
-        self.q_probs = None
-        self.softmaxed_probs = None
-        self.scores = None
+        # self.q_probs, self.softmaxed_probs and self.scores are unpopulated until self.score has been called.
 
     def _get_depth(self, idx):
         """Returns depth of node in dependency parse tree.
@@ -50,7 +45,8 @@ class DepParseTree:
         """
 
         if not idx:
-            return 0
+            # Authors consider depth of root to be 1, so q probability for root is 0.
+            return 1
 
         return 1 + self._get_depth(self.words[idx].head)
 
@@ -93,8 +89,8 @@ class DepParseTree:
         :type shape: str
         :param style: Style of node, defaults to 'filled'. Refer GraphViz docs for allowed values.
         :type style: str
-        :param fillcolor: Fill color of node, defaults to 'mediumorchid'.
-        :type fillcolor: str. Allowed values are X11 color strings.
+        :param fillcolor: Fill color of node, defaults to 'mediumorchid'. Allowed values are X11 color strings.
+        :type fillcolor: str
         :param fontname: Font to use for node labels, defaults to 'Courier'. Refer GraphViz docs for allowed values.
         :type fontname: str
         :param fontcolor: Color of font for node labels, defaults to 'black'. Allowed values are X11 color strings.
@@ -157,6 +153,17 @@ class DepParseTree:
         return [[idx, self.index2word(idx), self.scores[idx]] for idx in range(len(self.words))]
 
 def closest_freq(word, freq_dict):
+    """Returns the word in ``freq_dict`` that has the closest frequency to that of ``word``.
+
+    :param word: Word whose closest frequency word is to be found.
+    :type word: str
+    :param freq_dict: Word to frequency mapping as returned by ``vocab.freq2dict_vocab``.
+    :type freq_dict: dict
+
+    :return: Word with closest frequency to that of ``word``.
+    :rtype: str
+    """
+
     if not word in freq_dict.keys():
         raise ERRORS['word_not_found']
 
@@ -186,85 +193,52 @@ def closest_freq(word, freq_dict):
             # Next word is closer.
             return freq_df.loc[word_idx + 1, 'word'].values[0]
 
-def depparse_aug(src_sent, tgt_sent, mode, alpha, src_freq_dict=None, tgt_freq_dict=None):
-    """Performs dependency parsing augmentation (refer :cite:t:`duan2020syntax`) on source and target sentences.
+def depparse_aug(sent, mode, alpha, freq_dict=None):
+    """Performs dependency parsing augmentation (refer :cite:t:`duan2020syntax`) on a sentences.
 
-    ``src_freq_dict`` and ``tgt_freq_dict`` are required only if ``mode`` is 'replace', ignored otherwise.
+    ``freq_dict`` is required only if ``mode`` is 'replace', it is ignored otherwise.
 
-    :param src_sent: Source sentence to be augmented. Do NOT pass a str.
-    :type src_sent: ``stanza.models.common.doc.Sentence``
-    :param tgt_sent: Corresponding target sentence to be augmented. Do NOT pass a str.
-    :type tgt_sent: ``stanza.models.common.doc.Sentence``
+    :param sent: Sentence to be augmented. Do NOT pass a str.
+    :type sent: ``stanza.models.common.doc.Sentence``
     :param mode: Action to perform after scores are extracted. Valid values are given in globals.py.
     :type mode: str
     :param alpha: Same as for ``DepParseTree.score``.
     :type alpha: float
-    :param src_freq_dict: Dictionary of source word-frequency pairs as returned by ``vocab.score2freq_vocab``, defaults to None.
-    :type src_freq_dict: dict, optional
-    :param tgt_freq_dict: Dictionary of target word-frequency pairs as returned by ``vocab.score2freq_vocab``, defaults to None.
-    :type tgt_freq_dict: dict, optional
+    :param freq_dict: Dictionary of word-frequency pairs as returned by ``vocab.score2freq_vocab``, defaults to None.
+    :type freq_dict: dict, optional
     """
 
-    def apply_mode(sent, scores, mode, freq_dict=None):
-        """Performs the actual step of blank/dropout/replace.
-
-        Again, ``freq_dict`` is required only when ``mode`` is 'replace'.
-
-        :param sent: Sentence to be augmented. Pass a list of tokens as returned by ``utils.stanza2list``, NOT ``stanza.models.common.Sentence``.
-        :type sent: list
-        :param scores: Array of scores corresponding to each word.
-        :type scores: ``arraylike``
-        :param mode: One of 'blank', 'dropout' and 'replace'.
-        :type mode: str
-        :param freq_dict: Dictionary of word-frequency pairs as returned by ``vocab.score2freq_vocab``, defaults to None.
-        :type freq_dict: dict
-
-        :return: Augmented sentences as a tuple of str.
-        :rtype: tuple
-        """
-
-        for idx, word in enumerate(sent):
-            # Not replacing start of sentence and end of sentence tokens.
-            if word in {SOS_TOKEN, EOS_TOKEN}:
-                continue
-
-            if np.random.uniform() < scores[idx]:
-                if mode == 'blank':
-                    # Blanking with probability src_scores[idx].
-                    sent[idx] = BLANK_TOKEN
-                elif mode == 'dropout':
-                    # Dropping word with probability src_scores[idx].
-                    sent[idx] = ''
-                elif mode == 'replace':
-                    # Replacing word with probability src_scores[idx].
-                    sent[idx] = closest_freq(word, freq_dict)
-
-        # Stripping any extra whitespace that has been introduced by dropout.
-        sent = list(filter(lambda x: x != '', sent))
-
-        return ' '.join(sent)
-
-    if mode == 'replace' and (src_freq_dict is None or tgt_freq_dict is None):
+    if mode == 'replace' and freq_dict is None:
         raise ValueError(f'Passing freq_dict is compulsory with mode=\'replace\'.')
 
-    src_tree = DepParseTree(src_sent)               # Dependency parse tree for source sentence.
-    src_tree.score(alpha=alpha)
-    tgt_tree = DepParseTree(tgt_sent)               # Dependency parse tree for target sentence.
-    tgt_tree.score(alpha=alpha)
+    tree = DepParseTree(sent)                   # Dependency parse tree for sentence.
+    tree.score(alpha=alpha)
 
-    # Converting stanza sentences to simple list as we no longer need the extra stuff.
-    src_sent = stanza2list(src_sent)
-    tgt_sent = stanza2list(tgt_sent)
+    # Converting stanza sentence to simple list as we no longer need the extra stuff.
+    sent = stanza2list(sent)
 
-    src_scores = src_tree.scores[1:]                # Dropping score related to root as it is not required.
+    scores = tree.scores[1:]                    # Dropping score related to root as it is not required.
     # Sanity check
-    assert len(src_scores) == len(src_sent)         # After removing score for <root>, lengths should match.
+    assert len(scores) == len(sent)             # After removing score for <root>, lengths should match.
 
-    tgt_scores = tgt_tree.scores[1:]                # Dropping score related to root as it is not required.
-    # Sanity check
-    assert len(tgt_scores) == len(tgt_sent)         # After removing score for <root>, lengths should match.
+    for idx, word in enumerate(sent):
+        # Not replacing special tokens.
+        if word in {UNK_TOKEN, PAD_TOKEN, SOS_TOKEN, EOS_TOKEN, BLANK_TOKEN}:
+            continue
 
-    src_sent = apply_mode(src_sent, src_scores, mode, src_freq_dict)
-    tgt_sent = apply_mode(tgt_sent, tgt_scores, mode, tgt_freq_dict)
+        # CHECK: Generate a new random number for each iteration or use a common one initialized outside the for loop?
+        if np.random.uniform() < scores[idx]:
+            if mode == 'blank':
+                # Blanking with probability src_scores[idx].
+                sent[idx] = BLANK_TOKEN
+            elif mode == 'dropout':
+                # Dropping word with probability src_scores[idx].
+                sent[idx] = ''
+            elif mode == 'replace':
+                # Replacing word with probability src_scores[idx].
+                sent[idx] = closest_freq(word, freq_dict)
 
-    return src_sent, tgt_sent
+    # Stripping any extra whitespace that has been introduced by dropout.
+    sent = list(filter(lambda x: x != '', sent))
+
+    return ' '.join(sent)

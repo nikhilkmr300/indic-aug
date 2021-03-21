@@ -1,5 +1,60 @@
+"""
+Module to contain variables that are required in multiple places.
+
+.. data:: LANGS
+
+    List of supported languages.
+
+.. data:: PREPROC_FUNCS
+
+    List of preprocessing functions that can be used with ``preprocess.Preprocess.preprocess``.
+
+.. data:: INVALID_CHARS
+
+    List of characters that need to be removed from the raw corpus before using any augmentation. Remove all tabs and double quotes as they clash with the implementation.
+
+.. data:: PAD_TOKEN
+
+    Token to use for padding sentences.
+
+.. data:: PAD_ID
+
+    Index corresponding to ``PAD_TOKEN``.
+
+.. data:: UNK_TOKEN
+
+    Token to use for unknown words.
+
+.. data:: UNK_ID
+
+    Index corresponding to ``UNK_TOKEN``.
+
+.. data:: SOS_TOKEN
+
+    Token to use for start of sentence.
+
+.. data:: SOS_ID
+
+    Index corresponding to ``SOS_TOKEN``.
+
+.. data:: EOS_TOKEN
+
+    Token to use for end of sentence.
+
+.. data:: EOS_ID
+
+    Index corresponding to ``EOS_TOKEN``.
+
+.. data:: BLANK_TOKEN
+
+    Token to use for blanking words for some augmentation algorithms.
+
+.. data:: BLANK_ID
+
+    Index corresponding to ``BLANK_TOKEN``.
+"""
+
 import os
-from abc import ABC, abstractmethod
 
 # Supported languages.
 LANGS = [

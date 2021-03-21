@@ -33,13 +33,7 @@ def cyclic_read(filepath):
     :param filepath: Path to input file.
     :type filepath: str
 
-    :usage: Say you have a file ``sample.txt`` which contains the following text
-
-    .. code-block: text
-
-    Line 1
-    Line 2
-    Line 3
+    :usage: Say you have a file ``sample.txt`` which contains the text 'Line 1', 'Line 2' and 'Line 3' on three successive lines
 
     .. code-block: python
 

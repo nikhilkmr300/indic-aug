@@ -60,3 +60,5 @@ html_static_path = ['_static']
 
 
 # -- Extension configuration -------------------------------------------------
+
+autoclass_content = 'both'
