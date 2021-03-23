@@ -1,5 +1,9 @@
 import os
 
+import pandas as pd
+
+from .globals import ERRORS, UNK_TOKEN
+
 def path2lang(path):
     """Returns language code from extension of path.
 
@@ -70,3 +74,44 @@ def cyclic_read(filepath):
         with open(filepath, 'r') as f:
             for line in f:
                 yield line.rstrip('\n')
+
+def closest_freq(word, freq_dict):
+    """Returns the word in ``freq_dict`` that has the closest frequency to that of ``word``.
+
+    :param word: Word whose closest frequency word is to be found.
+    :type word: str
+    :param freq_dict: Word to frequency mapping as returned by ``vocab.freq2dict_vocab``.
+    :type freq_dict: dict
+
+    :return: Word with closest frequency to that of ``word``.
+    :rtype: str
+    """
+
+    if not word in freq_dict.keys():
+        word = UNK_TOKEN
+
+    # Converting frequency dictionary to dataframe for easier handling.
+    freq_df = pd.DataFrame(
+        [[word, freq] for word, freq in freq_dict.items()],
+        columns=['word', 'freq']
+    ).sort_values(by='freq', ascending=False).reset_index(drop=True)
+
+    # Index of desired word
+    word_idx = freq_df[freq_df['word'] == word].index
+
+    # Since freq_df is sorted, word of closest frequency will either be previous word or next word.
+    if word_idx == 0:
+        return freq_df.loc[word_idx + 1, 'word'].values[0]
+    elif word_idx == len(freq_df) - 1:
+        return freq_df.loc[word_idx - 1, 'word'].values[0]
+    else:
+        word_minus_freq = freq_df.loc[word_idx - 1, 'freq'].values[0]
+        word_freq = freq_df.loc[word_idx, 'freq'].values[0]
+        word_plus_freq = freq_df.loc[word_idx + 1, 'freq'].values[0]
+
+        if word_minus_freq - word_freq < word_freq - word_plus_freq:
+            # Previous word is closer.
+            return freq_df.loc[word_idx - 1, 'word'].values[0]
+        else:
+            # Next word is closer.
+            return freq_df.loc[word_idx + 1, 'word'].values[0]

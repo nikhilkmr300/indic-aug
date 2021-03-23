@@ -1,15 +1,23 @@
+indic\_aug package
+==================
+
+.. automodule:: indic_aug
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Subpackages
-===========
+-----------
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 1
 
    indic_aug.basic
    indic_aug.depparse
    indic_aug.embedding
 
 Submodules
-==========
+----------
 
 indic\_aug.globals module
 -------------------------
@@ -23,14 +31,6 @@ indic\_aug.preprocess module
 ----------------------------
 
 .. automodule:: indic_aug.preprocess
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-indic\_aug.transforms module
-----------------------------
-
-.. automodule:: indic_aug.transforms
    :members:
    :undoc-members:
    :show-inheritance:

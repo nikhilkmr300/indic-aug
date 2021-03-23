@@ -16,7 +16,7 @@ def build_vocab(src_input_path, tgt_input_path, src_vocab_size, tgt_vocab_size, 
 
     :param src_input_path: Path to preprocessed source corpus.
     :type src_input_path: str
-    :param tgt_input_path: Path to preprocessed source corpus.
+    :param tgt_input_path: Path to preprocessed target corpus.
     :type src_input_path: str
     :param src_vocab_size: Max number of tokens in source vocabulary. Pass -1 to use all tokens.
     :type src_vocab_size: int

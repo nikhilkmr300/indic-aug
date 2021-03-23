@@ -1,12 +1,12 @@
+import os
 import warnings
 
 import numpy as np
-import pandas as pd
 from scipy.special import softmax
 import stanza
 
-from .globals import VALID_AUG_MODES, ERRORS, PAD_TOKEN, UNK_TOKEN, SOS_TOKEN, EOS_TOKEN, BLANK_TOKEN
-from .utils import stanza2list
+from ..utils import path2lang, cyclic_read, stanza2list, closest_freq
+from ..globals import VALID_AUG_MODES, ERRORS, PAD_TOKEN, UNK_TOKEN, SOS_TOKEN, EOS_TOKEN, BLANK_TOKEN
 
 class DepParseTree:
     """Represents a dependency parsing tree."""
@@ -19,7 +19,7 @@ class DepParseTree:
     def __init__(self, sent):
         """Constructor method.
 
-        :param sent: Sentence for which dependency parse tree is to be created. Do NOT pass a ``str``.
+        :param sent: Sentence for which dependency parse tree is to be created. Do NOT pass a `str`.
         :type sent: ``stanza.models.common.doc.Sentence``
         """
 
@@ -152,53 +152,12 @@ class DepParseTree:
 
         return [[idx, self.index2word(idx), self.scores[idx]] for idx in range(len(self.words))]
 
-def closest_freq(word, freq_dict):
-    """Returns the word in ``freq_dict`` that has the closest frequency to that of ``word``.
-
-    :param word: Word whose closest frequency word is to be found.
-    :type word: str
-    :param freq_dict: Word to frequency mapping as returned by ``vocab.freq2dict_vocab``.
-    :type freq_dict: dict
-
-    :return: Word with closest frequency to that of ``word``.
-    :rtype: str
-    """
-
-    if not word in freq_dict.keys():
-        raise ERRORS['word_not_found']
-
-    # Converting frequency dictionary to dataframe for easier handling.
-    freq_df = pd.DataFrame(
-        [[word, freq] for word, freq in freq_dict.items()],
-        columns=['word', 'freq']
-    ).sort_values(by='freq', ascending=False).reset_index(drop=True)
-
-    # Index of desired word
-    word_idx = freq_df[freq_df['word'] == word].index
-
-    # Since freq_df is sorted, word of closest frequency will either be previous word or next word.
-    if word_idx == 0:
-        return freq_df.loc[word_idx + 1, 'word'].values[0]
-    elif word_idx == len(freq_df) - 1:
-        return freq_df.loc[word_idx - 1, 'word'].values[0]
-    else:
-        word_minus_freq = freq_df.loc[word_idx - 1, 'freq'].values[0]
-        word_freq = freq_df.loc[word_idx, 'freq'].values[0]
-        word_plus_freq = freq_df.loc[word_idx + 1, 'freq'].values[0]
-
-        if word_minus_freq - word_freq < word_freq - word_plus_freq:
-            # Previous word is closer.
-            return freq_df.loc[word_idx - 1, 'word'].values[0]
-        else:
-            # Next word is closer.
-            return freq_df.loc[word_idx + 1, 'word'].values[0]
-
 def depparse_aug(sent, mode, alpha, freq_dict=None):
-    """Performs dependency parsing augmentation (refer :cite:t:`duan2020syntax`) on a sentences.
+    """Performs dependency parsing augmentation (refer :cite:t:`duan2020syntax`) on a sentence.
 
     ``freq_dict`` is required only if ``mode`` is 'replace', it is ignored otherwise.
 
-    :param sent: Sentence to be augmented. Do NOT pass a str.
+    :param sent: Sentence to be augmented. Do NOT pass a str or a list of str.
     :type sent: ``stanza.models.common.doc.Sentence``
     :param mode: Action to perform after scores are extracted. Valid values are given in globals.py.
     :type mode: str
@@ -206,10 +165,13 @@ def depparse_aug(sent, mode, alpha, freq_dict=None):
     :type alpha: float
     :param freq_dict: Dictionary of word-frequency pairs as returned by ``vocab.score2freq_vocab``, defaults to None.
     :type freq_dict: dict, optional
+
+    :return: Augmented sentence.
+    :rtype: str
     """
 
-    if mode == 'replace' and freq_dict is None:
-        raise ValueError(f'Passing freq_dict is compulsory with mode=\'replace\'.')
+    if mode == 'replace_freq' and freq_dict is None:
+        raise ValueError(ERRORS['freq_dict_compulsory'])
 
     tree = DepParseTree(sent)                   # Dependency parse tree for sentence.
     tree.score(alpha=alpha)
@@ -227,18 +189,117 @@ def depparse_aug(sent, mode, alpha, freq_dict=None):
             continue
 
         # CHECK: Generate a new random number for each iteration or use a common one initialized outside the for loop?
-        if np.random.uniform() < scores[idx]:
+        if np.random.binomial(1, scores[idx]):
             if mode == 'blank':
-                # Blanking with probability src_scores[idx].
+                # Blanking with probability scores[idx].
                 sent[idx] = BLANK_TOKEN
             elif mode == 'dropout':
-                # Dropping word with probability src_scores[idx].
+                # Dropping word with probability scores[idx].
                 sent[idx] = ''
-            elif mode == 'replace':
-                # Replacing word with probability src_scores[idx].
+            elif mode == 'replace_freq':
+                # Replacing word with probability scores[idx].
                 sent[idx] = closest_freq(word, freq_dict)
+            else:
+                raise ValueError(f'Invalid value of parameter \'mode\'. Valid values for parameter \'mode\' to depparse_aug are values in {*VALID_AUG_MODES["depparse"],}.')
 
     # Stripping any extra whitespace that has been introduced by dropout.
     sent = list(filter(lambda x: x != '', sent))
 
     return ' '.join(sent)
+
+class DepParseAugmentor:
+    """Class to augment parallel corpora using dependency parsing technique by :cite:t:`duan2020syntax`."""
+
+    def __init__(self, src_input_path, tgt_input_path, mode, alpha, src_freq_dict=None, tgt_freq_dict=None, stanza_dir=os.path.join('~', 'stanza_resources'), augment=True, random_state=1):
+        """Constructor method.
+
+        :param src_input_path: Path to aligned source corpus.
+        :type src_input_path: str
+        :param tgt_input_path: Path to aligned target corpus, corresponding to the above source corpus.
+        :type tgt_input_path: str
+        :param mode: Same as for ``depparse_aug``.
+        :type mode: str
+        :param alpha: Same as for ``DepParseTree``.
+        :type alpha: float
+        :param src_freq_dict: Same as for ``freq_dict`` in ``transforms.depparse_aug``.
+        :type src_freq_dict: dict
+        :param tgt_freq_dict: Same as for ``freq_dict`` in ``transforms.depparse_aug``.
+        :type tgt_freq_dict: dict
+        :param stanza_dir: Path to directory containing stanza models (the default is ``~/stanza_resources`` on doing a ``stanza.download``).
+        :type stanza_dir: str
+        :param augment: Performs augmentation if ``True``, else returns original pair of sentences.
+        :type augment: bool
+        :param random_state: Seed for the random number generator.
+        :type random_state: int
+        """
+
+        np.random.seed(random_state)
+
+        src_lang = path2lang(src_input_path)
+        tgt_lang = path2lang(tgt_input_path)
+
+        self.augment = augment
+
+        if self.augment:
+            # If augment is True, can perform arbitrary number of augmentations by cycling through all the sentences in the corpus repeatedly.
+            self.src_input_file = cyclic_read(src_input_path)
+            self.tgt_input_file = cyclic_read(tgt_input_path)
+        else:
+            # Else does one pass through the corpus and stops.
+            self.src_input_file = open(src_input_path)
+            self.tgt_input_file = open(tgt_input_path)
+
+        self.mode = mode
+        self.alpha = alpha
+        self.src_freq_dict = src_freq_dict
+        self.tgt_freq_dict = tgt_freq_dict
+
+        # Loading stanza pipeline for source language to convert string to stanza.models.common.doc.Sentence.
+        try:
+            self.src_pipeline = stanza.Pipeline(src_lang)
+        except (stanza.pipeline.core.ResourcesFileNotFoundError, stanza.pipeline.core.LanguageNotDownloadedError) as e:
+            print(f'Could not find stanza model at {stanza_dir}. Downloading model...')
+            print(f'If you have already downloaded the model, stop this process (Ctrl-C) and pass the path to the model to parameter stanza_dir.')
+            stanza.download(src_lang)
+            self.src_pipeline = stanza.Pipeline(src_lang)
+
+        # Loading stanza pipeline for target language to convert string to stanza.models.common.doc.Sentence.
+        try:
+            self.tgt_pipeline = stanza.Pipeline(tgt_lang)
+        except (stanza.pipeline.core.ResourcesFileNotFoundError, stanza.pipeline.core.LanguageNotDownloadedError) as e:
+            print(f'Could not find stanza model at {stanza_dir}. Downloading model...')
+            print(f'If you have already downloaded the model, stop this process (Ctrl-C) and pass the path to the model to parameter stanza_dir.')
+            stanza.download(tgt_lang)
+            self.tgt_pipeline = stanza.Pipeline(tgt_lang)
+
+    def __next__(self):
+        """Returns a pair of sentences on every call using a generator. Does a lazy load of the data.
+
+        If augment is False, then original sentences are returned until end of file is reached. Useful if corpus is large and you cannot load the whole data into memory.
+
+        Else if augment is True, you can keep cycling through the dataset generating new augmented versions of the sentences on each cycle.
+        """
+
+        # Returning original sentences as they are if self.augment is False.
+        if not self.augment:
+            return next(self.src_input_file).rstrip('\n'), next(self.tgt_input_file).rstrip('\n')
+
+        # Converting sample (string of sentences) to stanza.models.common.doc.Document object, getting next document.
+        src_doc = self.src_pipeline(next(self.src_input_file).rstrip('\n'))
+        tgt_doc = self.tgt_pipeline(next(self.tgt_input_file).rstrip('\n'))
+
+        # Placeholder list to hold augmented document, will join all sentences in document before returning.
+        augmented_src_doc = list()
+        augmented_tgt_doc = list()
+
+        # Iterating over sentences in current document. Using separate for loops (and not zipping) because source and target documents may have different number of sentences.
+        for src_sent in src_doc.sentences:
+            augmented_src_doc.append(depparse_aug(src_sent, self.mode, self.alpha, self.src_freq_dict))
+        for tgt_sent in tgt_doc.sentences:
+            augmented_tgt_doc.append(depparse_aug(tgt_sent, self.mode, self.alpha, self.tgt_freq_dict))
+
+        # Joining all sentences in document.
+        augmented_src_doc = ' '.join(augmented_src_doc)
+        augmented_tgt_doc = ' '.join(augmented_tgt_doc)
+
+        return augmented_src_doc, augmented_tgt_doc

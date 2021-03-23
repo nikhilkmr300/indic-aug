@@ -87,10 +87,16 @@ BLANK_TOKEN = '<blank>';            # sentencepiece will assign the next availab
 
 # Valid augmentation modes for each type of augmentation.
 VALID_AUG_MODES = {
+    'noising': [                    # Valid modes for noising (Xie paper) augmentation.
+        'blank',                    # Replaces word with <blank>.
+        'replace',                  # Replaces word with another word from the unigram distribution.
+        'absolute_discount',        # Adaptively generates replacement probability using absolute discounting.
+        'kneser_ney'                # Uses absolute discounting while restricting replacement words to a smaller set.
+    ],
     'depparse': [                   # Valid modes for dependency parsing augmentation.
         'blank',                    # Replaces word with <blank>.
-        'dropout',                  # Delete word.
-        'replace'                   # Replaces word with another word with most similar unigram frequency.
+        'dropout',                  # Deletes word.
+        'replace_freq'              # Replaces word with another word with most similar unigram frequency.
     ],
     'embedding': [                  # Valid modes for embedding augmentation.
         'replace'                   # Replaces word with another word with most similar embedding.
@@ -110,9 +116,12 @@ ERRORS = {
     # Ensure that root is at index 0 for dependency parsing tree.
     'root_at_0': f'<root> must be at index 0. Ensure that you have prepended dummy <root> to the list of words returned by stanza.models.common.doc.Sentence.words to account for stanza using 1-based indexing for words in sentence.',
 
-    # Invalid augmentation mode.
-    'invalid_aug_mode': f'Invalid augmentation mode. Refer to globals for allowed values.',
-
     # Word not found.
-    'word_not_found': 'Word not found in vocabulary.'
+    'word_not_found': 'Word not found in vocabulary.',
+
+    # Frequency dictionary compulsory with mode 'replace_freq' of 'depparse_aug'.
+    'freq_dict_compulsory': 'Passing freq_dict is compulsory with mode=\'replace_freq\' of depparse_aug.',
+
+    # Prev set compulsory with mode 'kneser_ney' of 'noising_aug'.
+    'prev_set_compulsory': 'Passing prev_sets is compulsory with mode=\'kneser_ney\' of noising_aug.'
 }

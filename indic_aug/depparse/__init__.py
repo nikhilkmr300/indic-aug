@@ -1,1 +1,7 @@
-from .depparse_augmentor import *
+__all__ = [
+    'DepParseTree',
+    'dep_parse_aug',
+    'DepParseAugmentor'
+]
+
+from .depparse import *

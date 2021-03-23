@@ -43,7 +43,7 @@ def normalize_sent(sent, lang):
     :param sent: Sentence to be tokenized.
     :type sent: str
     :param lang: Language code (refer globals.py) of sentence.
-    :type lang: str.
+    :type lang: str
 
     :return: Normalized sentence.
     :rtype: str
