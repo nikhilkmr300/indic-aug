@@ -14,7 +14,7 @@ from sacremoses.normalize import MosesPunctNormalizer
 from tqdm import tqdm
 
 from .globals import ERRORS, LANGS, PREPROC_FUNCS
-from .utils import path2lang
+from .utils import path2lang, line_count
 
 def pretokenize_sent(sent, lang):
     """Returns tokenized form of a sentence.
@@ -174,8 +174,7 @@ class Preprocess:
                 raise ValueError(ERRORS['func'])
 
         # Finding number of documents to pass as argument to tqdm.
-        process = subprocess.Popen(['wc', '-l', self.src_input_path], stdout=subprocess.PIPE)
-        doc_count = int(process.communicate()[0].strip().split()[0])    # Number of documents.
+        doc_count = line_count(self.src_input_path)                     # Number of documents.
         batch_count = int(np.ceil(doc_count / batch_size))              # Theoretical number of batches.
 
         # Deleting (if exists) and recreating output files.

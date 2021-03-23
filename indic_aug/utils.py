@@ -1,4 +1,5 @@
 import os
+import subprocess
 
 import pandas as pd
 
@@ -115,3 +116,17 @@ def closest_freq(word, freq_dict):
         else:
             # Next word is closer.
             return freq_df.loc[word_idx + 1, 'word'].values[0]
+
+def line_count(path):
+    """Returns the number of lines in a file.
+
+    :param path: Path to file.
+    :type path: str
+
+    :return: Number of lines in file.
+    :rtype: int
+    """
+
+    process = subprocess.Popen(['wc', '-l', path], stdout=subprocess.PIPE)
+
+    return int(process.communicate()[0].strip().split()[0])

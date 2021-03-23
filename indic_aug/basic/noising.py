@@ -3,7 +3,7 @@ import re
 import numpy as np
 
 from ..globals import VALID_AUG_MODES, BLANK_TOKEN
-from ..utils import cyclic_read, path2lang
+from ..utils import cyclic_read, path2lang, line_count
 
 def get_unigram_counts(path):
     """Returns the count of all the unigrams that appear in the corpus at ``path``. Corpus at ``path`` must be formatted so that each line contains a document, and each document may contain one or more sentences terminated either by the fullstop character (\u002e) or the poorna virama character (\u0964). Each sentence is made of space-separated tokens.
@@ -247,6 +247,10 @@ class NoisingAugmentor:
         :type random_state: int
         """
 
+        if line_count(src_input_path) != line_count(tgt_input_path):
+            raise RuntimeError(ERRORS['corpus_shape'])
+        self.doc_count = line_count(src_input_path)
+
         np.random.seed(random_state)
 
         self.mode = mode
@@ -304,3 +308,6 @@ class NoisingAugmentor:
         augmented_tgt_doc = noising_aug(tgt_doc, self.mode, self.gamma0, self.tgt_unigram_counts, self.tgt_next_sets, self.tgt_prev_sets)
 
         return augmented_src_doc, augmented_tgt_doc
+
+    def __len__(self):
+        return self.doc_count

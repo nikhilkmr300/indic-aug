@@ -110,6 +110,9 @@ ERRORS = {
     # Invalid preprocessing function.
     'func': f'funcs must be a str or list of values in {*PREPROC_FUNCS,} or \'all\'.',
 
+    # Mismatch in number of source and target sentences in corpus.
+    'corpus_shape': f'Shape of source and target corpora do not match. Check that raw input corpora do not contain any characters among {*INVALID_CHARS,} nor any empty lines.',
+
     # Mismatch in number of source and target sentences in a preprocessing batch.
     'batch_shape': f'Shape of source and target batches do not match. Check that raw input corpora do not contain any characters among {*INVALID_CHARS,} nor any empty lines.',
 

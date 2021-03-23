@@ -5,8 +5,8 @@ import numpy as np
 from scipy.special import softmax
 import stanza
 
-from ..utils import path2lang, cyclic_read, stanza2list, closest_freq
 from ..globals import VALID_AUG_MODES, ERRORS, PAD_TOKEN, UNK_TOKEN, SOS_TOKEN, EOS_TOKEN, BLANK_TOKEN
+from ..utils import path2lang, cyclic_read, stanza2list, closest_freq, line_count
 
 class DepParseTree:
     """Represents a dependency parsing tree."""
@@ -233,6 +233,10 @@ class DepParseAugmentor:
         :type random_state: int
         """
 
+        if line_count(src_input_path) != line_count(tgt_input_path):
+            raise RuntimeError(ERRORS['corpus_shape'])
+        self.doc_count = line_count(src_input_path)
+
         np.random.seed(random_state)
 
         src_lang = path2lang(src_input_path)
@@ -303,3 +307,6 @@ class DepParseAugmentor:
         augmented_tgt_doc = ' '.join(augmented_tgt_doc)
 
         return augmented_src_doc, augmented_tgt_doc
+
+    def __len__(self):
+        return self.doc_count
