@@ -4,7 +4,7 @@ from ..globals import ERRORS
 from ..utils import cyclic_read, path2lang, line_count
 
 def dropout_aug(sent, p):
-    """Performs noising augmentation (blanking/replacement) according to :cite:t:`iyyer2015deep`.
+    """Performs augmentation on a sentence by dropout (refer: :cite:t:`iyyer2015deep`).
 
     :param sent: Sentence to be augmented.
     :type sent: str
@@ -32,7 +32,7 @@ def dropout_aug(sent, p):
     return ' '.join(augmented_sent)
 
 class DropoutAugmentor:
-    """Class to augment parallel corpora using the dropout technique by :cite:t:`iyyer2015deep`."""
+    """Class to augment parallel corpora by dropout (refer: :cite:t:`iyyer2015deep`)."""
 
     def __init__(self, src_input_path, tgt_input_path, p, augment=True, random_state=1):
         """Constructor method.
@@ -43,7 +43,7 @@ class DropoutAugmentor:
         :type tgt_input_path: str
         :param p: Same as for ``dropout_aug``.
         :type p: float
-        :param augment: Performs augmentation if True, else returns original pair of sentences.
+        :param augment: Performs augmentation if ``True``, else returns original pair of sentences.
         :type augment: bool
         :param random_state: Seed for the random number generator.
         :type random_state: int

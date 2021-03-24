@@ -1,37 +1,44 @@
 digraph G {
 	node [shape=box style=filled fillcolor=mediumorchid fontname=Courier fontcolor=black];
 	edge [color=black];
-	1 -> 6;
-	2 -> 1;
-	2 -> 5;
-	2 -> 9;
-	2 -> 8;
-	2 -> 10;
-	2 -> 11;
-	2 -> 6;
-	4 -> 11;
-	4 -> 10;
-	4 -> 6;
-	4 -> 5;
-	4 -> 7;
-	4 -> 1;
-	5 -> 9;
-	7 -> 11;
-	8 -> 9;
-	8 -> 3;
-	10 -> 11;
-	10 -> 9;
-	10 -> 6;
-	10 -> 1;
-	1 [label="Xie,2017"];
-	2 [label="Li,2020"];
-	3 [label="Wang,2015"];
-	4 [label="Duan,2020"];
-	5 [label="Nguyen,2020"];
-	6 [label="Iyyer,2015"];
-	7 [label="Xia,2019"];
-	8 [label="Kobayashi,2018"]
-	9 [label="Fadaee,2017"];
-	10 [label="Gao,2019"];
-	11 [label="Artetxe,2018"]
+
+	Xie -> Iyyer;
+	Li -> Xie;
+	Li -> Nguyen;
+	Li -> Fadaee;
+	Li -> Kobayashi;
+	Li -> Gao;
+	Li -> Artetxe;
+	Li -> Iyyer;
+	Duan -> Artetxe;
+	Duan -> Gao;
+	Duan -> Iyyer;
+	Duan -> Nguyen;
+	Duan -> Xia;
+	Duan -> Xie;
+	Nguyen -> Fadaee;
+	Xia -> Artetxe;
+	Kobayashi -> Fadaee;
+	Kobayashi -> Wang;
+	Gao -> Artetxe;
+	Gao -> Fadaee;
+	Gao -> Iyyer;
+	Gao -> Xie;
+	Wei -> Fadaee;
+	Wei -> Kobayashi;
+	Wei -> Wang;
+	Wei -> Xie;
+
+	Xie [label="Xie,2017"];
+	Li [label="Li,2020"];
+	Wang [label="Wang,2015"];
+	Duan [label="Duan,2020"];
+	Nguyen [label="Nguyen,2020"];
+	Iyyer [label="Iyyer,2015"];
+	Xia [label="Xia,2019"];
+	Kobayashi [label="Kobayashi,2018"]
+	Fadaee [label="Fadaee,2017"];
+	Gao [label="Gao,2019"];
+	Artetxe [label="Artetxe,2018"]
+	Wei [label="Wei,2019"]
 }

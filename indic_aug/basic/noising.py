@@ -2,7 +2,7 @@ import re
 
 import numpy as np
 
-from ..globals import VALID_AUG_MODES, BLANK_TOKEN
+from ..globals import VALID_AUG_MODES, BLANK_TOKEN, ERRORS
 from ..utils import cyclic_read, path2lang, line_count
 
 def get_unigram_counts(path):
@@ -145,13 +145,13 @@ def get_prev_sets(bigram_counts):
     return prev_sets
 
 def noising_aug(sent, mode, gamma0, unigram_counts, next_sets, prev_sets=None):
-    """Performs noising augmentation (blanking/replacement) according to :cite:t:`xie2017data`.
+    """Performs augmentation on a sentence by blanking/replacement (refer: :cite:t:`xie2017data`).
 
     Supports all the four modes specified in the paper:
         * `blank`: Replaces token with ``BLANK_TOKEN`` with noising probability ``gamma0``.
         * `replace`: Replaces token with another token from the unigram distribution with noising probability ``gamma0``.
         * `absolute_discount`: Replaces token with another token from the unigram distribution with absoute discounted probability obtained from ``gamma0``.
-        * 'kneser_ney`: Replaces token with another token from a subset of the unigram distribution with absoute discounted probability obtained from ``gamma0``, analogous to Kneser-Ney smoothing.
+        * `kneser_ney`: Replaces token with another token from a subset of the unigram distribution with absoute discounted probability obtained from ``gamma0``, analogous to Kneser-Ney smoothing.
 
     :param sent: Sentence to be augmented.
     :type sent: str
@@ -197,9 +197,8 @@ def noising_aug(sent, mode, gamma0, unigram_counts, next_sets, prev_sets=None):
             gammaAD = gamma0 * numer / denom     # Absolute discounted gamma, refer Xie's paper.
 
             if np.random.binomial(1, gammaAD):
-                # Replacing from unigram distribution with probability gammaAD.
                 sampled_word = sample_word(unigram_counts)
-                print(f'Replacing {word} with {sampled_word}.')
+                # Replacing from unigram distribution with probability gammaAD.
                 augmented_sent.append(sampled_word)
             else:
                 augmented_sent.append(word)
@@ -228,7 +227,7 @@ def noising_aug(sent, mode, gamma0, unigram_counts, next_sets, prev_sets=None):
     return ' '.join(augmented_sent)
 
 class NoisingAugmentor:
-    """Class to augment parallel corpora using the noising techniques by :cite:t:`xie2017data`."""
+    """Class to augment parallel corpora by blanking/replacement (refer: :cite:t:`xie2017data`)."""
 
     def __init__(self, src_input_path, tgt_input_path, mode, gamma0, augment=True, random_state=1):
         """Constructor method.
@@ -241,7 +240,7 @@ class NoisingAugmentor:
         :type mode: str
         :param gamma0: Same as for ``noising_aug``.
         :type gamma0: float
-        :param augment: Performs augmentation if True, else returns original pair of sentences.
+        :param augment: Performs augmentation if ``True``, else returns original pair of sentences.
         :type augment: bool
         :param random_state: Seed for the random number generator.
         :type random_state: int
@@ -255,7 +254,7 @@ class NoisingAugmentor:
 
         self.mode = mode
         if not self.mode in VALID_AUG_MODES['noising']:
-            raise ValueError(f'Valid values for parameter mode to BlankingAugmentor must be one of {*VALID_AUG_MODES["noising"],}.')
+            raise ValueError(f'Invalid value of parameter \'mode\'. Valid values for parameter \'mode\' to depparse_aug are values in {*VALID_AUG_MODES["noising"],}.')
 
         src_lang = path2lang(src_input_path)
         tgt_lang = path2lang(tgt_input_path)

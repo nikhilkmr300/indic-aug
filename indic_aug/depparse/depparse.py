@@ -153,7 +153,7 @@ class DepParseTree:
         return [[idx, self.index2word(idx), self.scores[idx]] for idx in range(len(self.words))]
 
 def depparse_aug(sent, mode, alpha, freq_dict=None):
-    """Performs dependency parsing augmentation (refer :cite:t:`duan2020syntax`) on a sentence.
+    """Performs augmentation on a sentence by dependency parsing (refer :cite:t:`duan2020syntax`).
 
     ``freq_dict`` is required only if ``mode`` is 'replace', it is ignored otherwise.
 
@@ -208,7 +208,7 @@ def depparse_aug(sent, mode, alpha, freq_dict=None):
     return ' '.join(sent)
 
 class DepParseAugmentor:
-    """Class to augment parallel corpora using dependency parsing technique by :cite:t:`duan2020syntax`."""
+    """Class to augment parallel corpora by dependency parsing technique (refer: :cite:t:`duan2020syntax`)."""
 
     def __init__(self, src_input_path, tgt_input_path, mode, alpha, src_freq_dict=None, tgt_freq_dict=None, stanza_dir=os.path.join('~', 'stanza_resources'), augment=True, random_state=1):
         """Constructor method.

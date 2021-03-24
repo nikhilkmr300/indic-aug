@@ -24,3 +24,11 @@ indic\_aug.basic.noising module
    :members:
    :undoc-members:
    :show-inheritance:
+
+indic\_aug.basic.synonym module
+-------------------------------
+
+.. automodule:: indic_aug.basic.synonym
+   :members:
+   :undoc-members:
+   :show-inheritance:
