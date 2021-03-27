@@ -1,37 +1,43 @@
+import re
+
 import numpy as np
 
-from ..globals import ERRORS
+from ..globals import Augmentor, ERRORS, SENTENCE_DELIMS
 from ..utils import cyclic_read, path2lang, line_count
 
-def dropout_aug(sent, p):
-    """Performs augmentation on a sentence by dropout (refer: :cite:t:`iyyer2015deep`).
+def dropout_aug(doc, p):
+    """Performs augmentation on a document by dropout (refer: :cite:t:`iyyer2015deep`).
 
-    :param sent: Sentence to be augmented.
-    :type sent: str
+    :param doc: Document to be augmented.
+    :type doc: str
     :param p: Probability of a word to be dropped.
     :type p: float
 
-    :return: Augmented sentence.
+    :return: Augmented document.
     :rtype: str
     """
 
-    augmented_sent = list()
-    sent = [word.strip() for word in sent.split(' ')]
+    augmented_doc = list()
 
-    for word in sent:
-        if word == '.' or word == '\u0964':
-            # Not dropping out fullstops.
+    # Splitting document at all punctuation marks.
+    doc = ' '.join(re.split(SENTENCE_DELIMS, doc))
+    # Stripping extra whitespace around words and removing empty strings.
+    doc = [word.strip() for word in doc.split(' ') if word != '']
+
+    for word in doc:
+        if word in set(re.split('|', SENTENCE_DELIMS)):
+            # Not noising punctuations.
             continue
 
         if np.random.binomial(1, p):
             # Dropping word with probability p.
             continue
         else:
-            augmented_sent.append(word)
+            augmented_doc.append(word)
 
-    return ' '.join(augmented_sent)
+    return ' '.join(augmented_doc)
 
-class DropoutAugmentor:
+class DropoutAugmentor(Augmentor):
     """Class to augment parallel corpora by dropout (refer: :cite:t:`iyyer2015deep`)."""
 
     def __init__(self, src_input_path, tgt_input_path, p, augment=True, random_state=1):

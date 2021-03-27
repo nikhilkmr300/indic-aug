@@ -1,4 +1,5 @@
 import random
+import re
 import sys
 
 import numpy as np
@@ -6,7 +7,7 @@ from nltk.corpus import wordnet as wn
 import stanza
 import pyiwn
 
-from ..globals import ERRORS
+from ..globals import Augmentor, ERRORS, SENTENCE_DELIMS
 from ..utils import cyclic_read, path2lang, line_count
 
 def convert_pos(stanza_pos, to):
@@ -128,11 +129,11 @@ def get_synonyms(word, pipeline, net):
 
     return synonyms
 
-def synonym_aug(sent, pipeline, net, p):
-    """Performs augmentation on a sentence by replacing with synonyms (refer: :cite:t:`wei2019eda`).
+def synonym_aug(doc, pipeline, net, p):
+    """Performs augmentation on a document by replacing with synonyms (refer: :cite:t:`wei2019eda`).
 
-    :param sent: Sentence to be augmented.
-    :type sent: str
+    :param doc: Document to be augmented.
+    :type doc: str
     :param pipeline: Same as for ``get_synonyms``.
     :type pipeline: `stanza.Pipeline`
     :param net: Same as for ``get_synonyms``.
@@ -140,28 +141,38 @@ def synonym_aug(sent, pipeline, net, p):
     :param p: Probability of a word to be replaced by one of its synonyms.
     :type p: float
 
-    :return: Augmented sentence.
+    :return: Augmented document.
     :rtype: str
     """
 
-    augmented_sent = list()
-    sent = [word.strip() for word in sent.split(' ')]
+    augmented_doc = list()
 
-    for word in sent:
+    # Splitting document at all punctuation marks.
+    doc = ' '.join(re.split(SENTENCE_DELIMS, doc))
+    # Stripping extra whitespace around words and removing empty strings.
+    doc = [word.strip() for word in doc.split(' ') if word != '']
+
+    for word in doc:
         if word == '.' or word == '\u0964':
             # Not replacing fullstops.
             continue
 
         if np.random.binomial(1, p):
             # Randomly sampling a synonym from list of synonyms of word.
-            sampled_synonym = random.sample(get_synonyms(word, pipeline, net), 1)[0]
-            augmented_sent.append(sampled_synonym)
+            synonyms = get_synonyms(word, pipeline, net)
+            if not len(synonyms):
+                # If no synonyms found, replace word with itself.
+                sampled_synonym = word
+            else:
+                # Else replace word with a randomly sampled synonym.
+                sampled_synonym = random.sample(synonyms, 1)[0]
+            augmented_doc.append(sampled_synonym)
         else:
-            augmented_sent.append(word)
+            augmented_doc.append(word)
 
-    return ' '.join(augmented_sent)
+    return ' '.join(augmented_doc)
 
-class SynonymAugmentor:
+class SynonymAugmentor(Augmentor):
     """Class to augment parallel corpora by synonym augmentation technique (refer: :cite:t:`wei2019eda`)."""
 
     def __init__(self, src_input_path, tgt_input_path, p, augment=True, random_state=1):

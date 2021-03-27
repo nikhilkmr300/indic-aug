@@ -2,7 +2,7 @@ import re
 
 import numpy as np
 
-from ..globals import VALID_AUG_MODES, BLANK_TOKEN, ERRORS
+from ..globals import Augmentor, VALID_AUG_MODES, BLANK_TOKEN, ERRORS, SENTENCE_DELIMS
 from ..utils import cyclic_read, path2lang, line_count
 
 def get_unigram_counts(path):
@@ -21,8 +21,9 @@ def get_unigram_counts(path):
     with open(path, 'r') as f:
         for doc in f:
             # Splitting document at all punctuation marks.
-            sents = re.split('\.|\?|!|\u0964', doc)
+            sents = re.split(SENTENCE_DELIMS, doc)
             for sent in sents:
+                # Removing extra whitespace around words.
                 words = [word.strip() for word in sent.split(' ')]
                 for word in words:
                     if word == '':
@@ -77,8 +78,9 @@ def get_bigram_counts(path):
     with open(path, 'r') as f:
         for doc in f:
             # Splitting document at all punctuation marks.
-            sents = re.split('\.|\?|!|\u0964', doc)
+            sents = re.split(SENTENCE_DELIMS, doc)
             for sent in sents:
+                # Removing extra whitespace around words.
                 words = [word.strip() for word in sent.split(' ')]
                 for idx in range(len(words) - 1):
                     if (words[idx], words[idx + 1]) in bigram_counts.keys():
@@ -144,89 +146,101 @@ def get_prev_sets(bigram_counts):
 
     return prev_sets
 
-def noising_aug(sent, mode, gamma0, unigram_counts, next_sets, prev_sets=None):
-    """Performs augmentation on a sentence by blanking/replacement (refer: :cite:t:`xie2017data`).
+def noising_aug(doc, mode, gamma0, unigram_counts, next_sets, prev_sets=None):
+    """Performs augmentation on a document by blanking/replacement (refer: :cite:t:`xie2017data`).
 
     Supports all the four modes specified in the paper:
         * `blank`: Replaces token with ``BLANK_TOKEN`` with noising probability ``gamma0``.
         * `replace`: Replaces token with another token from the unigram distribution with noising probability ``gamma0``.
         * `absolute_discount`: Replaces token with another token from the unigram distribution with absoute discounted probability obtained from ``gamma0``.
-        * `kneser_ney`: Replaces token with another token from a subset of the unigram distribution with absoute discounted probability obtained from ``gamma0``, analogous to Kneser-Ney smoothing.
+        * `kneser_ney`: Replaces token with another token from its prev set with absoute discounted probability obtained from ``gamma0``, analogous to Kneser-Ney smoothing.
 
-    :param sent: Sentence to be augmented.
-    :type sent: str
+    :param doc: Document to be augmented.
+    :type doc: str
     :param mode: One of the modes described above.
     :type mode: str
     :param gamma0: Noising probability. Values are clipped to range [0, 1].
     :type gamma0: float
-    :param next_sets: Next sets of all tokens in the sentence `sent`, as returned by `get_next_sets`.
+    :param next_sets: Next sets of all tokens in corpus, as returned by `get_next_sets`.
     :type next_sets: dict
-    :param prev_sets: Prev sets of all tokens in the sentence `sent`, as returned by `get_next_sets`, optional. Required if ``mode`` is 'kneser_ney', else ignored.
+    :param prev_sets: Prev sets of all tokens in corpus, as returned by `get_next_sets`, optional. Required if ``mode`` is 'kneser_ney', else ignored.
     :type prev_sets: dict
 
-    :return: Augmented sentence.
+    :return: Augmented document.
     :rtype: str
     """
 
-    augmented_sent = list()
-    sent = [word.strip() for word in sent.split(' ')]
+    augmented_doc = list()
 
-    for word in sent:
-        if word == '.' or word == '\u0964':
-            # Not noising fullstops.
+    # Splitting document at all punctuation marks.
+    doc = ' '.join(re.split(SENTENCE_DELIMS, doc))
+    # Stripping extra whitespace around words and removing empty strings.
+    doc = [word.strip() for word in doc.split(' ') if word != '']
+
+    for word in doc:
+        if word in set(re.split('|', SENTENCE_DELIMS)):
+            # Not noising punctuations.
             continue
 
         if mode == 'blank':
             if np.random.binomial(1, gamma0):
                 # Blanking with probability gamma0.
-                augmented_sent.append(BLANK_TOKEN)
+                augmented_doc.append(BLANK_TOKEN)
             else:
-                augmented_sent.append(word)
+                augmented_doc.append(word)
 
         elif mode == 'replace':
             if np.random.binomial(1, gamma0):
                 sampled_word = sample_word(unigram_counts)
                 # Replacing from unigram distribution with probability gamma0.
-                augmented_sent.append(sampled_word)
+                augmented_doc.append(sampled_word)
             else:
-                augmented_sent.append(word)
+                augmented_doc.append(word)
 
         elif mode == 'absolute_discount':
-            numer = len(next_sets[word])
+            numer = len(next_sets[word]) if word in next_sets.keys() else 0
             denom = unigram_counts[word]
             gammaAD = gamma0 * numer / denom     # Absolute discounted gamma, refer Xie's paper.
 
             if np.random.binomial(1, gammaAD):
                 sampled_word = sample_word(unigram_counts)
                 # Replacing from unigram distribution with probability gammaAD.
-                augmented_sent.append(sampled_word)
+                augmented_doc.append(sampled_word)
             else:
-                augmented_sent.append(word)
+                augmented_doc.append(word)
 
         elif mode == 'kneser_ney':
             if prev_sets is None:
                 raise ValueError(ERRORS['prev_set_compulsory'])
 
-            numer = len(next_sets[word])
+            numer = len(next_sets[word]) if word in next_sets.keys() else 0
             denom = unigram_counts[word]
             gammaAD = gamma0 * numer / denom     # Absolute discounted gamma, refer Xie's paper.
 
             # Unigram counts of words in prev set of word, calling it Kneser-Ney distribution.
-            kneser_ney_distr = {first_word: unigram_counts[first_word] for first_word in prev_sets[word]}
+            kneser_ney_distr = dict()
+            if word in prev_sets.keys():
+                for first_word in prev_sets[word]:
+                    kneser_ney_distr[first_word] = unigram_counts[first_word]
 
             if np.random.binomial(1, gammaAD):
                 # Replacing from Kneser-Ney distribution with probability gammaAD.
-                sampled_word = sample_word(kneser_ney_distr)
-                augmented_sent.append(sampled_word)
+                if not len(kneser_ney_distr):
+                    # If no words in prev set, replace word with itself.
+                    sampled_word = word
+                else:
+                    # Otherwise sample from Kneser-Ney distribution.
+                    sampled_word = sample_word(kneser_ney_distr)
+                augmented_doc.append(sampled_word)
             else:
-                augmented_sent.append(word)
+                augmented_doc.append(word)
 
         else:
             raise ValueError(f'Invalid value of parameter \'mode\'. Valid values for parameter \'mode\' to noising_aug are values in {*VALID_AUG_MODES["depparse"],}.')
 
-    return ' '.join(augmented_sent)
+    return ' '.join(augmented_doc)
 
-class NoisingAugmentor:
+class NoisingAugmentor(Augmentor):
     """Class to augment parallel corpora by blanking/replacement (refer: :cite:t:`xie2017data`)."""
 
     def __init__(self, src_input_path, tgt_input_path, mode, gamma0, augment=True, random_state=1):

@@ -5,7 +5,7 @@ import numpy as np
 from scipy.special import softmax
 import stanza
 
-from ..globals import VALID_AUG_MODES, ERRORS, PAD_TOKEN, UNK_TOKEN, SOS_TOKEN, EOS_TOKEN, BLANK_TOKEN
+from ..globals import Augmentor, VALID_AUG_MODES, ERRORS, PAD_TOKEN, UNK_TOKEN, SOS_TOKEN, EOS_TOKEN, BLANK_TOKEN
 from ..utils import path2lang, cyclic_read, stanza2list, closest_freq, line_count
 
 class DepParseTree:
@@ -153,7 +153,7 @@ class DepParseTree:
         return [[idx, self.index2word(idx), self.scores[idx]] for idx in range(len(self.words))]
 
 def depparse_aug(sent, mode, alpha, freq_dict=None):
-    """Performs augmentation on a sentence by dependency parsing (refer :cite:t:`duan2020syntax`).
+    """Performs augmentation on one sentence (and NOT a document of sentences, as some of the other augmentorss) by dependency parsing (refer :cite:t:`duan2020syntax`).
 
     ``freq_dict`` is required only if ``mode`` is 'replace', it is ignored otherwise.
 

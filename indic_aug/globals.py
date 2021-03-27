@@ -13,6 +13,10 @@ Module to contain variables that are required in multiple places.
 
     List of characters that need to be removed from the raw corpus before using any augmentation. Remove all tabs and double quotes as they clash with the implementation.
 
+.. data:: SENTENCE_DELIMS
+
+    String of pipe (|) separated characters on which to split a document into sentences.
+
 .. data:: PAD_TOKEN
 
     Token to use for padding sentences.
@@ -56,6 +60,19 @@ Module to contain variables that are required in multiple places.
 
 import os
 
+from abc import ABC, abstractmethod
+
+class Augmentor(ABC):
+    """Abstract base class for all augmentor classes."""
+
+    @abstractmethod
+    def __next__(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def __len__(self):
+        raise NotImplementedError
+
 # Supported languages.
 LANGS = [
     'en',   # English
@@ -74,32 +91,34 @@ PREPROC_FUNCS = [
 
 # Make sure raw input corpora are rid of these characters.
 INVALID_CHARS = [
-    '\t',                           # Tabs clash with sep argument used in pandas.read_csv.
-    '"'                             # Clashes with Python double quotes.
+    '\t',                               # Tabs clash with sep argument used in pandas.read_csv.
+    '"'                                 # Clashes with Python double quotes.
 ]
+
+SENTENCE_DELIMS = '\.|\?|!|\u0964'      # Characters on which to split sentences in a document.
 
 # Special tokens and their IDs.
 PAD_TOKEN = '<pad>'; PAD_ID = 0
 UNK_TOKEN = '<unk>'; UNK_ID = 1
 SOS_TOKEN = '<s>'; SOS_ID = 2
 EOS_TOKEN = '</s>'; EOS_ID = 3
-BLANK_TOKEN = '<blank>';            # sentencepiece will assign the next available ID to <blank>.
+BLANK_TOKEN = '<blank>';                # sentencepiece will assign the next available ID to <blank>.
 
 # Valid augmentation modes for each type of augmentation.
 VALID_AUG_MODES = {
-    'noising': [                    # Valid modes for noising (Xie paper) augmentation.
-        'blank',                    # Replaces word with <blank>.
-        'replace',                  # Replaces word with another word from the unigram distribution.
-        'absolute_discount',        # Adaptively generates replacement probability using absolute discounting.
-        'kneser_ney'                # Uses absolute discounting while restricting replacement words to a smaller set.
+    'noising': [                        # Valid modes for noising (Xie paper) augmentation.
+        'blank',                        # Replaces word with <blank>.
+        'replace',                      # Replaces word with another word from the unigram distribution.
+        'absolute_discount',            # Adaptively generates replacement probability using absolute discounting.
+        'kneser_ney'                    # Uses absolute discounting while restricting replacement words to a smaller set.
     ],
-    'depparse': [                   # Valid modes for dependency parsing augmentation.
-        'blank',                    # Replaces word with <blank>.
-        'dropout',                  # Deletes word.
-        'replace_freq'              # Replaces word with another word with most similar unigram frequency.
+    'depparse': [                       # Valid modes for dependency parsing augmentation.
+        'blank',                        # Replaces word with <blank>.
+        'dropout',                      # Deletes word.
+        'replace_freq'                  # Replaces word with another word with most similar unigram frequency.
     ],
-    'embedding': [                  # Valid modes for embedding augmentation.
-        'replace'                   # Replaces word with another word with most similar embedding.
+    'embedding': [                      # Valid modes for embedding augmentation.
+        'replace'                       # Replaces word with another word with most similar embedding.
     ]
 }
 
