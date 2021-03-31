@@ -19,6 +19,14 @@ Subpackages
 Submodules
 ----------
 
+indic\_aug.align module
+-------------------------
+
+.. automodule:: indic_aug.align
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 indic\_aug.globals module
 -------------------------
 

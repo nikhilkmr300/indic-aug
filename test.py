@@ -30,8 +30,16 @@
 # for i in tqdm(range(len(aug))):
 #     print(next(aug))
 
-# Synonym demo
-# ------------
-from indic_aug.basic import SynonymAugmentor
-aug = SynonymAugmentor('example/data/preprocessed/dev.en', 'example/data/preprocessed/dev.hi', 0.5, random_state=1)
-print(next(aug))
+# # Synonym demo
+# # ------------
+# from indic_aug.basic import SynonymAugmentor
+# aug = SynonymAugmentor('example/data/preprocessed/dev.en', 'example/data/preprocessed/dev.hi', 0.5, random_state=1)
+# print(next(aug))
+
+# # Alignment demo
+# # --------------
+# from indic_aug.align import Aligner
+# aligner = Aligner('ibm1', 5)
+# print('Training...')
+# aligner.train('example/data/preprocessed/dev.en', 'example/data/preprocessed/dev.hi')
+# aligner.serialize('sample.pkl')

@@ -18,7 +18,12 @@ def path2lang(path):
     :rtype: str
     """
 
-    return os.path.splitext(path)[-1].strip('.')
+    lang = os.path.splitext(path)[-1].strip('.')
+
+    if not lang in LANGS:
+        raise ValueError(ERRORS['lang'])
+
+    return lang
 
 def stanza2list(stanza_sent):
     """Converts ``stanza.models.common.doc.Sentence`` to a list of str tokens, by stripping away all the extra stuff.
@@ -146,6 +151,8 @@ def doc2sents(doc, lang):
     :rtype: list
     """
 
+    doc = doc.strip('\n\t ')
+
     if lang == 'en':
         return nltk.sent_tokenize(doc)
     elif lang in LANGS:
@@ -164,6 +171,8 @@ def doc2words(doc, lang):
     :return: List of words in ``doc``.
     :rtype: list
     """
+
+    doc = doc.strip('\n\t ')
 
     if lang == 'en':
         return nltk.word_tokenize(doc)
@@ -185,6 +194,8 @@ def sent2words(sent, lang):
     :return: List of words in ``sent``.
     :rtype: list
     """
+
+    doc = doc.strip('\n\t ')
 
     if lang == 'en':
         return nltk.word_tokenize(sent)
