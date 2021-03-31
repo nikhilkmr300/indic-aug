@@ -2,8 +2,11 @@ import os
 import subprocess
 
 import pandas as pd
+import nltk
+from indicnlp.tokenize.sentence_tokenize import sentence_split
+from indicnlp.tokenize.indic_tokenize import trivial_tokenize
 
-from .globals import ERRORS, UNK_TOKEN
+from .globals import ERRORS, UNK_TOKEN, LANGS
 
 def path2lang(path):
     """Returns language code from extension of path.
@@ -130,3 +133,62 @@ def line_count(path):
     process = subprocess.Popen(['wc', '-l', path], stdout=subprocess.PIPE)
 
     return int(process.communicate()[0].strip().split()[0])
+
+def doc2sents(doc, lang):
+    """Splits a document into sentences. Wrapper around ``nltk.sent_tokenize`` and ``indicnlp.tokenize.sentence_tokenize.sentence_split``.
+
+    :param doc: Document to be split into sentences.
+    :type doc: str
+    :param lang: ISO 639-1 language code of ``doc``.
+    :type lang: str
+
+    :return: List of sentences in ``doc``.
+    :rtype: list
+    """
+
+    if lang == 'en':
+        return nltk.sent_tokenize(doc)
+    elif lang in LANGS:
+        return sentence_split(doc, lang=lang)
+    else:
+        raise ValueError(ERRORS['lang'])
+
+def doc2words(doc, lang):
+    """Splits a document into words. Wrapper around ``nltk.word_tokenize`` and ``indicnlp.tokenize.indic_tokenize.trivial_tokenize``.
+
+    :param doc: Document to be split into words.
+    :type doc: str
+    :param lang: ISO 639-1 language code of ``doc``.
+    :type lang: str
+
+    :return: List of words in ``doc``.
+    :rtype: list
+    """
+
+    if lang == 'en':
+        return nltk.word_tokenize(doc)
+    elif lang in LANGS:
+        return trivial_tokenize(doc, lang=lang)
+    else:
+        raise ValueError(ERRORS['lang'])
+
+def sent2words(sent, lang):
+    """Splits a sentence into words. Wrapper around ``nltk.word_tokenize`` and ``indicnlp.tokenize.indic_tokenize.trivial_tokenize``.
+
+    Same as ``doc2words``, however have kept separate for readability reasons (document vs sentence).
+
+    :param sent: Document to be split into words.
+    :type sent: str
+    :param lang: ISO 639-1 language code of ``sent``.
+    :type lang: str
+
+    :return: List of words in ``sent``.
+    :rtype: list
+    """
+
+    if lang == 'en':
+        return nltk.word_tokenize(sent)
+    elif lang in LANGS:
+        return trivial_tokenize(sent, lang=lang)
+    else:
+        raise ValueError(ERRORS['lang'])

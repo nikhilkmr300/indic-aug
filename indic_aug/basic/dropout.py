@@ -2,16 +2,18 @@ import re
 
 import numpy as np
 
-from ..globals import Augmentor, ERRORS, SENTENCE_DELIMS
-from ..utils import cyclic_read, path2lang, line_count
+from ..globals import Augmentor, ERRORS
+from ..utils import cyclic_read, path2lang, line_count, doc2words
 
-def dropout_aug(doc, p):
+def dropout_aug(doc, p, lang):
     """Performs augmentation on a document by dropout (refer: :cite:t:`iyyer2015deep`).
 
     :param doc: Document to be augmented.
     :type doc: str
     :param p: Probability of a word to be dropped.
     :type p: float
+    :param lang: ISO 639-1 language code of ``doc``.
+    :type lang: str
 
     :return: Augmented document.
     :rtype: str
@@ -19,16 +21,7 @@ def dropout_aug(doc, p):
 
     augmented_doc = list()
 
-    # Splitting document at all punctuation marks.
-    doc = ' '.join(re.split(SENTENCE_DELIMS, doc))
-    # Stripping extra whitespace around words and removing empty strings.
-    doc = [word.strip() for word in doc.split(' ') if word != '']
-
-    for word in doc:
-        if word in set(re.split('|', SENTENCE_DELIMS)):
-            # Not noising punctuations.
-            continue
-
+    for word in doc2words(doc, lang):
         if np.random.binomial(1, p):
             # Dropping word with probability p.
             continue
@@ -61,6 +54,9 @@ class DropoutAugmentor(Augmentor):
 
         np.random.seed(random_state)
 
+        self.src_lang = path2lang(src_input_path)
+        self.tgt_lang = path2lang(tgt_input_path)
+
         self.augment = augment
 
         if self.augment:
@@ -88,9 +84,9 @@ class DropoutAugmentor(Augmentor):
 
         # Augmenting current document.
         src_doc = next(self.src_input_file)
-        augmented_src_doc = dropout_aug(src_doc, self.p)
+        augmented_src_doc = dropout_aug(src_doc, self.p, self.src_lang)
         tgt_doc = next(self.tgt_input_file)
-        augmented_tgt_doc = dropout_aug(tgt_doc, self.p)
+        augmented_tgt_doc = dropout_aug(tgt_doc, self.p, self.tgt_lang)
 
         return augmented_src_doc, augmented_tgt_doc
 

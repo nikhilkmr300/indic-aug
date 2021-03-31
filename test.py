@@ -15,10 +15,10 @@
 # print(depparse_aug(sent, 'blank', 0.3))
 
 # # Noising demo
-# # -------------
+# # ------------
 # from indic_aug.basic import NoisingAugmentor
 # from tqdm import tqdm
-# aug = NoisingAugmentor('example/data/preprocessed/dev.en', 'example/data/preprocessed/dev.hi', 'absolute_discount', 0.1)
+# aug = NoisingAugmentor('example/data/preprocessed/dev.en', 'example/data/preprocessed/dev.hi', 'replace', 0.1)
 # for i in tqdm(range(len(aug))):
 #     print(next(aug))
 
@@ -30,8 +30,8 @@
 # for i in tqdm(range(len(aug))):
 #     print(next(aug))
 
-# # Synonym demo
-# # ------------
-# from indic_aug.basic import SynonymAugmentor
-# aug = SynonymAugmentor('example/data/preprocessed/dev.en', 'example/data/preprocessed/dev.hi', 0.5, random_state=1)
-# print(next(aug))
+# Synonym demo
+# ------------
+from indic_aug.basic import SynonymAugmentor
+aug = SynonymAugmentor('example/data/preprocessed/dev.en', 'example/data/preprocessed/dev.hi', 0.5, random_state=1)
+print(next(aug))

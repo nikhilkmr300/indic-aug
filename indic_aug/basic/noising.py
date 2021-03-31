@@ -3,7 +3,7 @@ import re
 import numpy as np
 
 from ..globals import Augmentor, VALID_AUG_MODES, BLANK_TOKEN, ERRORS, SENTENCE_DELIMS
-from ..utils import cyclic_read, path2lang, line_count
+from ..utils import cyclic_read, path2lang, line_count, doc2sents, sent2words, doc2words
 
 def get_unigram_counts(path):
     """Returns the count of all the unigrams that appear in the corpus at ``path``. Corpus at ``path`` must be formatted so that each line contains a document, and each document may contain one or more sentences terminated either by the fullstop character (\u002e) or the poorna virama character (\u0964). Each sentence is made of space-separated tokens.
@@ -17,15 +17,12 @@ def get_unigram_counts(path):
 
     unigram_counts = dict()
 
-    i = 0
+    lang = path2lang(path)
+
     with open(path, 'r') as f:
         for doc in f:
-            # Splitting document at all punctuation marks.
-            sents = re.split(SENTENCE_DELIMS, doc)
-            for sent in sents:
-                # Removing extra whitespace around words.
-                words = [word.strip() for word in sent.split(' ')]
-                for word in words:
+            for sent in doc2sents(doc, lang):
+                for word in sent2words(sent, lang):
                     if word == '':
                         # '' is end of sentence, not counting it as unigram.
                         continue
@@ -74,14 +71,12 @@ def get_bigram_counts(path):
 
     bigram_counts = dict()
 
-    i = 0
+    lang = path2lang(path)
+
     with open(path, 'r') as f:
         for doc in f:
-            # Splitting document at all punctuation marks.
-            sents = re.split(SENTENCE_DELIMS, doc)
-            for sent in sents:
-                # Removing extra whitespace around words.
-                words = [word.strip() for word in sent.split(' ')]
+            for sent in doc2sents(doc, lang):
+                words = sent2words(sent, lang)
                 for idx in range(len(words) - 1):
                     if (words[idx], words[idx + 1]) in bigram_counts.keys():
                         bigram_counts[(words[idx], words[idx + 1])] += 1
@@ -146,7 +141,7 @@ def get_prev_sets(bigram_counts):
 
     return prev_sets
 
-def noising_aug(doc, mode, gamma0, unigram_counts, next_sets, prev_sets=None):
+def noising_aug(doc, mode, gamma0, unigram_counts, lang, next_sets, prev_sets=None):
     """Performs augmentation on a document by blanking/replacement (refer: :cite:t:`xie2017data`).
 
     Supports all the four modes specified in the paper:
@@ -161,6 +156,8 @@ def noising_aug(doc, mode, gamma0, unigram_counts, next_sets, prev_sets=None):
     :type mode: str
     :param gamma0: Noising probability. Values are clipped to range [0, 1].
     :type gamma0: float
+    :param lang: ISO 639-1 language code of ``doc``.
+    :type lang: str
     :param next_sets: Next sets of all tokens in corpus, as returned by `get_next_sets`.
     :type next_sets: dict
     :param prev_sets: Prev sets of all tokens in corpus, as returned by `get_next_sets`, optional. Required if ``mode`` is 'kneser_ney', else ignored.
@@ -172,12 +169,7 @@ def noising_aug(doc, mode, gamma0, unigram_counts, next_sets, prev_sets=None):
 
     augmented_doc = list()
 
-    # Splitting document at all punctuation marks.
-    doc = ' '.join(re.split(SENTENCE_DELIMS, doc))
-    # Stripping extra whitespace around words and removing empty strings.
-    doc = [word.strip() for word in doc.split(' ') if word != '']
-
-    for word in doc:
+    for word in doc2words(doc, lang):
         if word in set(re.split('|', SENTENCE_DELIMS)):
             # Not noising punctuations.
             continue
@@ -266,12 +258,12 @@ class NoisingAugmentor(Augmentor):
 
         np.random.seed(random_state)
 
+        self.src_lang = path2lang(src_input_path)
+        self.tgt_lang = path2lang(tgt_input_path)
+
         self.mode = mode
         if not self.mode in VALID_AUG_MODES['noising']:
             raise ValueError(f'Invalid value of parameter \'mode\'. Valid values for parameter \'mode\' to depparse_aug are values in {*VALID_AUG_MODES["noising"],}.')
-
-        src_lang = path2lang(src_input_path)
-        tgt_lang = path2lang(tgt_input_path)
 
         self.augment = augment
 
@@ -316,9 +308,9 @@ class NoisingAugmentor(Augmentor):
 
         # Augmenting current document.
         src_doc = next(self.src_input_file)
-        augmented_src_doc = noising_aug(src_doc, self.mode, self.gamma0, self.src_unigram_counts, self.src_next_sets, self.src_prev_sets)
+        augmented_src_doc = noising_aug(src_doc, self.mode, self.gamma0, self.src_unigram_counts, self.src_lang, self.src_next_sets, self.src_prev_sets)
         tgt_doc = next(self.tgt_input_file)
-        augmented_tgt_doc = noising_aug(tgt_doc, self.mode, self.gamma0, self.tgt_unigram_counts, self.tgt_next_sets, self.tgt_prev_sets)
+        augmented_tgt_doc = noising_aug(tgt_doc, self.mode, self.gamma0, self.tgt_unigram_counts, self.tgt_lang, self.tgt_next_sets, self.tgt_prev_sets)
 
         return augmented_src_doc, augmented_tgt_doc
 

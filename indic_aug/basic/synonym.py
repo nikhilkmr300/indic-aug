@@ -8,7 +8,7 @@ import stanza
 import pyiwn
 
 from ..globals import Augmentor, ERRORS, SENTENCE_DELIMS
-from ..utils import cyclic_read, path2lang, line_count
+from ..utils import cyclic_read, path2lang, line_count, doc2words
 
 def convert_pos(stanza_pos, to):
     """Converts Universal Dependencies parts of speech to WordNet/IndoWordNet parts of speech.
@@ -147,14 +147,11 @@ def synonym_aug(doc, pipeline, net, p):
 
     augmented_doc = list()
 
-    # Splitting document at all punctuation marks.
-    doc = ' '.join(re.split(SENTENCE_DELIMS, doc))
-    # Stripping extra whitespace around words and removing empty strings.
-    doc = [word.strip() for word in doc.split(' ') if word != '']
+    lang = pipeline.lang
 
-    for word in doc:
-        if word == '.' or word == '\u0964':
-            # Not replacing fullstops.
+    for word in doc2words(doc, lang):
+        if word in set(re.split('|', SENTENCE_DELIMS)):
+            # Not replacing punctuations.
             continue
 
         if np.random.binomial(1, p):
@@ -194,11 +191,11 @@ class SynonymAugmentor(Augmentor):
             raise RuntimeError(ERRORS['corpus_shape'])
         self.doc_count = line_count(src_input_path)
 
-        random.seed(random_state)               # synonym_aug uses random from standard library.
+        random.seed(random_state)                   # synonym_aug uses random from standard library.
         np.random.seed(random_state)
 
-        src_lang = path2lang(src_input_path)
-        tgt_lang = path2lang(tgt_input_path)
+        self.src_lang = path2lang(src_input_path)
+        self.tgt_lang = path2lang(tgt_input_path)
 
         self.augment = augment
 
@@ -214,12 +211,12 @@ class SynonymAugmentor(Augmentor):
         self.p = p
 
         # Setting up stanza pipelines for source and target languages, for use with synonym_aug.
-        self.src_pipeline = stanza.Pipeline(lang=src_lang)
-        self.tgt_pipeline = stanza.Pipeline(lang=tgt_lang)
+        self.src_pipeline = stanza.Pipeline(lang=self.src_lang)
+        self.tgt_pipeline = stanza.Pipeline(lang=self.tgt_lang)
 
         # Setting up objects to use WordNet/IndoWordNet.
-        self.src_net = wn if src_lang == 'en' else pyiwn.IndoWordNet()
-        self.tgt_net = wn if tgt_lang == 'en' else pyiwn.IndoWordNet()
+        self.src_net = wn if self.src_lang == 'en' else pyiwn.IndoWordNet()
+        self.tgt_net = wn if self.tgt_lang == 'en' else pyiwn.IndoWordNet()
 
     def __next__(self):
         """Returns a pair of sentences on every call using a generator. Does a lazy load of the data.
