@@ -11,7 +11,9 @@ from .globals import ERRORS, UNK_TOKEN, LANGS
 def path2lang(path):
     """Returns language code from extension of path.
 
-    :param path: File whose language code is to be extracted. Note that the file must have extension as language code, for example, train.en for English. Refer globals.py for language codes.
+    :param path: File whose language code is to be extracted. Note that the file
+        must have extension as language code, for example, train.en for English.
+        Refer globals.py for language codes.
     :type path: str
 
     :return: Language code.
@@ -26,7 +28,8 @@ def path2lang(path):
     return lang
 
 def stanza2list(stanza_sent):
-    """Converts ``stanza.models.common.doc.Sentence`` to a list of str tokens, by stripping away all the extra stuff.
+    """Converts ``stanza.models.common.doc.Sentence`` to a list of str tokens,
+    by stripping away all the extra stuff.
 
     :param stanza_sent: Stanza sentence to be converted.
     :type stanza_sent: ``stanza.models.common.doc.Sentence``
@@ -41,12 +44,16 @@ def stanza2list(stanza_sent):
 def cyclic_read(filepath):
     """Returns a generator which can read the same file line by line (lazily) arbitrary number of times.
 
-    Using ``open`` to read a file will raise ``StopIteration`` once EOF is reached. ``cyclic_read`` will instead loop back to the start of file and continue reading indefinitely. Note that it also strips newline characters (both '\\n' and '\\r') before returning the line.
+    Using ``open`` to read a file will raise ``StopIteration`` once EOF is
+    reached. ``cyclic_read`` will instead loop back to the start of file and
+    continue reading indefinitely. Note that it also strips newline characters
+    (both '\\n' and '\\r') before returning the line.
 
     :param filepath: Path to input file.
     :type filepath: str
 
-    :usage: Say you have a file ``sample.txt`` which contains the text 'Line 1', 'Line 2' and 'Line 3' on three successive lines
+    :usage: Say you have a file ``sample.txt`` which contains the text 'Line 1',
+    'Line 2' and 'Line 3' on three successive lines
 
     .. code-block: python
 
@@ -85,11 +92,13 @@ def cyclic_read(filepath):
                 yield line.rstrip('\n')
 
 def closest_freq(word, freq_dict):
-    """Returns the word in ``freq_dict`` that has the closest frequency to that of ``word``.
+    """Returns the word in ``freq_dict`` that has the closest frequency to that
+    of ``word``.
 
     :param word: Word whose closest frequency word is to be found.
     :type word: str
-    :param freq_dict: Word to frequency mapping as returned by ``vocab.freq2dict_vocab``.
+    :param freq_dict: Word to frequency mapping as returned by
+        ``vocab.freq2dict_vocab``.
     :type freq_dict: dict
 
     :return: Word with closest frequency to that of ``word``.
@@ -140,7 +149,8 @@ def line_count(path):
     return int(process.communicate()[0].strip().split()[0])
 
 def doc2sents(doc, lang):
-    """Splits a document into sentences. Wrapper around ``nltk.sent_tokenize`` and ``indicnlp.tokenize.sentence_tokenize.sentence_split``.
+    """Splits a document into sentences. Wrapper around ``nltk.sent_tokenize``
+    and ``indicnlp.tokenize.sentence_tokenize.sentence_split``.
 
     :param doc: Document to be split into sentences.
     :type doc: str
@@ -161,7 +171,8 @@ def doc2sents(doc, lang):
         raise ValueError(ERRORS['lang'])
 
 def doc2words(doc, lang):
-    """Splits a document into words. Wrapper around ``nltk.word_tokenize`` and ``indicnlp.tokenize.indic_tokenize.trivial_tokenize``.
+    """Splits a document into words. Wrapper around ``nltk.word_tokenize`` and
+    ``indicnlp.tokenize.indic_tokenize.trivial_tokenize``.
 
     :param doc: Document to be split into words.
     :type doc: str
@@ -181,13 +192,15 @@ def doc2words(doc, lang):
     else:
         raise ValueError(ERRORS['lang'])
 
-def sent2words(sent, lang):
-    """Splits a sentence into words. Wrapper around ``nltk.word_tokenize`` and ``indicnlp.tokenize.indic_tokenize.trivial_tokenize``.
+def sent2words(doc, lang):
+    """Splits a sentence into words. Wrapper around ``nltk.word_tokenize`` and
+    ``indicnlp.tokenize.indic_tokenize.trivial_tokenize``.
 
-    Same as ``doc2words``, however have kept separate for readability reasons (document vs sentence).
+    Same as ``doc2words``, however have kept separate for readability reasons
+    (document vs sentence).
 
-    :param sent: Document to be split into words.
-    :type sent: str
+    :param doc: Document to be split into words.
+    :type doc: str
     :param lang: ISO 639-1 language code of ``sent``.
     :type lang: str
 
@@ -198,8 +211,8 @@ def sent2words(sent, lang):
     doc = doc.strip('\n\t ')
 
     if lang == 'en':
-        return nltk.word_tokenize(sent)
+        return nltk.word_tokenize(doc)
     elif lang in LANGS:
-        return trivial_tokenize(sent, lang=lang)
+        return trivial_tokenize(doc, lang=lang)
     else:
         raise ValueError(ERRORS['lang'])

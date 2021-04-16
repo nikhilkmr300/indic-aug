@@ -7,15 +7,19 @@ Module to contain variables that are required in multiple places.
 
 .. data:: PREPROC_FUNCS
 
-    List of preprocessing functions that can be used with ``preprocess.Preprocess.preprocess``.
+    List of preprocessing functions that can be used with 
+    ``preprocess.Preprocess.preprocess``.
 
 .. data:: INVALID_CHARS
 
-    List of characters that need to be removed from the raw corpus before using any augmentation. Remove all tabs and double quotes as they clash with the implementation.
+    List of characters that need to be removed from the raw corpus before using 
+    any augmentation. Remove all tabs and double quotes as they clash with the 
+    implementation.
 
 .. data:: SENTENCE_DELIMS
 
-    String of pipe (|) separated characters on which to split a document into sentences.
+    String of pipe (|) separated characters on which to split a document into 
+    sentences.
 
 .. data:: PAD_TOKEN
 
@@ -145,5 +149,8 @@ ERRORS = {
     'freq_dict_compulsory': 'Passing freq_dict is compulsory with mode=\'replace_freq\' of depparse_aug.',
 
     # Prev set compulsory with mode 'kneser_ney' of 'noising_aug'.
-    'prev_set_compulsory': 'Passing prev_sets is compulsory with mode=\'kneser_ney\' of noising_aug.'
+    'prev_set_compulsory': 'Passing prev_sets is compulsory with mode=\'kneser_ney\' of noising_aug.',
+
+    # Cannot retrieve alignment without first calling train.
+    'call_train': 'Attribute \'model\' of Aligner object does not exist yet. Call \'train\' on Aligner object first.'
 }

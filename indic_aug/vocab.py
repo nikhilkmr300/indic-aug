@@ -12,17 +12,22 @@ from .globals import PAD_TOKEN, PAD_ID, UNK_TOKEN, UNK_ID, SOS_TOKEN, SOS_ID, EO
 from .utils import path2lang
 
 def build_vocab(src_input_path, tgt_input_path, src_vocab_size, tgt_vocab_size, output_dirpath):
-    """Generates vocabulary from preprocessed corpus. Use ``preprocess.Preprocess`` to preprocess raw corpus. Outputs \*.model and \*.vocab files compatible with ``sentencepiece``.
+    """Generates vocabulary from preprocessed corpus. Use
+    ``preprocess.Preprocess`` to preprocess raw corpus. Outputs \*.model and
+    \*.vocab files compatible with ``sentencepiece``.
 
     :param src_input_path: Path to preprocessed source corpus.
     :type src_input_path: str
     :param tgt_input_path: Path to preprocessed target corpus.
     :type src_input_path: str
-    :param src_vocab_size: Max number of tokens in source vocabulary. Pass -1 to use all tokens.
+    :param src_vocab_size: Max number of tokens in source vocabulary. Pass -1 to
+        use all tokens.
     :type src_vocab_size: int
-    :param tgt_vocab_size: Max number of tokens in target vocabulary. Pass -1 to use all tokens.
+    :param tgt_vocab_size: Max number of tokens in target vocabulary. Pass -1 to
+        use all tokens.
     :type tgt_vocab_size: int
-    :param output_dirpath: Path to directory where to write \*.model and \*.vocab files.
+    :param output_dirpath: Path to directory where to write \*.model and
+        \*.vocab files.
     :type output_dirpath: str
     """
 
@@ -62,9 +67,11 @@ def read_vocab(vocab_path):
     return vocab
 
 def score2freq(model, words):
-    """Converts negative log likelihood score returned by ``sentencepiece`` to frequency of occurrence of tokens in corpus.
+    """Converts negative log likelihood score returned by ``sentencepiece`` to
+    frequency of occurrence of tokens in corpus.
 
-    :param model: ``sentencepiece.SentencePieceProcessor`` object on which ``load`` method has been called with a \*.model file.
+    :param model: ``sentencepiece.SentencePieceProcessor`` object on which
+        ``load`` method has been called with a \*.model file.
     :type model: ``sentencepiece.SentencePieceProcessor``
     :param words: List of words whose frequencies are to be returned.
     :type words: list
@@ -89,11 +96,13 @@ def score2freq(model, words):
     return freq_dict
 
 def score2freq_vocab(model_path, vocab_path):
-    """Returns frequencies of all words in the vocabulary, given a \*.vocab file.
+    """Returns frequencies of all words in the vocabulary, given a \*.vocab
+    file.
 
     :param model_path: Path to \*.model file compatible with ``sentencepiece``.
     :type model_path: str
-    :param vocab_path: Path to \*.vocab file compatible with ``sentencepiece``, corresponding to model at ``model_path``.
+    :param vocab_path: Path to \*.vocab file compatible with ``sentencepiece``,
+        corresponding to model at ``model_path``.
     :type vocab_path: str
 
     :return: Dictionary of word to frequency pairs.

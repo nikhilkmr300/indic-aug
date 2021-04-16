@@ -12,14 +12,17 @@ class DepParseTree:
     """Represents a dependency parsing tree."""
 
     class Root:
-        """Representation of <root> as class with static attribute text for compatibility with ``stanza.models.common.doc.Word``."""
+        """Representation of <root> as class with static attribute text for
+        compatibility with ``stanza.models.common.doc.Word``.
+        """
 
         text = '<root>'
 
     def __init__(self, sent):
         """Constructor method.
 
-        :param sent: Sentence for which dependency parse tree is to be created. Do NOT pass a `str`.
+        :param sent: Sentence for which dependency parse tree is to be created.
+            Do NOT pass a `str`.
         :type sent: ``stanza.models.common.doc.Sentence``
         """
 
@@ -51,9 +54,11 @@ class DepParseTree:
         return 1 + self._get_depth(self.words[idx].head)
 
     def score(self, alpha=0.1):
-        """Calculates score of node in dependency parse tree in accordance with :cite:t:`duan2020syntax`.
+        """Calculates score of node in dependency parse tree in accordance with
+        :cite:t:`duan2020syntax`.
 
-        :param alpha: Hyperparameter which controls likelihood of changing, defaults to 0.1.
+        :param alpha: Hyperparameter which controls likelihood of changing,
+            defaults to 0.1.
         :type alpha: float, optional
 
         :return: Score of node.
@@ -85,17 +90,23 @@ class DepParseTree:
 
         :param output_path: Path to output DOT file.
         :type output_path: str
-        :param shape: Shape of boundary box of node, defaults to 'box'. Refer GraphViz docs for allowed values.
+        :param shape: Shape of boundary box of node, defaults to 'box'. Refer
+            GraphViz docs for allowed values.
         :type shape: str
-        :param style: Style of node, defaults to 'filled'. Refer GraphViz docs for allowed values.
+        :param style: Style of node, defaults to 'filled'. Refer GraphViz docs
+            for allowed values.
         :type style: str
-        :param fillcolor: Fill color of node, defaults to 'mediumorchid'. Allowed values are X11 color strings.
+        :param fillcolor: Fill color of node, defaults to 'mediumorchid'.
+            Allowed values are X11 color strings.
         :type fillcolor: str
-        :param fontname: Font to use for node labels, defaults to 'Courier'. Refer GraphViz docs for allowed values.
+        :param fontname: Font to use for node labels, defaults to 'Courier'.
+        Refer GraphViz docs for allowed values.
         :type fontname: str
-        :param fontcolor: Color of font for node labels, defaults to 'black'. Allowed values are X11 color strings.
+        :param fontcolor: Color of font for node labels, defaults to 'black'.
+        Allowed values are X11 color strings.
         :type fontcolor: str
-        :param edgecolor: Color of edges, defaults to 'black'. Allowed values are X11 color strings.
+        :param edgecolor: Color of edges, defaults to 'black'. Allowed values
+        are X11 color strings.
         :type edgecolor: str
         """
 
@@ -129,41 +140,53 @@ class DepParseTree:
         return self.words[idx].text
 
     def depths2list(self):
-        """Returns depths of all nodes in tree as a list. Each element in the list is itself a list in the format [<word_index>, <word>, <depth>].
+        """Returns depths of all nodes in tree as a list. Each element in the
+        list is itself a list in the format [<word_index>, <word>, <depth>].
         """
 
         return [[idx, self.index2word(idx), self.depths[idx]] for idx in range(len(self.words))]
 
     def qprobs2list(self):
-        """Returns q-probabilities (refer :cite:t:`duan2020syntax`) of all nodes in tree as a list. Each element in the list is itself a list in the format [<word_index>, <word>, <q_probability>].
+        """Returns q-probabilities (refer :cite:t:`duan2020syntax`) of all nodes
+        in tree as a list. Each element in the list is itself a list in the
+        format [<word_index>, <word>, <q_probability>].
         """
 
         return [[idx, self.index2word(idx), self.q_probs[idx]] for idx in range(len(self.words))]
 
     def softmax2list(self):
-        """Returns softmax output (refer :cite:t:`duan2020syntax`) of all nodes in tree as a list. Each element in the list is itself a list in the format [<word_index>, <word>, <softmax_output>].
+        """Returns softmax output (refer :cite:t:`duan2020syntax`) of all nodes
+        in tree as a list. Each element in the list is itself a list in the
+        format [<word_index>, <word>, <softmax_output>].
         """
 
         return [[idx, self.index2word(idx), self.softmaxed_probs[idx]] for idx in range(len(self.words))]
 
     def scores2list(self):
-        """Returns score (refer :cite:t:`duan2020syntax`) of all nodes in tree as a list. Each element in the list is itself a list in the format [<word_index>, <word>, <score>].
+        """Returns score (refer :cite:t:`duan2020syntax`) of all nodes in tree
+        as a list. Each element in the list is itself a list in the format
+        [<word_index>, <word>, <score>].
         """
 
         return [[idx, self.index2word(idx), self.scores[idx]] for idx in range(len(self.words))]
 
 def depparse_aug(sent, mode, alpha, freq_dict=None):
-    """Performs augmentation on one sentence (and NOT a document of sentences, as some of the other augmentorss) by dependency parsing (refer :cite:t:`duan2020syntax`).
+    """Performs augmentation on one sentence (and NOT a document of sentences,
+    as some of the other augmentorss) by dependency parsing (refer
+    :cite:t:`duan2020syntax`).
 
-    ``freq_dict`` is required only if ``mode`` is 'replace', it is ignored otherwise.
+    ``freq_dict`` is required only if ``mode`` is 'replace', it is ignored
+    otherwise.
 
     :param sent: Sentence to be augmented. Do NOT pass a str or a list of str.
     :type sent: ``stanza.models.common.doc.Sentence``
-    :param mode: Action to perform after scores are extracted. Valid values are given in globals.py.
+    :param mode: Action to perform after scores are extracted. Valid values are
+        given in globals.py.
     :type mode: str
     :param alpha: Same as for ``DepParseTree.score``.
     :type alpha: float
-    :param freq_dict: Dictionary of word-frequency pairs as returned by ``vocab.score2freq_vocab``, defaults to None.
+    :param freq_dict: Dictionary of word-frequency pairs as returned by
+        ``vocab.score2freq_vocab``, defaults to None.
     :type freq_dict: dict, optional
 
     :return: Augmented sentence.
@@ -176,7 +199,8 @@ def depparse_aug(sent, mode, alpha, freq_dict=None):
     tree = DepParseTree(sent)                   # Dependency parse tree for sentence.
     tree.score(alpha=alpha)
 
-    # Converting stanza sentence to simple list as we no longer need the extra stuff.
+    # Converting stanza sentence to simple list as we no longer need the extra
+    # stuff.
     sent = stanza2list(sent)
 
     scores = tree.scores[1:]                    # Dropping score related to root as it is not required.
@@ -188,7 +212,6 @@ def depparse_aug(sent, mode, alpha, freq_dict=None):
         if word in {UNK_TOKEN, PAD_TOKEN, SOS_TOKEN, EOS_TOKEN, BLANK_TOKEN}:
             continue
 
-        # CHECK: Generate a new random number for each iteration or use a common one initialized outside the for loop?
         if np.random.binomial(1, scores[idx]):
             if mode == 'blank':
                 # Blanking with probability scores[idx].
@@ -208,26 +231,33 @@ def depparse_aug(sent, mode, alpha, freq_dict=None):
     return ' '.join(sent)
 
 class DepParseAugmentor:
-    """Class to augment parallel corpora by dependency parsing technique (refer: :cite:t:`duan2020syntax`)."""
+    """Class to augment parallel corpora by dependency parsing technique (refer:
+    :cite:t:`duan2020syntax`).
+    """
 
     def __init__(self, src_input_path, tgt_input_path, mode, alpha, src_freq_dict=None, tgt_freq_dict=None, stanza_dir=os.path.join('~', 'stanza_resources'), augment=True, random_state=1):
         """Constructor method.
 
         :param src_input_path: Path to aligned source corpus.
         :type src_input_path: str
-        :param tgt_input_path: Path to aligned target corpus, corresponding to the above source corpus.
+        :param tgt_input_path: Path to aligned target corpus, corresponding to
+            the above source corpus.
         :type tgt_input_path: str
         :param mode: Same as for ``depparse_aug``.
         :type mode: str
         :param alpha: Same as for ``DepParseTree``.
         :type alpha: float
-        :param src_freq_dict: Same as for ``freq_dict`` in ``transforms.depparse_aug``.
+        :param src_freq_dict: Same as for ``freq_dict`` in
+            ``transforms.depparse_aug``.
         :type src_freq_dict: dict
-        :param tgt_freq_dict: Same as for ``freq_dict`` in ``transforms.depparse_aug``.
+        :param tgt_freq_dict: Same as for ``freq_dict`` in
+            ``transforms.depparse_aug``.
         :type tgt_freq_dict: dict
-        :param stanza_dir: Path to directory containing stanza models (the default is ``~/stanza_resources`` on doing a ``stanza.download``).
+        :param stanza_dir: Path to directory containing stanza models (the
+            default is ``~/stanza_resources`` on doing a ``stanza.download``).
         :type stanza_dir: str
-        :param augment: Performs augmentation if ``True``, else returns original pair of sentences.
+        :param augment: Performs augmentation if ``True``, else returns original
+            pair of sentences.
         :type augment: bool
         :param random_state: Seed for the random number generator.
         :type random_state: int
@@ -245,7 +275,8 @@ class DepParseAugmentor:
         self.augment = augment
 
         if self.augment:
-            # If augment is True, can perform arbitrary number of augmentations by cycling through all the sentences in the corpus repeatedly.
+            # If augment is True, can perform arbitrary number of augmentations
+            # by cycling through all the sentences in the corpus repeatedly.
             self.src_input_file = cyclic_read(src_input_path)
             self.tgt_input_file = cyclic_read(tgt_input_path)
         else:
@@ -258,7 +289,8 @@ class DepParseAugmentor:
         self.src_freq_dict = src_freq_dict
         self.tgt_freq_dict = tgt_freq_dict
 
-        # Loading stanza pipeline for source language to convert string to stanza.models.common.doc.Sentence.
+        # Loading stanza pipeline for source language to convert string to
+        # stanza.models.common.doc.Sentence.
         try:
             self.src_pipeline = stanza.Pipeline(src_lang)
         except (stanza.pipeline.core.ResourcesFileNotFoundError, stanza.pipeline.core.LanguageNotDownloadedError) as e:
@@ -267,7 +299,8 @@ class DepParseAugmentor:
             stanza.download(src_lang)
             self.src_pipeline = stanza.Pipeline(src_lang)
 
-        # Loading stanza pipeline for target language to convert string to stanza.models.common.doc.Sentence.
+        # Loading stanza pipeline for target language to convert string to
+        # stanza.models.common.doc.Sentence.
         try:
             self.tgt_pipeline = stanza.Pipeline(tgt_lang)
         except (stanza.pipeline.core.ResourcesFileNotFoundError, stanza.pipeline.core.LanguageNotDownloadedError) as e:
@@ -277,26 +310,23 @@ class DepParseAugmentor:
             self.tgt_pipeline = stanza.Pipeline(tgt_lang)
 
     def __next__(self):
-        """Returns a pair of sentences on every call using a generator. Does a lazy load of the data.
-
-        If augment is False, then original sentences are returned until end of file is reached. Useful if corpus is large and you cannot load the whole data into memory.
-
-        Else if augment is True, you can keep cycling through the dataset generating new augmented versions of the sentences on each cycle.
-        """
-
         # Returning original sentences as they are if self.augment is False.
         if not self.augment:
             return next(self.src_input_file).rstrip('\n'), next(self.tgt_input_file).rstrip('\n')
 
-        # Converting sample (string of sentences) to stanza.models.common.doc.Document object, getting next document.
+        # Converting sample (string of sentences) to
+        # stanza.models.common.doc.Document object, getting next document.
         src_doc = self.src_pipeline(next(self.src_input_file).rstrip('\n'))
         tgt_doc = self.tgt_pipeline(next(self.tgt_input_file).rstrip('\n'))
 
-        # Placeholder list to hold augmented document, will join all sentences in document before returning.
+        # Placeholder list to hold augmented document, will join all sentences
+        # in document before returning.
         augmented_src_doc = list()
         augmented_tgt_doc = list()
 
-        # Iterating over sentences in current document. Using separate for loops (and not zipping) because source and target documents may have different number of sentences.
+        # Iterating over sentences in current document. Using separate for loops
+        # (and not zipping) because source and target documents may have
+        # different number of sentences.
         for src_sent in src_doc.sentences:
             augmented_src_doc.append(depparse_aug(src_sent, self.mode, self.alpha, self.src_freq_dict))
         for tgt_sent in tgt_doc.sentences:

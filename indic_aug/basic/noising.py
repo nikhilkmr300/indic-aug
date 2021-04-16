@@ -5,8 +5,12 @@ import numpy as np
 from ..globals import Augmentor, VALID_AUG_MODES, BLANK_TOKEN, ERRORS, SENTENCE_DELIMS
 from ..utils import cyclic_read, path2lang, line_count, doc2sents, sent2words, doc2words
 
-def get_unigram_counts(path):
-    """Returns the count of all the unigrams that appear in the corpus at ``path``. Corpus at ``path`` must be formatted so that each line contains a document, and each document may contain one or more sentences terminated either by the fullstop character (\u002e) or the poorna virama character (\u0964). Each sentence is made of space-separated tokens.
+def count_unigrams(path):
+    """Returns the count of all the unigrams that appear in the corpus at
+    ``path``. Corpus at ``path`` must be formatted so that each line contains a
+    document, and each document may contain one or more sentences terminated
+    either by the fullstop character (\u002e) or the poorna virama character
+    (\u0964). Each sentence is made of space-separated tokens.
 
     :param path: Path to input corpus.
     :type path: str
@@ -37,10 +41,12 @@ def get_unigram_counts(path):
 def sample_word(unigram_counts):
     """Samples words from a probability distribution of words.
 
-    :param unigram_counts: Map of words (str) to their number of occurrences (int), as returned by ``get_unigram_counts``.
+    :param unigram_counts: Map of words (str) to their number of occurrences
+        (int), as returned by ``count_unigrams``.
     :type: dict
 
-    :return: Word randomly sampled according to the probability distribution of counts.
+    :return: Word randomly sampled according to the probability distribution of
+        counts.
     :rtype: str
     """
 
@@ -59,13 +65,18 @@ def sample_word(unigram_counts):
     # Returning the word corresponding to word_idx.
     return words2probs[word_idx][0]
 
-def get_bigram_counts(path):
-    """Returns the count of all the bigrams that appear in the corpus at ``path``. Corpus at ``path`` must be formatted so that each line contains a document, and each document may contain one or more sentences terminated either by the fullstop character (\u002e) or the poorna virama character (\u0964). Each sentence is made of space-separated tokens.
+def count_bigrams(path):
+    """Returns the count of all the bigrams that appear in the corpus at
+    ``path``. Corpus at ``path`` must be formatted so that each line contains a
+    document, and each document may contain one or more sentences terminated
+    either by the fullstop character (\u002e) or the poorna virama character
+    (\u0964). Each sentence is made of space-separated tokens.
 
     :param path: Path to input corpus.
     :type path: str
 
-    :return: Map of bigram (represented as a 2-tuple) to number of occurrences of that bigram.
+    :return: Map of bigram (represented as a 2-tuple) to number of occurrences
+        of that bigram.
     :rtype: dict
     """
 
@@ -85,15 +96,19 @@ def get_bigram_counts(path):
 
     return bigram_counts
 
-def get_next_sets(bigram_counts):
+def next_sets(bigram_counts):
     """Returns the next set of first unigrams occurring in ``bigram_counts``.
 
-    Defining next set of a word as the set of second unigrams where that word is the first unigram.
-    For example, say we have the bigrams ('hello', 'world'), ('hello', 'alice') and ('hello', 'bob'), then the next set of 'hello' would be {'world', 'alice', 'bob'}.
+    Defining next set of a word as the set of second unigrams where that word is
+    the first unigram. For example, say we have the bigrams ('hello', 'world'),
+    ('hello', 'alice') and ('hello', 'bob'), then the next set of 'hello' would
+    be {'world', 'alice', 'bob'}.
 
-    Return value of this function is a dictionary of first unigram to its next set pairs.
+    Return value of this function is a dictionary of first unigram to its next
+    set pairs.
 
-    :param bigram_counts: Dictionary of bigram (2-tuple) to bigram count pairs, as returned by ``get_bigram_counts``.
+    :param bigram_counts: Dictionary of bigram (2-tuple) to bigram count pairs,
+        as returned by ``count_bigrams``.
     :type bigram_counts: dict
 
     :return: Next sets of all first unigrams.
@@ -113,15 +128,20 @@ def get_next_sets(bigram_counts):
 
     return next_sets
 
-def get_prev_sets(bigram_counts):
+def prev_sets(bigram_counts):
     """Returns the prev set of second unigrams occurring in ``bigram_counts``.
 
-    Defining prev set of a word as the set of first unigrams where that word is the second unigram.
-    For example, say we have the bigrams ('red', 'flag'), ('green', 'flag'), ('white', 'flag'), then the prev set of 'flag' would be {'red', 'green', 'flag'}.
+    Defining prev set of a word as the set of first unigrams where that word is
+    the second unigram.
+    For example, say we have the bigrams ('red', 'flag'), ('green', 'flag'),
+    ('white', 'flag'), then the prev set of 'flag' would be {'red', 'green',
+    'flag'}.
 
-    Return value of this function is a dictionary of first unigram to its next set pairs.
+    Return value of this function is a dictionary of first unigram to its next
+    set pairs.
 
-    :param bigram_counts: Dictionary of bigram (2-tuple) to bigram count pairs, as returned by ``get_bigram_counts``.
+    :param bigram_counts: Dictionary of bigram (2-tuple) to bigram count pairs,
+        as returned by ``count_bigrams``.
     :type bigram_counts: dict
 
     :return: Next sets of all first unigrams.
@@ -142,13 +162,20 @@ def get_prev_sets(bigram_counts):
     return prev_sets
 
 def noising_aug(doc, mode, gamma0, unigram_counts, lang, next_sets, prev_sets=None):
-    """Performs augmentation on a document by blanking/replacement (refer: :cite:t:`xie2017data`).
+    """Performs augmentation on a document by blanking/replacement (refer:
+    :cite:t:`xie2017data`).
 
     Supports all the four modes specified in the paper:
-        * `blank`: Replaces token with ``BLANK_TOKEN`` with noising probability ``gamma0``.
-        * `replace`: Replaces token with another token from the unigram distribution with noising probability ``gamma0``.
-        * `absolute_discount`: Replaces token with another token from the unigram distribution with absoute discounted probability obtained from ``gamma0``.
-        * `kneser_ney`: Replaces token with another token from its prev set with absoute discounted probability obtained from ``gamma0``, analogous to Kneser-Ney smoothing.
+        * `blank`: Replaces token with ``BLANK_TOKEN`` with noising probability
+            ``gamma0``.
+        * `replace`: Replaces token with another token from the unigram
+            distribution with noising probability ``gamma0``.
+        * `absolute_discount`: Replaces token with another token from the
+            unigram distribution with absoute discounted probability obtained 
+            from ``gamma0``.
+        * `kneser_ney`: Replaces token with another token from its prev set with
+            absoute discounted probability obtained from ``gamma0``, analogous 
+            to Kneser-Ney smoothing.
 
     :param doc: Document to be augmented.
     :type doc: str
@@ -158,9 +185,12 @@ def noising_aug(doc, mode, gamma0, unigram_counts, lang, next_sets, prev_sets=No
     :type gamma0: float
     :param lang: ISO 639-1 language code of ``doc``.
     :type lang: str
-    :param next_sets: Next sets of all tokens in corpus, as returned by `get_next_sets`.
+    :param next_sets: Next sets of all tokens in corpus, as returned by
+        `next_sets`.
     :type next_sets: dict
-    :param prev_sets: Prev sets of all tokens in corpus, as returned by `get_next_sets`, optional. Required if ``mode`` is 'kneser_ney', else ignored.
+    :param prev_sets: Prev sets of all tokens in corpus, as returned by
+        `next_sets`, optional. Required if ``mode`` is 'kneser_ney', else
+        ignored.
     :type prev_sets: dict
 
     :return: Augmented document.
@@ -209,14 +239,16 @@ def noising_aug(doc, mode, gamma0, unigram_counts, lang, next_sets, prev_sets=No
             denom = unigram_counts[word]
             gammaAD = gamma0 * numer / denom     # Absolute discounted gamma, refer Xie's paper.
 
-            # Unigram counts of words in prev set of word, calling it Kneser-Ney distribution.
+            # Unigram counts of words in prev set of word, calling it Kneser-Ney
+            # distribution.
             kneser_ney_distr = dict()
             if word in prev_sets.keys():
                 for first_word in prev_sets[word]:
                     kneser_ney_distr[first_word] = unigram_counts[first_word]
 
             if np.random.binomial(1, gammaAD):
-                # Replacing from Kneser-Ney distribution with probability gammaAD.
+                # Replacing from Kneser-Ney distribution with probability
+                # gammaAD.
                 if not len(kneser_ney_distr):
                     # If no words in prev set, replace word with itself.
                     sampled_word = word
@@ -240,13 +272,15 @@ class NoisingAugmentor(Augmentor):
 
         :param src_input_path: Path to aligned source corpus.
         :type src_input_path: str
-        :param tgt_input_path: Path to aligned target corpus, corresponding to the above source corpus.
+        :param tgt_input_path: Path to aligned target corpus, corresponding to
+            the above source corpus.
         :type tgt_input_path: str
         :param mode: Same as for ``noising_aug``.
         :type mode: str
         :param gamma0: Same as for ``noising_aug``.
         :type gamma0: float
-        :param augment: Performs augmentation if ``True``, else returns original pair of sentences.
+        :param augment: Performs augmentation if ``True``, else returns original
+            pair of sentences.
         :type augment: bool
         :param random_state: Seed for the random number generator.
         :type random_state: int
@@ -268,7 +302,8 @@ class NoisingAugmentor(Augmentor):
         self.augment = augment
 
         if self.augment:
-            # If augment is True, can perform arbitrary number of augmentations by cycling through all the sentences in the corpus repeatedly.
+            # If augment is True, can perform arbitrary number of augmentations
+            # by cycling through all the sentences in the corpus repeatedly.
             self.src_input_file = cyclic_read(src_input_path)
             self.tgt_input_file = cyclic_read(tgt_input_path)
         else:
@@ -278,30 +313,23 @@ class NoisingAugmentor(Augmentor):
 
         self.gamma0 = gamma0
 
-        self.src_unigram_counts = get_unigram_counts(src_input_path)
-        self.tgt_unigram_counts = get_unigram_counts(tgt_input_path)
-        src_bigram_counts = get_bigram_counts(src_input_path)
-        tgt_bigram_counts = get_bigram_counts(tgt_input_path)
+        self.src_unigram_counts = count_unigrams(src_input_path)
+        self.tgt_unigram_counts = count_unigrams(tgt_input_path)
+        src_bigram_counts = count_bigrams(src_input_path)
+        tgt_bigram_counts = count_bigrams(tgt_input_path)
 
-        self.src_next_sets = get_next_sets(src_bigram_counts)
-        self.tgt_next_sets = get_next_sets(tgt_bigram_counts)
+        self.src_next_sets = next_sets(src_bigram_counts)
+        self.tgt_next_sets = next_sets(tgt_bigram_counts)
 
         if self.mode == 'kneser_ney':
             # Only Kneser-Ney noising requires previous sets.
-            self.src_prev_sets = get_prev_sets(src_bigram_counts)
-            self.tgt_prev_sets = get_prev_sets(tgt_bigram_counts)
+            self.src_prev_sets = prev_sets(src_bigram_counts)
+            self.tgt_prev_sets = prev_sets(tgt_bigram_counts)
         else:
             self.src_prev_sets = None
             self.tgt_prev_sets = None
 
     def __next__(self):
-        """Returns a pair of sentences on every call using a generator. Does a lazy load of the data.
-
-        If augment is False, then original sentences are returned until end of file is reached. Useful if corpus is large and you cannot load the whole data into memory.
-
-        Else if augment is True, you can keep cycling through the dataset generating new augmented versions of the sentences on each cycle.
-        """
-
         # Returning original sentences as they are if self.augment is False.
         if not self.augment:
             return next(self.src_input_file).rstrip('\n'), next(self.tgt_input_file).rstrip('\n')

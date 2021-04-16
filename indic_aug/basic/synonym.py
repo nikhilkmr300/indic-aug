@@ -11,11 +11,13 @@ from ..globals import Augmentor, ERRORS, SENTENCE_DELIMS
 from ..utils import cyclic_read, path2lang, line_count, doc2words
 
 def convert_pos(stanza_pos, to):
-    """Converts Universal Dependencies parts of speech to WordNet/IndoWordNet parts of speech.
+    """Converts Universal Dependencies parts of speech to WordNet/IndoWordNet
+    parts of speech.
 
     :param stanza_pos: POS defined by Universal Dependencies.
     :type stanza_pos: str
-    :param to: POS to convert to, can be 'wn' for WordNet and 'iwn' for IndoWordNet.
+    :param to: POS to convert to, can be 'wn' for WordNet and 'iwn' for
+        IndoWordNet.
     :type to: str
 
     :return: POS in WordNet/IndoWordNet format.
@@ -73,32 +75,37 @@ def convert_pos(stanza_pos, to):
     else:
         raise ValueError(f'Invalid value of parameter \'to\'. Valid values for parameter \'to\' are values in (\'wn\', \'iwn\'. Pass \'wn\' to convert from Universal Dependencies POS to WordNet POS (for English) and \'iwn\' to convert from Universal Dependencies POS to IndoWordNet POS (for Indian languages).')
 
-def get_synonyms(word, pipeline, net):
+def find_synonyms(word, pipeline, net):
     """Returns a list of synonyms of ``word``.
 
     :param word: Word whose synonym is required.
     :type word: str
     :param pipeline: ``stanza.Pipeline`` corresponding to language of word.
-    :type pipeline: `stanza.Pipeline`
-    :param net: Thesaurus (word net) to use. Use nltk.corpus.wordnet for English and pyiwn.iwn.IndoWordNet() for Indian languages.
-    :type net: `nltk.corpus.reader.wordnet.WordNetCorpusReader` for English and `pyiwn.iwn.IndoWordNet` for Indian languages.
+    :type pipeline: ``stanza.Pipeline``
+    :param net: Thesaurus (word net) to use. Use nltk.corpus.wordnet for English
+        and pyiwn.iwn.IndoWordNet() for Indian languages.
+    :type net: ``nltk.corpus.reader.wordnet.WordNetCorpusReader`` for English
+        and ``pyiwn.iwn.IndoWordNet`` for Indian languages.
 
     :return: List of synonyms for ``word``.
     :rtype: list
     """
 
     if len(word.split(' ')) != 1:
-        raise ValueError(f'Parameter \'word\' to get_synonyms must be a str with no spaces.')
+        raise ValueError(f'Parameter \'word\' to find_synonyms must be a str with no spaces.')
 
     lang = pipeline.lang
 
-    # POS of word whose synonyms are required in Universal Dependencies format, used by stanza.
+    # POS of word whose synonyms are required in Universal Dependencies format,
+    # used by stanza.
     stanza_pos = pipeline(word).sentences[0].words[0].upos
-    # POS of word whose synonyms are required in WordNet or IndoWordNet format, used by nltk/pyiwn.
+    # POS of word whose synonyms are required in WordNet or IndoWordNet format,
+    # used by nltk/pyiwn.
     converted_pos = convert_pos(stanza_pos, 'wn') if lang == 'en' else convert_pos(stanza_pos, 'iwn')
 
     if converted_pos is None:
-        # If converted_pos is None, unknown POS, nltk/pyiwn cannot handle, return word as its own synonym.
+        # If converted_pos is None, unknown POS, nltk/pyiwn cannot handle,
+        # return word as its own synonym.
         return [word]
 
     synonyms = list()
@@ -124,20 +131,23 @@ def get_synonyms(word, pipeline, net):
     synonyms = [synonym for synonym in synonyms if synonym != word]
 
     if len(synonyms) == 0:
-        # If removing occurrences of word itself led to synonyms being empty, return word as its own synonym.
+        # If removing occurrences of word itself led to synonyms being empty,
+        # return word as its own synonym.
         synonyms = [word]
 
     return synonyms
 
 def synonym_aug(doc, pipeline, net, p):
-    """Performs augmentation on a document by replacing with synonyms (refer: :cite:t:`wei2019eda`).
+    """Performs augmentation on a document by replacing with synonyms (refer:
+    :cite:t:`wei2019eda`).
 
     :param doc: Document to be augmented.
     :type doc: str
-    :param pipeline: Same as for ``get_synonyms``.
-    :type pipeline: `stanza.Pipeline`
-    :param net: Same as for ``get_synonyms``.
-    :type net: `nltk.corpus.reader.wordnet.WordNetCorpusReader` for English and `pyiwn.iwn.IndoWordNet` for Indian languages.
+    :param pipeline: Same as for ``find_synonyms``.
+    :type pipeline: ``stanza.Pipeline``
+    :param net: Same as for ``find_synonyms``.
+    :type net: ``nltk.corpus.reader.wordnet.WordNetCorpusReader`` for English
+        and ``pyiwn.iwn.IndoWordNet`` for Indian languages.
     :param p: Probability of a word to be replaced by one of its synonyms.
     :type p: float
 
@@ -156,7 +166,7 @@ def synonym_aug(doc, pipeline, net, p):
 
         if np.random.binomial(1, p):
             # Randomly sampling a synonym from list of synonyms of word.
-            synonyms = get_synonyms(word, pipeline, net)
+            synonyms = find_synonyms(word, pipeline, net)
             if not len(synonyms):
                 # If no synonyms found, replace word with itself.
                 sampled_synonym = word
@@ -170,18 +180,22 @@ def synonym_aug(doc, pipeline, net, p):
     return ' '.join(augmented_doc)
 
 class SynonymAugmentor(Augmentor):
-    """Class to augment parallel corpora by synonym augmentation technique (refer: :cite:t:`wei2019eda`)."""
+    """Class to augment parallel corpora by synonym augmentation technique
+    (refer: :cite:t:`wei2019eda`).
+    """
 
     def __init__(self, src_input_path, tgt_input_path, p, augment=True, random_state=1):
         """Constructor method.
 
         :param src_input_path: Path to aligned source corpus.
         :type src_input_path: str
-        :param tgt_input_path: Path to aligned target corpus, corresponding to the above source corpus.
+        :param tgt_input_path: Path to aligned target corpus, corresponding to
+            the above source corpus.
         :type tgt_input_path: str
         :param p: Same as for ``synonym_aug``.
         :type p: float
-        :param augment: Performs augmentation if ``True``, else returns original pair of sentences.
+        :param augment: Performs augmentation if ``True``, else returns original
+            pair of sentences.
         :type augment: bool
         :param random_state: Seed for the random number generator.
         :type random_state: int
@@ -200,7 +214,8 @@ class SynonymAugmentor(Augmentor):
         self.augment = augment
 
         if self.augment:
-            # If augment is True, can perform arbitrary number of augmentations by cycling through all the sentences in the corpus repeatedly.
+            # If augment is True, can perform arbitrary number of augmentations
+            # by cycling through all the sentences in the corpus repeatedly.
             self.src_input_file = cyclic_read(src_input_path)
             self.tgt_input_file = cyclic_read(tgt_input_path)
         else:
@@ -210,7 +225,8 @@ class SynonymAugmentor(Augmentor):
 
         self.p = p
 
-        # Setting up stanza pipelines for source and target languages, for use with synonym_aug.
+        # Setting up stanza pipelines for source and target languages, for use
+        # with synonym_aug.
         self.src_pipeline = stanza.Pipeline(lang=self.src_lang)
         self.tgt_pipeline = stanza.Pipeline(lang=self.tgt_lang)
 
@@ -219,13 +235,6 @@ class SynonymAugmentor(Augmentor):
         self.tgt_net = wn if self.tgt_lang == 'en' else pyiwn.IndoWordNet()
 
     def __next__(self):
-        """Returns a pair of sentences on every call using a generator. Does a lazy load of the data.
-
-        If augment is False, then original sentences are returned until end of file is reached. Useful if corpus is large and you cannot load the whole data into memory.
-
-        Else if augment is True, you can keep cycling through the dataset generating new augmented versions of the sentences on each cycle.
-        """
-
         # Returning original sentences as they are if self.augment is False.
         if not self.augment:
             return next(self.src_input_file).rstrip('\n'), next(self.tgt_input_file).rstrip('\n')

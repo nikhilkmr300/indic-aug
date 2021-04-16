@@ -38,8 +38,56 @@
 
 # # Alignment demo
 # # --------------
+# import dill as pickle
+# import time
+
 # from indic_aug.align import Aligner
-# aligner = Aligner('ibm1', 5)
-# print('Training...')
-# aligner.train('example/data/preprocessed/dev.en', 'example/data/preprocessed/dev.hi')
-# aligner.serialize('sample.pkl')
+
+# ibm1 = Aligner('ibm1', 5)
+
+# # # Training model.
+# # t1 = time.time()
+# # ibm1.train('example/data/preprocessed/train.en', 'example/data/preprocessed/train.hi')
+# # t2 = time.time()
+# # print(f'Training IBM Model 1 took {t2 - t1} s.')
+# # ibm1.serialize('ibm1.pkl')
+
+# # Loading model.
+# with open('ibm1.pkl', 'rb') as f:
+#     ibm1 = pickle.load(f)
+
+# # test_words = [
+# #     'Ambedkar',
+# #     'India',
+# #     'Government',
+# #     'recall',
+# #     'welcome',
+# #     'importance',
+# #     'independence',
+# #     'yesterday',
+# #     'fabric',
+# #     'terror',
+# #     'attacks',
+# #     'Afghanistan',
+# #     'celebrated',
+# #     'partnerships',
+# #     'tallest',
+# #     'Vietnam',
+# #     'economic',
+# #     'lorem_ipsum'
+# # ]
+
+# test_words = [
+#     'John',
+#     'hit',
+#     'the',
+#     'ball',
+#     'with',
+#     'the',
+#     'bat',
+#     '.'
+# ]
+
+# print('IBM Model 1\n' + '-' * len('IBM Model 1'))
+# for test_word in test_words:
+#     print('{:20s}{:20s}'.format(test_word, ibm1.get_aligned_word(test_word)))

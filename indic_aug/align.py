@@ -1,9 +1,10 @@
 import logging
+import warnings
 
 from nltk.translate import AlignedSent
 import dill as pickle
 
-from .globals import ERRORS
+from .globals import ERRORS, UNK_TOKEN
 from .utils import path2lang, line_count, doc2words
 
 ALIGNER_MODELS = [
@@ -19,11 +20,14 @@ class Aligner:
     def __init__(self, model_type, iters, max_tokens=None):
         """Constructor method.
 
-        :param model_type: Variant of IBM Model to use, one of ('ibm1', 'ibm2', 'ibm3').
+        :param model_type: Variant of IBM Model to use, one of 
+            ('ibm1', 'ibm2', 'ibm3'). 
         :type model_type: str
         :param iters: Number of iterations to train the model.
         :type iters: int
-        :param max_tokens: Documents with number of tokens greater than ``max_tokens`` will not be used for training, pass None to use all documents, defaults to None.
+        :param max_tokens: Documents with number of tokens greater than
+            ``max_tokens`` will not be used for training, pass None to use all
+            documents, defaults to None.
         :type max_tokens: int, optional
         """
 
@@ -35,7 +39,8 @@ class Aligner:
         self.max_tokens = max_tokens
 
     def _load_bitext(self):
-        """Loads documents in source and target corpora as ``nltk.translate.AlignedSent`` objects.
+        """Loads documents in source and target corpora as
+        ``nltk.translate.AlignedSent`` objects.
         """
 
         if line_count(self.src_input_path) != line_count(self.tgt_input_path):
@@ -51,7 +56,7 @@ class Aligner:
             tgt_words = doc2words(tgt_doc, self.tgt_lang)
 
             if self.max_tokens is None:
-                bitext.append((src_words, tgt_words))
+                bitext.append(AlignedSent(src_words, tgt_words))
             elif len(src_words) > self.max_tokens or len(tgt_words) > self.max_tokens:
                 logging.info(f'Dropping parallel documents with {len(src_words)} source tokens and {len(tgt_words)} target tokens.')
             else:
@@ -64,7 +69,8 @@ class Aligner:
 
         :param src_input_path: Path to source parallel corpus.
         :type src_input_path: str
-        :param tgt_input_path: Path to target parallel corpus corresponding to above source corpus.
+        :param tgt_input_path: Path to target parallel corpus corresponding to
+            above source corpus.
         :type tgt_input_path: str
         """
 
@@ -88,29 +94,11 @@ class Aligner:
             from nltk.translate.ibm3 import IBMModel3
             self.model = IBMModel3(bitext, self.iters)
 
-    def get_aligned(self, word):
-        """Returns the aligned word in target corpus corresponding to ``word`` in source corpus.
-
-        :param word: Word in source corpus whose corresponding aligned word in target corpus is to be found.
-        :type word: str
-
-        :return: Aligned word.
-        :rtype: str
-        """
-
-        aligned = None
-        max_score = 0
-        scores = self.model.translation_table[word]
-
-        for aligned_candidate, score in scores.items():
-            if score > max_score:
-                max_score = score
-                aligned = aligned_candidate
-
-        return aligned
+    def find
 
     def serialize(self, path):
-        """Saves this object to disk. Use ``dill`` to load serialized object, not ``pickle``.
+        """Saves this object to disk. Use ``dill`` to save serialized object,
+        not ``pickle``.
 
         :param path: Path where to save object.
         :type path: str
@@ -118,3 +106,18 @@ class Aligner:
 
         with open(path, 'wb') as f:
             pickle.dump(self, f)
+
+    @classmethod
+    def load(self, path):
+        """Loads object from disk. Use ``dill`` to save serialized object, not
+        ``pickle``.
+
+        :param path: Path from where to load object.
+        :type path: str
+
+        :return: Aligner object stored at path.
+        :rtype: ``align.Aligner``
+        """
+
+        with open(path, 'rb') as f:
+            return pickle.load(f)
