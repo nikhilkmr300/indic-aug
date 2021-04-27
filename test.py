@@ -56,27 +56,6 @@
 # with open('ibm1.pkl', 'rb') as f:
 #     ibm1 = pickle.load(f)
 
-# # test_words = [
-# #     'Ambedkar',
-# #     'India',
-# #     'Government',
-# #     'recall',
-# #     'welcome',
-# #     'importance',
-# #     'independence',
-# #     'yesterday',
-# #     'fabric',
-# #     'terror',
-# #     'attacks',
-# #     'Afghanistan',
-# #     'celebrated',
-# #     'partnerships',
-# #     'tallest',
-# #     'Vietnam',
-# #     'economic',
-# #     'lorem_ipsum'
-# # ]
-
 # test_words = [
 #     'John',
 #     'hit',
@@ -91,3 +70,16 @@
 # print('IBM Model 1\n' + '-' * len('IBM Model 1'))
 # for test_word in test_words:
 #     print('{:20s}{:20s}'.format(test_word, ibm1.get_aligned_word(test_word)))
+
+# Top n and bottom n words
+# ------------------------
+import os
+
+from indic_aug.vocab import read_topn_vocab, read_bottomn_vocab
+
+model_path = os.path.join('example', 'data', 'vocab', 'en.model')
+vocab_path = os.path.join('example', 'data', 'vocab', 'en.vocab')
+n = 100
+
+print(read_topn_vocab(model_path, vocab_path, n).keys())
+print(read_bottomn_vocab(model_path, vocab_path, n).keys())

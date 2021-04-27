@@ -144,6 +144,9 @@ def line_count(path):
     :rtype: int
     """
 
+    if not os.path.isfile(path):
+        raise FileNotFoundError
+
     process = subprocess.Popen(['wc', '-l', path], stdout=subprocess.PIPE)
 
     return int(process.communicate()[0].strip().split()[0])

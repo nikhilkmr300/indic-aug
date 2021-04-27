@@ -84,13 +84,12 @@ LANGS = [
     'mr',   # Marathi
     'ta',   # Tamil
     'te',   # Telugu
-    'ur'    # Urdu
 ]
 
 # Functions that can be used with Preprocess.preprocess.
 PREPROC_FUNCS = [
-    'pretokenize',
-    'normalize'
+    'normalize',
+    'pretokenize'
 ]
 
 # Make sure raw input corpora are rid of these characters.

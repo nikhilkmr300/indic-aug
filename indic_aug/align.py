@@ -94,7 +94,38 @@ class Aligner:
             from nltk.translate.ibm3 import IBMModel3
             self.model = IBMModel3(bitext, self.iters)
 
-    def find
+    def get_aligned_word(self, word):
+        """Returns the word in target corpus which has the highest alignment
+        score corresponding to ``word`` in source corpus.
+
+        :param word: Word in source corpus whose corresponding aligned word in
+            target corpus is to be found.
+        :type word: str
+
+        :return: Best aligned word.
+        :rtype: str
+        """
+
+        aligned = None
+        max_score = 0
+
+        try:
+            scores = self.model.translation_table[word]
+        except AttributeError:
+            raise AttributeError(ERRORS['call_train'])
+
+        for aligned_candidate, score in scores.items():
+            if score > max_score:
+                max_score = score
+                aligned = aligned_candidate
+
+        if aligned is None:
+            # Either the word does not belong to the corpus or the closest
+            # aligned word is None.
+            warnings.warn(f'Returning None as closest alignment to \'{word}\'. Either \'{word}\' is not present in the corpus, or None is actually the closest alignment.')
+            aligned = UNK_TOKEN
+
+        return aligned
 
     def serialize(self, path):
         """Saves this object to disk. Use ``dill`` to save serialized object,

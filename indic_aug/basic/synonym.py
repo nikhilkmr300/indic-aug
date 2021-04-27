@@ -247,5 +247,8 @@ class SynonymAugmentor(Augmentor):
 
         return augmented_src_doc, augmented_tgt_doc
 
+    def __iter__(self):
+        return self
+
     def __len__(self):
         return self.doc_count

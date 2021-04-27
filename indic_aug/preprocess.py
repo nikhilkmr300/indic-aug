@@ -7,7 +7,7 @@ import sys
 import numpy as np
 import pandas as pd
 import nltk
-from indicnlp.tokenize.indic_tokenize import trivial_tokenize_indic, trivial_tokenize_urdu
+from indicnlp.tokenize.indic_tokenize import trivial_tokenize_indic
 from indicnlp.tokenize.indic_detokenize import trivial_detokenize
 from indicnlp.normalize.indic_normalize import DevanagariNormalizer, TamilNormalizer, TeluguNormalizer
 from sacremoses.normalize import MosesPunctNormalizer
@@ -28,12 +28,14 @@ def pretokenize_sent(sent, lang):
     :rtype: str
     """
 
+    # Removing special characters.
+    sent = sent.replace("'", '')
+    sent = sent.replace('"', '')
+
     if lang == 'en':
         return ' '.join(nltk.word_tokenize(sent))
     elif lang in {'hi', 'mr', 'ta', 'te'}:
         return ' '.join(trivial_tokenize_indic(sent))
-    elif lang == 'ur':
-        return ' '.join(trivial_tokenize_urdu(sent))
     else:
         raise RuntimeError(ERRORS['lang'])
 
@@ -53,6 +55,7 @@ def normalize_sent(sent, lang):
         normalizer = MosesPunctNormalizer(lang=lang)
         return normalizer.normalize(sent)
     elif lang in {'hi', 'mr'}:
+        sent = sent.replace('.', '\u0964')          # Replacing fullstop with poorna virama.
         normalizer = DevanagariNormalizer(lang, remove_nuktas=True, nasals_mode='to_anusvaara_strict', do_normalize_chandras=True, do_normalize_vowel_ending=False)
         return normalizer.normalize(sent)
     elif lang == 'ta':
@@ -61,8 +64,6 @@ def normalize_sent(sent, lang):
     elif lang == 'te':
         normalizer = TeluguNormalizer(lang, remove_nuktas=True)
         return normalizer.normalize(sent)
-    elif lang == 'ur':
-        return sent
     else:
         raise RuntimeError(ERRORS['lang'])
 
@@ -109,15 +110,16 @@ class Preprocess:
         :type batch_num: int
         """
 
-        # Tokenizing.
-        if 'pretokenize' in funcs:
-            src_batch = src_batch.apply(pretokenize_sent, args=(self.src_lang,))
-            tgt_batch = tgt_batch.apply(pretokenize_sent, args=(self.tgt_lang,))
+        for func in funcs:
+            # Normalizing.
+            if func == 'normalize':
+                src_batch = src_batch.apply(normalize_sent, args=(self.src_lang,))
+                tgt_batch = tgt_batch.apply(normalize_sent, args=(self.tgt_lang,))
 
-        # Normalizing.
-        if 'normalize' in funcs:
-            src_batch = src_batch.apply(normalize_sent, args=(self.src_lang,))
-            tgt_batch = tgt_batch.apply(normalize_sent, args=(self.tgt_lang,))
+            # Tokenizing.
+            if func == 'pretokenize':
+                src_batch = src_batch.apply(pretokenize_sent, args=(self.src_lang,))
+                tgt_batch = tgt_batch.apply(pretokenize_sent, args=(self.tgt_lang,))
 
         # Writing to temporary file corresponding to this batch, will be cleaned up by self._concat.
         if not self.src_output_path is None:

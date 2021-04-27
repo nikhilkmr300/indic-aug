@@ -96,7 +96,7 @@ def count_bigrams(path):
 
     return bigram_counts
 
-def next_sets(bigram_counts):
+def find_next_sets(bigram_counts):
     """Returns the next set of first unigrams occurring in ``bigram_counts``.
 
     Defining next set of a word as the set of second unigrams where that word is
@@ -128,7 +128,7 @@ def next_sets(bigram_counts):
 
     return next_sets
 
-def prev_sets(bigram_counts):
+def find_prev_sets(bigram_counts):
     """Returns the prev set of second unigrams occurring in ``bigram_counts``.
 
     Defining prev set of a word as the set of first unigrams where that word is
@@ -186,10 +186,10 @@ def noising_aug(doc, mode, gamma0, unigram_counts, lang, next_sets, prev_sets=No
     :param lang: ISO 639-1 language code of ``doc``.
     :type lang: str
     :param next_sets: Next sets of all tokens in corpus, as returned by
-        `next_sets`.
+        `find_next_sets`.
     :type next_sets: dict
     :param prev_sets: Prev sets of all tokens in corpus, as returned by
-        `next_sets`, optional. Required if ``mode`` is 'kneser_ney', else
+        `find_next_sets`, optional. Required if ``mode`` is 'kneser_ney', else
         ignored.
     :type prev_sets: dict
 
@@ -318,13 +318,13 @@ class NoisingAugmentor(Augmentor):
         src_bigram_counts = count_bigrams(src_input_path)
         tgt_bigram_counts = count_bigrams(tgt_input_path)
 
-        self.src_next_sets = next_sets(src_bigram_counts)
-        self.tgt_next_sets = next_sets(tgt_bigram_counts)
+        self.src_next_sets = find_next_sets(src_bigram_counts)
+        self.tgt_next_sets = find_next_sets(tgt_bigram_counts)
 
         if self.mode == 'kneser_ney':
             # Only Kneser-Ney noising requires previous sets.
-            self.src_prev_sets = prev_sets(src_bigram_counts)
-            self.tgt_prev_sets = prev_sets(tgt_bigram_counts)
+            self.src_prev_sets = find_prev_sets(src_bigram_counts)
+            self.tgt_prev_sets = find_prev_sets(tgt_bigram_counts)
         else:
             self.src_prev_sets = None
             self.tgt_prev_sets = None
@@ -341,6 +341,9 @@ class NoisingAugmentor(Augmentor):
         augmented_tgt_doc = noising_aug(tgt_doc, self.mode, self.gamma0, self.tgt_unigram_counts, self.tgt_lang, self.tgt_next_sets, self.tgt_prev_sets)
 
         return augmented_src_doc, augmented_tgt_doc
+
+    def __iter__(self):
+        return self
 
     def __len__(self):
         return self.doc_count

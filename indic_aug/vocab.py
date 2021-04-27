@@ -1,4 +1,4 @@
-import configparser
+from collections import OrderedDict
 import shutil
 import os
 import sys
@@ -122,3 +122,13 @@ def score2freq_vocab(model_path, vocab_path):
     assert sum(freq_dict.values()) <= 1
 
     return freq_dict
+
+def read_topn_vocab(model_path, vocab_path, n):
+    freq_dict = score2freq_vocab(model_path, vocab_path)
+
+    return OrderedDict(sorted(freq_dict.items(), key=lambda x: x[1])[-n:])
+
+def read_bottomn_vocab(model_path, vocab_path, n):
+    freq_dict = score2freq_vocab(model_path, vocab_path)
+
+    return OrderedDict(sorted(freq_dict.items(), key=lambda x: x[1])[:n])
