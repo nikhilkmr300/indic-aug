@@ -2,15 +2,20 @@
 *.DS_Store
 __pycache__
 .ipynb_checkpoints
-*.pkl
 *.gv
 *.dot
 *.zip
+*.tgz
+*.tar
+*.gz
 
 indic_aug/depparse/stanza_resources
+indic_aug/export.pkl
+indic_aug/lm/hi
 
 example/raw/*.txt
 example/raw/*.en
 example/raw/*.hi
+example/raw/parallel
 example/preprocessed
 example/vocab

@@ -15,6 +15,7 @@ Subpackages
    indic_aug.basic
    indic_aug.depparse
    indic_aug.embedding
+   indic_aug.lm
 
 Submodules
 ----------

@@ -1,3 +1,4 @@
+import logging
 import random
 import re
 import sys
@@ -9,6 +10,8 @@ import pyiwn
 
 from ..globals import Augmentor, ERRORS, SENTENCE_DELIMS
 from ..utils import cyclic_read, path2lang, line_count, doc2words
+
+pyiwn.logger.setLevel(logging.WARNING)
 
 def convert_pos(stanza_pos, to):
     """Converts Universal Dependencies parts of speech to WordNet/IndoWordNet
@@ -227,8 +230,8 @@ class SynonymAugmentor(Augmentor):
 
         # Setting up stanza pipelines for source and target languages, for use
         # with synonym_aug.
-        self.src_pipeline = stanza.Pipeline(lang=self.src_lang)
-        self.tgt_pipeline = stanza.Pipeline(lang=self.tgt_lang)
+        self.src_pipeline = stanza.Pipeline(lang=self.src_lang, verbose=False)
+        self.tgt_pipeline = stanza.Pipeline(lang=self.tgt_lang, verbose=False)
 
         # Setting up objects to use WordNet/IndoWordNet.
         self.src_net = wn if self.src_lang == 'en' else pyiwn.IndoWordNet()

@@ -1,8 +1,12 @@
 import logging
 import warnings
 
-from nltk.translate import AlignedSent
+import numpy as np
+import pandas as pd
 import dill as pickle
+from nltk.translate import AlignedSent, Alignment
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 from .globals import ERRORS, UNK_TOKEN
 from .utils import path2lang, line_count, doc2words
@@ -26,8 +30,8 @@ class Aligner:
         :param iters: Number of iterations to train the model.
         :type iters: int
         :param max_tokens: Documents with number of tokens greater than
-            ``max_tokens`` will not be used for training, pass None to use all
-            documents, defaults to None.
+            ``max_tokens`` will not be used for training, pass ``None`` to use
+            all documents, defaults to ``None``.
         :type max_tokens: int, optional
         """
 
@@ -56,11 +60,11 @@ class Aligner:
             tgt_words = doc2words(tgt_doc, self.tgt_lang)
 
             if self.max_tokens is None:
-                bitext.append(AlignedSent(src_words, tgt_words))
+                bitext.append(AlignedSent(tgt_words, src_words))
             elif len(src_words) > self.max_tokens or len(tgt_words) > self.max_tokens:
                 logging.info(f'Dropping parallel documents with {len(src_words)} source tokens and {len(tgt_words)} target tokens.')
             else:
-                bitext.append(AlignedSent(src_words, tgt_words))
+                bitext.append(AlignedSent(tgt_words, src_words))
 
         return bitext
 
@@ -94,12 +98,12 @@ class Aligner:
             from nltk.translate.ibm3 import IBMModel3
             self.model = IBMModel3(bitext, self.iters)
 
-    def get_aligned_word(self, word):
-        """Returns the word in target corpus which has the highest alignment
-        score corresponding to ``word`` in source corpus.
+    def get_closest_aligned(self, word):
+        """Returns the word in source corpus which has the highest alignment
+        score corresponding to ``word`` in target corpus.
 
-        :param word: Word in source corpus whose corresponding aligned word in
-            target corpus is to be found.
+        :param word: Word in target corpus whose corresponding aligned word in
+            source corpus is to be found.
         :type word: str
 
         :return: Best aligned word.
@@ -119,13 +123,90 @@ class Aligner:
                 max_score = score
                 aligned = aligned_candidate
 
-        if aligned is None:
-            # Either the word does not belong to the corpus or the closest
-            # aligned word is None.
-            warnings.warn(f'Returning None as closest alignment to \'{word}\'. Either \'{word}\' is not present in the corpus, or None is actually the closest alignment.')
-            aligned = UNK_TOKEN
-
         return aligned
+
+    def align(self, src_sent, tgt_sent):
+        """Given a sentence in the source language and a sentence in the target
+        language, outputs the values of the alignment function from words in the
+        target sentence to words in the source sentence.
+
+        :param src_sent: Source sentence
+        :type src_sent: str
+        :param tgt_sent: Target sentence
+        :type tgt_sent: str
+
+        :return: Aligned sentences
+        :rtype: ``nltk.translate.AlignedSent``
+        """
+
+        try:
+            self.model.translation_table
+        except AttributeError:
+            raise AttributeError(ERRORS['call_train'])
+
+        src_words = [None] + src_sent.split(' ')    # Prepending None for target words not aligned to any word.
+        tgt_words = tgt_sent.split(' ')
+
+        # Finding alignments of target words to source words.
+        alignments = list()
+        for tgt_word_idx, tgt_word in enumerate(tgt_words):
+            # Finding source word with highest alignment score with target word.
+            closest_src_word_idx = 0
+            highest_align_score = self.model.translation_table[tgt_word][src_words[0]]
+            for src_word_idx, src_word in enumerate(src_words):
+                if self.model.translation_table[tgt_word][src_word] > highest_align_score:
+                    closest_src_word_idx = src_word_idx
+                    highest_align_score = self.model.translation_table[tgt_word][src_word]
+                elif self.model.translation_table[tgt_word][src_word] == highest_align_score:
+                    # If word appears more than once in source sentence and is
+                    # the highest scoring, returning the index of source word
+                    # closer to the target word by position in sentence.
+                    if abs(tgt_word_idx - src_word_idx) < abs(tgt_word_idx - closest_src_word_idx):
+                        closest_src_word_idx = src_word_idx
+                        highest_align_score = self.model.translation_table[tgt_word][src_word]
+            alignments.append((tgt_word_idx, closest_src_word_idx))
+
+        return AlignedSent(tgt_words, src_words, Alignment(alignments))
+
+    def plot_alignment(self, src_sent, tgt_sent, font_family, figsize=(7, 5)):
+        """Given a sentence in the source language and a sentence in the target
+        language, plots the values of the alignment function from words in the
+        target sentence to words in the source sentence as a heatmap.
+
+        :param src_sent: Source sentence
+        :type src_sent: str
+        :param tgt_sent: Target sentence
+        :type tgt_sent: str
+        :param font_family: Font family to be passed to ``seaborn.set_theme``.
+            Recommended are any of the relevant Sangam MN fonts for MacOS.
+        :type font_family: str
+        :param figsize: Size of generated heatmap.
+        :type figsize: 2-tuple
+
+        :return: Aligned sentences
+        :rtype: ``nltk.translate.AlignedSent``
+        """
+
+        try:
+            self.model.translation_table
+        except AttributeError:
+            raise AttributeError(ERRORS['call_train'])
+
+        src_words = [None] + src_sent.split(' ')    # Prepending None for target words not aligned to any word.
+        tgt_words = tgt_sent.split(' ')
+
+        sns.set_theme(font=font_family)
+
+        alignment_matrix = pd.DataFrame(np.zeros((len(tgt_words), len(src_words))), index=tgt_words, columns=src_words)
+        for tgt_word in tgt_words:
+            for src_word in src_words:
+                alignment_matrix.loc[tgt_word, src_word] = self.model.translation_table[tgt_word][src_word]
+
+        # Changing index None to 'None' so it is visible in the heatmap.
+        alignment_matrix.columns.values[0] = 'None'
+
+        plt.figure(figsize=figsize)
+        sns.heatmap(alignment_matrix)
 
     def serialize(self, path):
         """Saves this object to disk. Use ``dill`` to save serialized object,
@@ -139,7 +220,7 @@ class Aligner:
             pickle.dump(self, f)
 
     @classmethod
-    def load(self, path):
+    def load(cls, path):
         """Loads object from disk. Use ``dill`` to save serialized object, not
         ``pickle``.
 

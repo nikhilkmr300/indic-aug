@@ -18,6 +18,8 @@ conda_packages=(
     "numpy"
     "scipy"
     "pandas"
+    "scikit-learn"
+    "seaborn"
     "tqdm"
     "nltk"
     "dill"
@@ -36,6 +38,7 @@ pip_packages=(
     "pyiwn"
     "polyglot"
     "indic-nlp-library"
+    "inltk"
 )
 
 # Installing conda packages.

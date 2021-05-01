@@ -53,7 +53,7 @@ def cyclic_read(filepath):
     :type filepath: str
 
     :usage: Say you have a file ``sample.txt`` which contains the text 'Line 1',
-    'Line 2' and 'Line 3' on three successive lines
+        'Line 2' and 'Line 3' on three successive lines
 
     .. code-block: python
 
@@ -66,24 +66,7 @@ def cyclic_read(filepath):
     'Line 2'
     'Line 3'
 
-    and so on indefinitely...
-
-    Alternatively, you could use ``next`` as you would on a generator as follows
-
-    .. code-block: python
-
-    >>> lines = cyclic_read('sample.txt')
-    >>> next(lines)
-    'Line 1'
-    >>> next(lines)
-    'Line 2'
-    >>> next(lines)
-    'Line 3'
-    >>> next(lines)
-    'Line 1'
-    >>> next(lines)
-    'Line 2'
-
+    and so on indefinitely.
     """
 
     while True:

@@ -59,6 +59,9 @@ def read_vocab(vocab_path):
 
     :param vocab_path: Path to the \*.vocab file to read.
     :type vocab_path: str
+
+    :return: Vocabulary as stored at ``vocab_path`` as a list.
+    :rtype: list
     """
 
     vocab = pd.read_csv(vocab_path, sep='\t', header=None)
@@ -124,11 +127,29 @@ def score2freq_vocab(model_path, vocab_path):
     return freq_dict
 
 def read_topn_vocab(model_path, vocab_path, n):
+    """Reads the ``n`` most frequent tokens in vocabulary into a list.
+
+    :param vocab_path: Path to the \*.vocab file to read.
+    :type vocab_path: str
+
+    :return: ``n`` most frequent tokens
+    :rtype: list
+    """
+
     freq_dict = score2freq_vocab(model_path, vocab_path)
 
     return OrderedDict(sorted(freq_dict.items(), key=lambda x: x[1])[-n:])
 
 def read_bottomn_vocab(model_path, vocab_path, n):
+    """Reads the ``n`` least frequent tokens in vocabulary into a list.
+
+    :param vocab_path: Path to the \*.vocab file to read.
+    :type vocab_path: str
+
+    :return: ``n`` least frequent tokens
+    :rtype: list
+    """
+
     freq_dict = score2freq_vocab(model_path, vocab_path)
 
     return OrderedDict(sorted(freq_dict.items(), key=lambda x: x[1])[:n])

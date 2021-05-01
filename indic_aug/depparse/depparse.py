@@ -100,13 +100,13 @@ class DepParseTree:
             Allowed values are X11 color strings.
         :type fillcolor: str
         :param fontname: Font to use for node labels, defaults to 'Courier'.
-        Refer GraphViz docs for allowed values.
+            Refer GraphViz docs for allowed values.
         :type fontname: str
         :param fontcolor: Color of font for node labels, defaults to 'black'.
-        Allowed values are X11 color strings.
+            Allowed values are X11 color strings.
         :type fontcolor: str
         :param edgecolor: Color of edges, defaults to 'black'. Allowed values
-        are X11 color strings.
+            are X11 color strings.
         :type edgecolor: str
         """
 
@@ -292,22 +292,22 @@ class DepParseAugmentor:
         # Loading stanza pipeline for source language to convert string to
         # stanza.models.common.doc.Sentence.
         try:
-            self.src_pipeline = stanza.Pipeline(src_lang)
+            self.src_pipeline = stanza.Pipeline(src_lang, verbose=False)
         except (stanza.pipeline.core.ResourcesFileNotFoundError, stanza.pipeline.core.LanguageNotDownloadedError) as e:
             print(f'Could not find stanza model at {stanza_dir}. Downloading model...')
             print(f'If you have already downloaded the model, stop this process (Ctrl-C) and pass the path to the model to parameter stanza_dir.')
             stanza.download(src_lang)
-            self.src_pipeline = stanza.Pipeline(src_lang)
+            self.src_pipeline = stanza.Pipeline(src_lang, verbose=False)
 
         # Loading stanza pipeline for target language to convert string to
         # stanza.models.common.doc.Sentence.
         try:
-            self.tgt_pipeline = stanza.Pipeline(tgt_lang)
+            self.tgt_pipeline = stanza.Pipeline(tgt_lang, verbose=False)
         except (stanza.pipeline.core.ResourcesFileNotFoundError, stanza.pipeline.core.LanguageNotDownloadedError) as e:
             print(f'Could not find stanza model at {stanza_dir}. Downloading model...')
             print(f'If you have already downloaded the model, stop this process (Ctrl-C) and pass the path to the model to parameter stanza_dir.')
             stanza.download(tgt_lang)
-            self.tgt_pipeline = stanza.Pipeline(tgt_lang)
+            self.tgt_pipeline = stanza.Pipeline(tgt_lang, verbose=False)
 
     def __next__(self):
         # Returning original sentences as they are if self.augment is False.
