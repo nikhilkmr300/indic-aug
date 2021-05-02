@@ -11,6 +11,7 @@ __pycache__
 
 indic_aug/depparse/stanza_resources
 indic_aug/export.pkl
+indic_aug/lm/en
 indic_aug/lm/hi
 
 example/raw/*.txt

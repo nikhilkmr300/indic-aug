@@ -1,3 +1,5 @@
+import os
+
 from ..globals import Augmentor, SENTENCE_DELIMS, ERRORS, PAD_TOKEN, UNK_TOKEN, SOS_TOKEN, EOS_TOKEN, BLANK_TOKEN
 from ..lm import load
 from ..vocab import read_bottomn_vocab
@@ -37,20 +39,12 @@ def extract_rare_words(model_path, vocab_path, word_count):
 
     return rare_words
 
-def suggest_substitution(left_context, lang_model, rare_words):
-    suggested_word = lang_model.predict(left_context)
-
-    if suggested_word in rare_words:
-        return suggested_word
-
-    return None
-
 class ParallelAugmentor(Augmentor):
     """Class to augment parallel corpora by translation data augmentation
     (parallel) technique (refer: :cite:t:`fadaee2017data`).
     """
 
-    def __init__(self, src_input_path, tgt_input_path, aligner, augment=True):
+    def __init__(self, src_input_path, tgt_input_path, aligner, rare_word_count, src_model_path, src_vocab_path, augment=True):
         if line_count(src_input_path) != line_count(tgt_input_path):
             raise RuntimeError(ERRORS['corpus_shape'])
         self.doc_count = line_count(src_input_path)
@@ -58,8 +52,17 @@ class ParallelAugmentor(Augmentor):
         src_lang = path2lang(src_input_path)
         tgt_lang = path2lang(tgt_input_path)
 
-        self.src_lm = load(src_lang)
-        self.tgt_lm = load(tgt_lang)
+        model_lang = os.path.basename(src_model_path)[:2]
+        vocab_lang = os.path.basename(src_vocab_path)[:2]
+
+        if model_lang != src_lang or vocab_lang != src_lang:
+            raise RuntimeError('src_model_path and src_vocab_path must correspond to lang={src_lang}.')
+
+        self.src_lm = load(src_lang)        # Language model for source language.
+        self.tgt_lm = load(tgt_lang)        # Language model for target language.
+
+        self.rare_words = extract_rare_words(src_model_path, src_vocab_path, rare_word_count)
+        print(f'Rare words: {self.rare_words}')
 
         self.aligner = aligner
 
@@ -80,15 +83,26 @@ class ParallelAugmentor(Augmentor):
         if not self.augment:
             return next(self.src_input_file).rstrip('\n'), next(self.tgt_input_file).rstrip('\n')
 
-        src_doc = next(self.src_input_file).rstrip('\n')
-        tgt_doc = next(self.tgt_input_file).rstrip('\n')
+        src_doc = next(self.src_input_file).rstrip('\n').split(' ')
+        tgt_doc = next(self.tgt_input_file).rstrip('\n').split(' ')
 
         # Placeholder list to hold augmented document, will join all sentences
         # in document before returning.
         augmented_src_doc = list()
         augmented_tgt_doc = list()
 
+        is_modified = False
 
+        for i in range(1, len(src_doc)):
+            context = ' '.join(src_doc[:i])         # Analogous to s_1^{i-1}
+            lm_pred = self.src_lm.predict(context)  # Analogous to s_{i}'.
+
+            if lm_pred in self.rare_words:
+                print(f'Rare word {lm_pred} replacing {src_doc[i]}.')
+                augmented_src_doc.append(lm_pred)
+
+                # Finding word corresponding to s_{i} in target sentence.
+                alignment = self.aligner.align(' '.join(src_doc), ' '.join(tgt_doc)).alignment
 
     def __iter__(self):
         pass

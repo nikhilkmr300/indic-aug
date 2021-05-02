@@ -5,11 +5,6 @@ Module to contain variables that are required in multiple places.
 
     List of supported languages.
 
-.. data:: PREPROC_FUNCS
-
-    List of preprocessing functions that can be used with 
-    ``preprocess.Preprocess.preprocess``.
-
 .. data:: INVALID_CHARS
 
     List of characters that need to be removed from the raw corpus before using 
@@ -90,15 +85,10 @@ LANGS = [
     'te',   # Telugu
 ]
 
-# Functions that can be used with Preprocess.preprocess.
-PREPROC_FUNCS = [
-    'normalize',
-    'pretokenize'
-]
-
 # Make sure raw input corpora are rid of these characters.
 INVALID_CHARS = [
     '\t',                               # Tabs clash with sep argument used in pandas.read_csv.
+    "'",                                # Clashes with Python single quotes.
     '"'                                 # Clashes with Python double quotes.
 ]
 
@@ -133,9 +123,6 @@ ERRORS = {
     # Invalid language code.
     'lang': f'\'lang\' must be one of the language codes in {*LANGS,}. Ensure file extension of corpus files is a language code (for example, \'train.en\' is a valid filename for an English corpus).',
 
-    # Invalid preprocessing function.
-    'func': f'funcs must be a str or list of values in {*PREPROC_FUNCS,} or \'all\'.',
-
     # Mismatch in number of source and target sentences in corpus.
     'corpus_shape': f'Shape of source and target corpora do not match. Check that raw input corpora do not contain any characters among {*INVALID_CHARS,} nor any empty lines.',
 
@@ -153,6 +140,9 @@ ERRORS = {
 
     # Prev set compulsory with mode 'kneser_ney' of 'noising_aug'.
     'prev_set_compulsory': 'Passing prev_sets is compulsory with mode=\'kneser_ney\' of noising_aug.',
+    
+    # Cannot generate vocabulary without first preprocessing.
+    'call_preprocess': 'Attribute \'prevocab_src_path\' of Preprocessor object does not exist yet. Call \'run_pipeline  \' on Preprocessor object first.',
 
     # Cannot retrieve alignment without first calling train.
     'call_train': 'Attribute \'model\' of Aligner object does not exist yet. Call \'train\' on Aligner object first.'
