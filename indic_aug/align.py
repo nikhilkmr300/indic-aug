@@ -98,15 +98,15 @@ class Aligner:
             from nltk.translate.ibm3 import IBMModel3
             self.model = IBMModel3(bitext, self.iters)
 
-    def get_closest_aligned(self, word):
+    def tgt2src(self, tgt_word):
         """Returns the word in source corpus which has the highest alignment
-        score corresponding to ``word`` in target corpus.
+        score corresponding to ``tgt_word`` in target corpus.
 
-        :param word: Word in target corpus whose corresponding aligned word in
-            source corpus is to be found.
+        :param tgt_word: Word in target corpus whose corresponding aligned word
+            in source corpus is to be found.
         :type word: str
 
-        :return: Best aligned word.
+        :return: Best aligned word in source corpus.
         :rtype: str
         """
 
@@ -114,7 +114,7 @@ class Aligner:
         max_score = 0
 
         try:
-            scores = self.model.translation_table[word]
+            scores = self.model.translation_table[tgt_word]
         except AttributeError:
             raise AttributeError(ERRORS['call_train'])
 
@@ -122,6 +122,32 @@ class Aligner:
             if score > max_score:
                 max_score = score
                 aligned = aligned_candidate
+
+        return aligned
+
+    def src2tgt(self, src_word):
+        """Returns a word in target corpus which has the highest alignment
+        score corresponding to ``src_word`` in source corpus.
+
+        :param src_word: Word in source corpus whose corresponding aligned word
+            in target corpus is to be found.
+        :type word: str
+
+        :return: Best aligned word in target corpus.
+        :rtype: str
+        """
+
+        aligned = None
+        max_score = 0
+
+        for tgt_word, src_words in self.model.translation_table.items():
+            if src_word in src_words.keys():
+                score = self.model.translation_table[tgt_word][src_word]
+                if score > max_score:
+                    max_score = score
+                    aligned = tgt_word
+            else:
+                continue
 
         return aligned
 
@@ -139,34 +165,10 @@ class Aligner:
         :rtype: ``nltk.translate.AlignedSent``
         """
 
-        try:
-            self.model.translation_table
-        except AttributeError:
-            raise AttributeError(ERRORS['call_train'])
+        sentence_pair = AlignedSent(tgt_sent.split(' '), src_sent.split(' '))
+        self.model.align(sentence_pair)
 
-        src_words = [None] + src_sent.split(' ')    # Prepending None for target words not aligned to any word.
-        tgt_words = tgt_sent.split(' ')
-
-        # Finding alignments of target words to source words.
-        alignments = list()
-        for tgt_word_idx, tgt_word in enumerate(tgt_words):
-            # Finding source word with highest alignment score with target word.
-            closest_src_word_idx = 0
-            highest_align_score = self.model.translation_table[tgt_word][src_words[0]]
-            for src_word_idx, src_word in enumerate(src_words):
-                if self.model.translation_table[tgt_word][src_word] > highest_align_score:
-                    closest_src_word_idx = src_word_idx
-                    highest_align_score = self.model.translation_table[tgt_word][src_word]
-                elif self.model.translation_table[tgt_word][src_word] == highest_align_score:
-                    # If word appears more than once in source sentence and is
-                    # the highest scoring, returning the index of source word
-                    # closer to the target word by position in sentence.
-                    if abs(tgt_word_idx - src_word_idx) < abs(tgt_word_idx - closest_src_word_idx):
-                        closest_src_word_idx = src_word_idx
-                        highest_align_score = self.model.translation_table[tgt_word][src_word]
-            alignments.append((tgt_word_idx, closest_src_word_idx))
-
-        return AlignedSent(tgt_words, src_words, Alignment(alignments))
+        return sentence_pair
 
     def plot_alignment(self, src_sent, tgt_sent, font_family, figsize=(7, 5)):
         """Given a sentence in the source language and a sentence in the target
@@ -206,7 +208,7 @@ class Aligner:
         alignment_matrix.columns.values[0] = 'None'
 
         plt.figure(figsize=figsize)
-        sns.heatmap(alignment_matrix)
+        sns.heatmap(alignment_matrix, vmin=0.0, vmax=1.0)
 
     def serialize(self, path):
         """Saves this object to disk. Use ``dill`` to save serialized object,

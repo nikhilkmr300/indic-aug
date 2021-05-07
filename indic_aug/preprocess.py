@@ -2,9 +2,10 @@ import csv
 import logging
 import subprocess
 import shutil
+import sys
 import os
 
-logging.basicConfig(level=logging.INFO, format='%(levelname)s:%(name)s: %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(levelname)s:%(name)s: %(message)s', stream=sys.stdout)
 logger = logging.getLogger(__name__)
 
 import numpy as np
@@ -24,10 +25,10 @@ from .utils import path2lang, line_count
 
 class Preprocessor:
     """Class to perform the following:
-        1. Preprocess input (tokenizing, normalizing) before feeding to
-          sentencepiece.
-        2. Generate the vocabulary.
-        3. Replace appropriate words in corpus by special tokens.
+    1. Preprocess input (tokenizing, normalizing) before feeding to
+    sentencepiece.
+    2. Generate the vocabulary.
+    3. Replace appropriate words in corpus by special tokens.
     """
 
     def __init__(self, raw_src_path, raw_tgt_path):
@@ -226,6 +227,17 @@ class Preprocessor:
         Vocab.build(self.prevocab_src_path, self.prevocab_tgt_path, src_vocab_size, tgt_vocab_size, self.vocab_dir)
 
     def post_vocab(self, out_src_path, out_tgt_path):
+        """Replaces out-of-vocabulary words with ``UNK_TOKEN`` ("postvocab
+        processing").
+
+        :param out_src_path: Path to output source corpus after postvocab
+            processing.
+        :type out_src_path: str
+        :param out_tgt_path: Path to output target corpus after postvocab
+            processing.
+        :type out_tgt_path: str
+        """
+
         def postprocess(line, vocab):
             line = [word.strip('\n').strip() for word in line.split()]
             processed_line = list()
@@ -263,3 +275,7 @@ class Preprocessor:
         logger.info(f'Replacing OOV words in target corpus with {UNK_TOKEN} token...')
         for line in tqdm(prevocab_tgt_file, total=line_count(self.prevocab_tgt_path)):
             postvocab_tgt_file.write(postprocess(line, tgt_vocab) + '\n')
+
+        # Deleting the prevocab directories as they are not of use anymore.
+        os.remove(self.prevocab_src_path)
+        os.remove(self.prevocab_tgt_path)

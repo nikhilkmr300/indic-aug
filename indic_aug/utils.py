@@ -1,5 +1,6 @@
 import os
 import subprocess
+import re
 
 import pandas as pd
 import nltk
@@ -7,6 +8,7 @@ from indicnlp.tokenize.sentence_tokenize import sentence_split
 from indicnlp.tokenize.indic_tokenize import trivial_tokenize
 
 from .globals import ERRORS, UNK_TOKEN, LANGS
+from .globals import PAD_TOKEN, UNK_TOKEN, SOS_TOKEN, EOS_TOKEN, BLANK_TOKEN
 
 def path2lang(path):
     """Returns language code from extension of path.
@@ -39,7 +41,9 @@ def stanza2list(stanza_sent):
     for word in stanza_sent.words:
         str_sent.append(word.text)
 
-    return str_sent
+    str_sent = fix_split_special_tokens(' '.join(str_sent))
+
+    return str_sent.split(' ')
 
 def cyclic_read(filepath):
     """Returns a generator which can read the same file line by line (lazily) arbitrary number of times.
@@ -172,33 +176,35 @@ def doc2words(doc, lang):
     doc = doc.strip('\n\t ')
 
     if lang == 'en':
-        return nltk.word_tokenize(doc)
+        doc = ' '.join(nltk.word_tokenize(doc))
     elif lang in LANGS:
-        return trivial_tokenize(doc, lang=lang)
+        doc = ' '.join(trivial_tokenize(doc, lang=lang))
     else:
         raise ValueError(ERRORS['lang'])
+
+    return fix_split_special_tokens(doc).split(' ')
 
 def sent2words(doc, lang):
-    """Splits a sentence into words. Wrapper around ``nltk.word_tokenize`` and
-    ``indicnlp.tokenize.indic_tokenize.trivial_tokenize``.
-
-    Same as ``doc2words``, however have kept separate for readability reasons
+    """Same as ``doc2words``, however have kept separate for readability reasons
     (document vs sentence).
-
-    :param doc: Document to be split into words.
-    :type doc: str
-    :param lang: ISO 639-1 language code of ``sent``.
-    :type lang: str
-
-    :return: List of words in ``sent``.
-    :rtype: list
     """
 
-    doc = doc.strip('\n\t ')
+    return doc2words(doc, lang)
 
-    if lang == 'en':
-        return nltk.word_tokenize(doc)
-    elif lang in LANGS:
-        return trivial_tokenize(doc, lang=lang)
-    else:
-        raise ValueError(ERRORS['lang'])
+def fix_split_special_tokens(doc):
+    """Tokenizing adds space within special tokens (so '<unk>' becomes '< unk
+    >'). This function restores modified special tokens to their normal form.
+
+    :param doc: Document in which special tokens are to be fixed.
+    :type doc: str
+
+    :return: Document with special tokens fixed.
+    :rtype: str
+    """
+
+    for token in [PAD_TOKEN, UNK_TOKEN, SOS_TOKEN, EOS_TOKEN, BLANK_TOKEN]:
+        to_match = token[:1] + ' ' + token[1:-1] + ' ' + token[-1]
+        if len(re.findall(to_match, doc)) > 0:
+            doc = re.sub(to_match, token, doc)
+
+    return doc

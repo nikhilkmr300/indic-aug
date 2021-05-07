@@ -12,6 +12,7 @@ from ..globals import Augmentor, ERRORS, SENTENCE_DELIMS
 from ..utils import cyclic_read, path2lang, line_count, doc2words
 
 pyiwn.logger.setLevel(logging.WARNING)
+logging.getLogger('numexpr.utils').setLevel(logging.WARN)
 
 def convert_pos(stanza_pos, to):
     """Converts Universal Dependencies parts of speech to WordNet/IndoWordNet

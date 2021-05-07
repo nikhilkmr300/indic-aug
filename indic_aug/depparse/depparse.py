@@ -1,3 +1,4 @@
+import logging
 import os
 import warnings
 
@@ -292,22 +293,22 @@ class DepParseAugmentor:
         # Loading stanza pipeline for source language to convert string to
         # stanza.models.common.doc.Sentence.
         try:
-            self.src_pipeline = stanza.Pipeline(src_lang, verbose=False)
+            self.src_pipeline = stanza.Pipeline(src_lang, tokenize_pretokenized=True, verbose=False)
         except (stanza.pipeline.core.ResourcesFileNotFoundError, stanza.pipeline.core.LanguageNotDownloadedError) as e:
-            print(f'Could not find stanza model at {stanza_dir}. Downloading model...')
-            print(f'If you have already downloaded the model, stop this process (Ctrl-C) and pass the path to the model to parameter stanza_dir.')
+            logging.info(f'Could not find stanza model at {stanza_dir}. Downloading model...')
+            logging.info(f'If you have already downloaded the model, stop this process (Ctrl-C) and pass the path to the model to parameter stanza_dir.')
             stanza.download(src_lang)
-            self.src_pipeline = stanza.Pipeline(src_lang, verbose=False)
+            self.src_pipeline = stanza.Pipeline(src_lang, tokenize_pretokenized=True, verbose=False)
 
         # Loading stanza pipeline for target language to convert string to
         # stanza.models.common.doc.Sentence.
         try:
-            self.tgt_pipeline = stanza.Pipeline(tgt_lang, verbose=False)
+            self.tgt_pipeline = stanza.Pipeline(tgt_lang, tokenize_pretokenized=True, verbose=False)
         except (stanza.pipeline.core.ResourcesFileNotFoundError, stanza.pipeline.core.LanguageNotDownloadedError) as e:
-            print(f'Could not find stanza model at {stanza_dir}. Downloading model...')
-            print(f'If you have already downloaded the model, stop this process (Ctrl-C) and pass the path to the model to parameter stanza_dir.')
+            logging.info(f'Could not find stanza model at {stanza_dir}. Downloading model...')
+            logging.info(f'If you have already downloaded the model, stop this process (Ctrl-C) and pass the path to the model to parameter stanza_dir.')
             stanza.download(tgt_lang)
-            self.tgt_pipeline = stanza.Pipeline(tgt_lang, verbose=False)
+            self.tgt_pipeline = stanza.Pipeline(tgt_lang, tokenize_pretokenized=True, verbose=False)
 
     def __next__(self):
         # Returning original sentences as they are if self.augment is False.
