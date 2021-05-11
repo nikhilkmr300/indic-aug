@@ -1,0 +1,384 @@
+SynonymAugmentor
+	doc_count=30000
+	src_input_path=preprocessed/data.hi
+	tgt_input_path=preprocessed/data.en
+	src_lang=hi
+	tgt_lang=en
+	vocab_dir=vocab
+	p=0.3
+	random_state=1
+Note: Words are 0-indexed.
+------------------------------
+src_doc: 'वर्तमान में , 38 टीएसडीएफ में क्रमशः 17 एकीकृत टीएसडीएफ , 13 <unk> कोमन <unk> <unk> और 8 <unk> कोमन <unk> <unk> और 4 स्टेट्स / <unk> में उपलब्ध हैं ।'
+	Sampled word 'में' at index 1 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'में'.
+	Sampled word 'कोमन' at index 13 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'कोमन'.
+	Sampled word '<unk>' at index 20 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for '<unk>'.
+	Sampled word '<unk>' at index 21 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for '<unk>'.
+	Sampled word 'स्टेट्स' at index 24 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'स्टेट्स'.
+	Sampled word '/' at index 25 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for '/'.
+	Sampled word 'हैं' at index 29 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'हैं'.
+tgt_doc: 'At present , 38 <unk> include 17 Integrated <unk> , 13 <unk> Common Secure <unk> and 8 <unk> Common <unk> are available in 10 <unk> and 4 <unk> respectively .'
+	Sampled word ',' at index 2 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for ','.
+	Sampled word 'Integrated' at index 7 as a potential candidate for synonym replacement.
+		Replaced 'Integrated' with its WordNet/IndoWordNet synonym 'integrate'.
+	Sampled word ',' at index 9 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for ','.
+	Sampled word '13' at index 10 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for '13'.
+	Sampled word '<unk>' at index 11 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for '<unk>'.
+	Sampled word 'Secure' at index 13 as a potential candidate for synonym replacement.
+		Replaced 'Secure' with its WordNet/IndoWordNet synonym 'secure'.
+	Sampled word '8' at index 16 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for '8'.
+augmented_src_doc: 'वर्तमान में , 38 टीएसडीएफ में क्रमशः 17 एकीकृत टीएसडीएफ , 13 <unk> कोमन <unk> <unk> और 8 <unk> कोमन <unk> <unk> और 4 स्टेट्स / <unk> में उपलब्ध हैं'
+augmented_tgt_doc: 'At present , 38 <unk> include 17 integrate <unk> , 13 <unk> Common secure <unk> and 8 <unk> Common <unk> are available in 10 <unk> and 4 <unk> respectively'
+------------------------------
+src_doc: 'ये राज्य / केंद्र शासित प्रदेश क्रमशः कुल देश के 8 % और देश में कुल खतरनाक अपशिष्ट कचरे के 88 । 19 % का योगदान करते हैं ।'
+	Sampled word 'के' at index 9 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'के'.
+	Sampled word '%' at index 11 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for '%'.
+	Sampled word 'में' at index 14 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'में'.
+	Sampled word 'अपशिष्ट' at index 17 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'अपशिष्ट'.
+	Sampled word 'के' at index 19 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'के'.
+	Sampled word '88' at index 20 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for '88'.
+	Sampled word '19' at index 22 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for '19'.
+	Sampled word 'का' at index 24 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'का'.
+	Sampled word 'हैं' at index 27 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'हैं'.
+tgt_doc: 'These States <unk> contribute about <unk> % of total <unk> and <unk> % of total <unk> hazardous wastes generation in the country respectively .'
+	Sampled word 'States' at index 1 as a potential candidate for synonym replacement.
+		Replaced 'States' with its WordNet/IndoWordNet synonym 'nation'.
+	Sampled word '<unk>' at index 5 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for '<unk>'.
+	Sampled word 'and' at index 10 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'and'.
+	Sampled word 'hazardous' at index 16 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'hazardous'.
+	Sampled word 'generation' at index 18 as a potential candidate for synonym replacement.
+		Replaced 'generation' with its WordNet/IndoWordNet synonym 'genesis'.
+	Sampled word 'country' at index 21 as a potential candidate for synonym replacement.
+		Replaced 'country' with its WordNet/IndoWordNet synonym 'area'.
+augmented_src_doc: 'ये राज्य / केंद्र शासित प्रदेश क्रमशः कुल देश के 8 % और देश में कुल खतरनाक अपशिष्ट कचरे के 88 19 % का योगदान करते हैं'
+augmented_tgt_doc: 'These nation <unk> contribute about <unk> % of total <unk> and <unk> % of total <unk> hazardous wastes genesis in the area respectively'
+------------------------------
+src_doc: '2013 - 14 के दौरान , देश भर में खतरनाक कचरे के लिए टीएसडीएफ की दो चालू / नई परियोजनाओं की स्थापना के लिए वित्तीय सहायता प्रदान की गई है ।'
+	Sampled word '2013' at index 0 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for '2013'.
+	Sampled word 'के' at index 3 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'के'.
+	Sampled word 'देश' at index 6 as a potential candidate for synonym replacement.
+		Replaced 'देश' with its WordNet/IndoWordNet synonym 'घर'.
+	Sampled word 'भर' at index 7 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'भर'.
+	Sampled word 'में' at index 8 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'में'.
+	Sampled word 'खतरनाक' at index 9 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'खतरनाक'.
+	Sampled word 'दो' at index 15 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'दो'.
+	Sampled word 'नई' at index 18 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'नई'.
+	Sampled word 'के' at index 22 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'के'.
+	Sampled word 'सहायता' at index 25 as a potential candidate for synonym replacement.
+		Replaced 'सहायता' with its WordNet/IndoWordNet synonym 'सहयोग'.
+	Sampled word 'की' at index 27 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'की'.
+	Sampled word 'है' at index 29 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'है'.
+tgt_doc: 'During 2013-14 , financial assistance has been provided for setting up of two <unk> projects of <unk> for hazardous wastes across the country .'
+	Sampled word 'During' at index 0 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'During'.
+	Sampled word 'for' at index 8 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'for'.
+	Sampled word 'two' at index 12 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'two'.
+	Sampled word '<unk>' at index 16 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for '<unk>'.
+	Sampled word 'wastes' at index 19 as a potential candidate for synonym replacement.
+		Replaced 'wastes' with its WordNet/IndoWordNet synonym 'waste'.
+	Sampled word 'across' at index 20 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'across'.
+augmented_src_doc: '2013 - 14 के दौरान , घर भर में खतरनाक कचरे के लिए टीएसडीएफ की दो चालू / नई परियोजनाओं की स्थापना के लिए वित्तीय सहयोग प्रदान की गई है'
+augmented_tgt_doc: 'During 2013-14 , financial assistance has been provided for setting up of two <unk> projects of <unk> for hazardous waste across the country'
+------------------------------
+src_doc: 'ई - कचरा प्रबंधनः'
+	Sampled word '-' at index 1 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for '-'.
+tgt_doc: '<unk> Management :'
+augmented_src_doc: 'ई - कचरा प्रबंधनः'
+augmented_tgt_doc: '<unk> Management :'
+------------------------------
+src_doc: 'पर्यावरण और वन मंत्रालय ने मई 2011 में ई - कचरा नियमों को अधिसूचित किया है , जो 1 मई 2012 से प्रभावी हो गया है ।'
+	Sampled word 'वन' at index 2 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'वन'.
+	Sampled word '2011' at index 6 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for '2011'.
+	Sampled word 'अधिसूचित' at index 13 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'अधिसूचित'.
+	Sampled word ',' at index 16 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for ','.
+	Sampled word '2012' at index 20 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for '2012'.
+	Sampled word 'हो' at index 23 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'हो'.
+	Sampled word 'गया' at index 24 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'गया'.
+	Sampled word 'है' at index 25 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'है'.
+tgt_doc: 'The Ministry of Environment and Forest , has notified <unk> Rules in May 2011 , which has come into force with effect from 1st May 2012 .'
+	Sampled word 'The' at index 0 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'The'.
+	Sampled word 'and' at index 4 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'and'.
+	Sampled word 'Forest' at index 5 as a potential candidate for synonym replacement.
+		Replaced 'Forest' with its WordNet/IndoWordNet synonym 'forest'.
+	Sampled word 'has' at index 7 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'has'.
+	Sampled word '2011' at index 13 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for '2011'.
+	Sampled word ',' at index 14 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for ','.
+	Sampled word 'has' at index 16 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'has'.
+	Sampled word 'from' at index 22 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'from'.
+	Sampled word '1st' at index 23 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for '1st'.
+augmented_src_doc: 'पर्यावरण और वन मंत्रालय ने मई 2011 में ई - कचरा नियमों को अधिसूचित किया है , जो 1 मई 2012 से प्रभावी हो गया है'
+augmented_tgt_doc: 'The Ministry of Environment and forest , has notified <unk> Rules in May 2011 , which has come into force with effect from 1st May 2012'
+------------------------------
+src_doc: 'इन नियमों में विस्तारित निर्माता जिम्मेदारी ( <unk> ) की अवधारणा को सुनिश्चित किया गया है ।'
+	Sampled word 'में' at index 2 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'में'.
+	Sampled word 'निर्माता' at index 4 as a potential candidate for synonym replacement.
+		Replaced 'निर्माता' with its WordNet/IndoWordNet synonym 'सर्जक'.
+	Sampled word '(' at index 6 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for '('.
+	Sampled word '<unk>' at index 7 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for '<unk>'.
+	Sampled word ')' at index 8 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for ')'.
+	Sampled word 'को' at index 11 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'को'.
+tgt_doc: 'The concept of <unk> <unk> Responsibility ( <unk> ) has been enshrined in these rules .'
+	Sampled word 'of' at index 2 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'of'.
+	Sampled word '<unk>' at index 4 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for '<unk>'.
+	Sampled word '<unk>' at index 7 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for '<unk>'.
+	Sampled word 'in' at index 12 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'in'.
+	Sampled word 'rules' at index 14 as a potential candidate for synonym replacement.
+		Replaced 'rules' with its WordNet/IndoWordNet synonym 'rule'.
+augmented_src_doc: 'इन नियमों में विस्तारित सर्जक जिम्मेदारी ( <unk> ) की अवधारणा को सुनिश्चित किया गया है'
+augmented_tgt_doc: 'The concept of <unk> <unk> Responsibility ( <unk> ) has been enshrined in these rule'
+------------------------------
+src_doc: 'इन नियमों के अनुसार , <unk> को संग्रह केंद्रों की स्थापना करके या व्यक्तिगत रूप से या सामूहिक रूप से सिस्टम वापस लेकर अपने उत्पादों के जीवन के अंत से उत्पन्न ई - कचरे को इकट्ठा करना आवश्यक है ।'
+	Sampled word 'नियमों' at index 1 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'नियमों'.
+	Sampled word 'अनुसार' at index 3 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'अनुसार'.
+	Sampled word 'केंद्रों' at index 8 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'केंद्रों'.
+	Sampled word 'की' at index 9 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'की'.
+	Sampled word 'स्थापना' at index 10 as a potential candidate for synonym replacement.
+		Replaced 'स्थापना' with its WordNet/IndoWordNet synonym 'गठन'.
+	Sampled word 'या' at index 12 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'या'.
+	Sampled word 'लेकर' at index 22 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'लेकर'.
+	Sampled word 'के' at index 27 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'के'.
+	Sampled word 'अंत' at index 28 as a potential candidate for synonym replacement.
+		Replaced 'अंत' with its WordNet/IndoWordNet synonym 'विनाश'.
+	Sampled word 'से' at index 29 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'से'.
+	Sampled word 'कचरे' at index 33 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'कचरे'.
+	Sampled word 'इकट्ठा' at index 35 as a potential candidate for synonym replacement.
+		Replaced 'इकट्ठा' with its WordNet/IndoWordNet synonym 'समाहित'.
+	Sampled word 'आवश्यक' at index 37 as a potential candidate for synonym replacement.
+		Replaced 'आवश्यक' with its WordNet/IndoWordNet synonym 'जरूरी'.
+tgt_doc: 'As per these Rules the producers are required to collect <unk> generated from the end of life of their products by setting up collections centers or take back systems either individually or collectively .'
+	Sampled word 'As' at index 0 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'As'.
+	Sampled word 'required' at index 7 as a potential candidate for synonym replacement.
+		Replaced 'required' with its WordNet/IndoWordNet synonym 'need'.
+	Sampled word 'collect' at index 9 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'collect'.
+	Sampled word '<unk>' at index 10 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for '<unk>'.
+	Sampled word 'products' at index 19 as a potential candidate for synonym replacement.
+		Replaced 'products' with its WordNet/IndoWordNet synonym 'product'.
+	Sampled word 'by' at index 20 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'by'.
+	Sampled word 'or' at index 25 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'or'.
+	Sampled word 'systems' at index 28 as a potential candidate for synonym replacement.
+		Replaced 'systems' with its WordNet/IndoWordNet synonym 'system'.
+augmented_src_doc: 'इन नियमों के अनुसार , <unk> को संग्रह केंद्रों की गठन करके या व्यक्तिगत रूप से या सामूहिक रूप से सिस्टम वापस लेकर अपने उत्पादों के जीवन के विनाश से उत्पन्न ई - कचरे को समाहित करना जरूरी है'
+augmented_tgt_doc: 'As per these Rules the producers are need to collect <unk> generated from the end of life of their product by setting up collections centers or take back system either individually or collectively'
+------------------------------
+src_doc: 'ई - कचरे की <unk> को केवल राज्य प्रदूषण नियंत्रण बोर्डों / प्रदूषण नियंत्रण समिति ( पीसीसी ) के साथ अधिकृत और पंजीकृत सुविधाओं में ही किया जा सकता है ।'
+	Sampled word 'राज्य' at index 7 as a potential candidate for synonym replacement.
+		Replaced 'राज्य' with its WordNet/IndoWordNet synonym 'प्रांत'.
+	Sampled word 'बोर्डों' at index 10 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'बोर्डों'.
+	Sampled word 'नियंत्रण' at index 13 as a potential candidate for synonym replacement.
+		Replaced 'नियंत्रण' with its WordNet/IndoWordNet synonym 'अंकुश'.
+	Sampled word 'समिति' at index 14 as a potential candidate for synonym replacement.
+		Replaced 'समिति' with its WordNet/IndoWordNet synonym 'कमेटी'.
+	Sampled word 'पीसीसी' at index 16 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'पीसीसी'.
+	Sampled word ')' at index 17 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for ')'.
+	Sampled word 'के' at index 18 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'के'.
+	Sampled word 'साथ' at index 19 as a potential candidate for synonym replacement.
+		Replaced 'साथ' with its WordNet/IndoWordNet synonym 'इकट्ठा'.
+	Sampled word 'पंजीकृत' at index 22 as a potential candidate for synonym replacement.
+		Replaced 'पंजीकृत' with its WordNet/IndoWordNet synonym 'दर्ज'.
+	Sampled word 'में' at index 24 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'में'.
+	Sampled word 'किया' at index 26 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'किया'.
+	Sampled word 'जा' at index 27 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'जा'.
+tgt_doc: '<unk> <unk> can be undertaken only in facilities authorized and registered with State Pollution Control <unk> Control Committee ( <unk> ) .'
+	Sampled word 'can' at index 2 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'can'.
+	Sampled word 'undertaken' at index 4 as a potential candidate for synonym replacement.
+		Replaced 'undertaken' with its WordNet/IndoWordNet synonym 'undertake'.
+	Sampled word 'only' at index 5 as a potential candidate for synonym replacement.
+		Replaced 'only' with its WordNet/IndoWordNet synonym 'merely'.
+	Sampled word 'authorized' at index 8 as a potential candidate for synonym replacement.
+		Replaced 'authorized' with its WordNet/IndoWordNet synonym 'authorize'.
+	Sampled word 'registered' at index 10 as a potential candidate for synonym replacement.
+		Replaced 'registered' with its WordNet/IndoWordNet synonym 'register'.
+	Sampled word 'State' at index 12 as a potential candidate for synonym replacement.
+		Replaced 'State' with its WordNet/IndoWordNet synonym 'state'.
+	Sampled word '<unk>' at index 19 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for '<unk>'.
+augmented_src_doc: 'ई - कचरे की <unk> को केवल प्रांत प्रदूषण नियंत्रण बोर्डों / प्रदूषण अंकुश कमेटी ( पीसीसी ) के इकट्ठा अधिकृत और दर्ज सुविधाओं में ही किया जा सकता है'
+augmented_tgt_doc: '<unk> <unk> can be undertake merely in facilities authorize and register with state Pollution Control <unk> Control Committee ( <unk> )'
+------------------------------
+src_doc: 'उत्पन्न कचरे को एक पंजीकृत या अधिकृत <unk> या फिर से <unk> को बेचा जाना चाहिए , जिसमें पर्यावरणीय रूप से ध्वनि की सुविधा हो ।'
+	Sampled word 'कचरे' at index 1 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'कचरे'.
+	Sampled word '<unk>' at index 7 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for '<unk>'.
+	Sampled word '<unk>' at index 11 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for '<unk>'.
+	Sampled word ',' at index 16 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for ','.
+	Sampled word 'से' at index 20 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'से'.
+	Sampled word 'की' at index 22 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'की'.
+tgt_doc: '<unk> generated are required to be sold to a registered or authorized <unk> or <unk> having environmentally sound facilities .'
+	Sampled word '<unk>' at index 0 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for '<unk>'.
+	Sampled word 'generated' at index 1 as a potential candidate for synonym replacement.
+		Replaced 'generated' with its WordNet/IndoWordNet synonym 'generate'.
+	Sampled word 'required' at index 3 as a potential candidate for synonym replacement.
+		Replaced 'required' with its WordNet/IndoWordNet synonym 'ask'.
+	Sampled word 'be' at index 5 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'be'.
+	Sampled word '<unk>' at index 12 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for '<unk>'.
+	Sampled word '<unk>' at index 14 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for '<unk>'.
+	Sampled word 'environmentally' at index 16 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'environmentally'.
+	Sampled word 'facilities' at index 18 as a potential candidate for synonym replacement.
+		Replaced 'facilities' with its WordNet/IndoWordNet synonym 'facility'.
+augmented_src_doc: 'उत्पन्न कचरे को एक पंजीकृत या अधिकृत <unk> या फिर से <unk> को बेचा जाना चाहिए , जिसमें पर्यावरणीय रूप से ध्वनि की सुविधा हो'
+augmented_tgt_doc: '<unk> generate are ask to be sold to a registered or authorized <unk> or <unk> having environmentally sound facility'
+------------------------------
+src_doc: 'नियम में व्यक्तिगत रूप से या संयुक्त रूप से संग्रह केंद्र स्थापित करने का प्रावधान है ; या एक पंजीकृत समाज या एक नामित एजेंसी द्वारा ; या ई - कचरा एकत्र करने के लिए एक संघ द्वारा ।'
+	Sampled word 'से' at index 8 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'से'.
+	Sampled word 'केंद्र' at index 10 as a potential candidate for synonym replacement.
+		Replaced 'केंद्र' with its WordNet/IndoWordNet synonym 'मध्य'.
+	Sampled word 'है' at index 15 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'है'.
+	Sampled word 'या' at index 17 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'या'.
+	Sampled word 'पंजीकृत' at index 19 as a potential candidate for synonym replacement.
+		Replaced 'पंजीकृत' with its WordNet/IndoWordNet synonym 'दर्ज'.
+	Sampled word 'द्वारा' at index 25 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'द्वारा'.
+	Sampled word ';' at index 26 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for ';'.
+	Sampled word 'या' at index 27 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'या'.
+	Sampled word 'ई' at index 28 as a potential candidate for synonym replacement.
+		Replaced 'ई' with its WordNet/IndoWordNet synonym 'श्री'.
+	Sampled word 'के' at index 33 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'के'.
+	Sampled word 'लिए' at index 34 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'लिए'.
+	Sampled word 'एक' at index 35 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'एक'.
+	Sampled word 'संघ' at index 36 as a potential candidate for synonym replacement.
+		Replaced 'संघ' with its WordNet/IndoWordNet synonym 'यूनियन'.
+	Sampled word 'द्वारा' at index 37 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'द्वारा'.
+tgt_doc: 'The rule has provision for setting up of Collection Centre individually or jointly ; or by a registered society or a designated agency ; or by an association to collect <unk> .'
+	Sampled word 'for' at index 4 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'for'.
+	Sampled word 'of' at index 7 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'of'.
+	Sampled word 'Centre' at index 9 as a potential candidate for synonym replacement.
+		Replaced 'Centre' with its WordNet/IndoWordNet synonym 'essence'.
+	Sampled word ';' at index 13 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for ';'.
+	Sampled word 'registered' at index 17 as a potential candidate for synonym replacement.
+		Replaced 'registered' with its WordNet/IndoWordNet synonym 'register'.
+	Sampled word 'or' at index 19 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'or'.
+	Sampled word 'a' at index 20 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'a'.
+	Sampled word 'or' at index 24 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'or'.
+augmented_src_doc: 'नियम में व्यक्तिगत रूप से या संयुक्त रूप से संग्रह मध्य स्थापित करने का प्रावधान है ; या एक दर्ज समाज या एक नामित एजेंसी द्वारा ; या श्री - कचरा एकत्र करने के लिए एक यूनियन द्वारा'
+augmented_tgt_doc: 'The rule has provision for setting up of Collection essence individually or jointly ; or by a register society or a designated agency ; or by an association to collect <unk>'
+------------------------------
+src_doc: 'ये नियम ई - कचरे के पर्यावरणीय ध्वनि प्रबंधन को सुनिश्चित करने के लिए मुख्य साधन हैं ।'
+	Sampled word '-' at index 3 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for '-'.
+	Sampled word 'ध्वनि' at index 7 as a potential candidate for synonym replacement.
+		Replaced 'ध्वनि' with its WordNet/IndoWordNet synonym 'शब्द'.
+	Sampled word 'प्रबंधन' at index 8 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'प्रबंधन'.
+	Sampled word 'को' at index 9 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'को'.
+	Sampled word 'सुनिश्चित' at index 10 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'सुनिश्चित'.
+tgt_doc: 'These rules are the main instrument to ensure environmentally sound management of <unk> .'
+	Sampled word 'rules' at index 1 as a potential candidate for synonym replacement.
+		Replaced 'rules' with its WordNet/IndoWordNet synonym 'rule'.
+	Sampled word 'the' at index 3 as a potential candidate for synonym replacement.
+		No in-vocabulary synonym found for 'the'.
+augmented_src_doc: 'ये नियम ई - कचरे के पर्यावरणीय शब्द प्रबंधन को सुनिश्चित करने के लिए मुख्य साधन हैं'
+augmented_tgt_doc: 'These rule are the main instrument to ensure environmentally sound management of <unk>'
+------------------------------

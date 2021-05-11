@@ -1,8 +1,10 @@
 import re
+import textwrap
 
 import numpy as np
 
 from ..globals import Augmentor, VALID_AUG_MODES, BLANK_TOKEN, ERRORS, SENTENCE_DELIMS
+from ..log import logger, NUM_LOGGER_DASHES
 from ..utils import cyclic_read, path2lang, line_count, doc2sents, sent2words, doc2words
 
 def count_unigrams(path):
@@ -199,7 +201,7 @@ def noising_aug(doc, mode, gamma0, unigram_counts, lang, next_sets, prev_sets=No
 
     augmented_doc = list()
 
-    for word in doc2words(doc, lang):
+    for idx, word in enumerate(doc2words(doc, lang)):
         if word in set(re.split('|', SENTENCE_DELIMS)):
             # Not noising punctuations.
             continue
@@ -208,6 +210,7 @@ def noising_aug(doc, mode, gamma0, unigram_counts, lang, next_sets, prev_sets=No
             if np.random.binomial(1, gamma0):
                 # Blanking with probability gamma0.
                 augmented_doc.append(BLANK_TOKEN)
+                logger.info(f'\tBlanked word \'{word}\' at index {idx}.')
             else:
                 augmented_doc.append(word)
 
@@ -216,6 +219,7 @@ def noising_aug(doc, mode, gamma0, unigram_counts, lang, next_sets, prev_sets=No
                 sampled_word = sample_word(unigram_counts)
                 # Replacing from unigram distribution with probability gamma0.
                 augmented_doc.append(sampled_word)
+                logger.info(f'\tReplaced word \'{word}\' at index {idx} with \'{sampled_word}\'.')
             else:
                 augmented_doc.append(word)
 
@@ -228,6 +232,7 @@ def noising_aug(doc, mode, gamma0, unigram_counts, lang, next_sets, prev_sets=No
                 sampled_word = sample_word(unigram_counts)
                 # Replacing from unigram distribution with probability gammaAD.
                 augmented_doc.append(sampled_word)
+                logger.info(f'\tReplaced word \'{word}\' with \'{sampled_word}\'.')
             else:
                 augmented_doc.append(word)
 
@@ -255,12 +260,13 @@ def noising_aug(doc, mode, gamma0, unigram_counts, lang, next_sets, prev_sets=No
                 else:
                     # Otherwise sample from Kneser-Ney distribution.
                     sampled_word = sample_word(kneser_ney_distr)
+                    logger.info(f'\tReplaced word \'{word}\' [gammaAD={gammaAD}] with \'{sampled_word}\'.')
                 augmented_doc.append(sampled_word)
             else:
                 augmented_doc.append(word)
 
         else:
-            raise ValueError(f'Invalid value of parameter \'mode\'. Valid values for parameter \'mode\' to noising_aug are values in {*VALID_AUG_MODES["depparse"],}.')
+            raise ValueError(f'Invalid value of parameter \'mode\'. Valid values for parameter \'mode\' to noising_aug are values in {*VALID_AUG_MODES["noising"],}.')
 
     return ' '.join(augmented_doc)
 
@@ -329,16 +335,38 @@ class NoisingAugmentor(Augmentor):
             self.src_prev_sets = None
             self.tgt_prev_sets = None
 
+        logger.info(textwrap.dedent(f'\
+            NoisingAugmentor\n\
+            \tdoc_count={self.doc_count}\n\
+            \tsrc_input_path={src_input_path}\n\
+            \ttgt_input_path={tgt_input_path}\n\
+            \tsrc_lang={self.src_lang}\n\
+            \ttgt_lang={self.tgt_lang}\n\
+            \tgamma0={self.gamma0}\n\
+            \tmode={self.mode}\n\
+            \trandom_state={random_state}\n\
+            Note: Words are 0-indexed.'
+        ))
+        logger.info('-' * NUM_LOGGER_DASHES)
+
     def __next__(self):
         # Returning original sentences as they are if self.augment is False.
         if not self.augment:
             return next(self.src_input_file).rstrip('\n'), next(self.tgt_input_file).rstrip('\n')
 
-        # Augmenting current document.
         src_doc = next(self.src_input_file)
+        logger.info(f'src_doc: \'{src_doc}\'')
+
         augmented_src_doc = noising_aug(src_doc, self.mode, self.gamma0, self.src_unigram_counts, self.src_lang, self.src_next_sets, self.src_prev_sets)
+
         tgt_doc = next(self.tgt_input_file)
+        logger.info(f'tgt_doc: \'{tgt_doc}\'')
+
         augmented_tgt_doc = noising_aug(tgt_doc, self.mode, self.gamma0, self.tgt_unigram_counts, self.tgt_lang, self.tgt_next_sets, self.tgt_prev_sets)
+
+        logger.info(f'augmented_src_doc: \'{augmented_src_doc}\'')
+        logger.info(f'augmented_tgt_doc: \'{augmented_tgt_doc}\'')
+        logger.info('-' * NUM_LOGGER_DASHES)
 
         return augmented_src_doc, augmented_tgt_doc
 

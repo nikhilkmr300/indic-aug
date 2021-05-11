@@ -20,3 +20,4 @@ example/raw/*.hi
 example/raw/parallel
 example/preprocessed
 example/vocab
+example/stanza_resources

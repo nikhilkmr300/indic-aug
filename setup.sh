@@ -30,6 +30,7 @@ conda_packages=(
     "sphinx"
     "sphinxcontrib-bibtex"
     "sphinx_rtd_theme"
+    "jupyterlab"
 )
 conda config --add channels conda-forge
 
@@ -65,3 +66,8 @@ done
 echo "y" | pip uninstall torch
 # Installing torch==1.3.0 as required by inltk.
 echo "y" | conda install pytorch==1.3.0 -c pytorch
+
+# Removing spacy==3.x installed as dependency.
+echo "y" | pip uninstall spacy
+# Installing spacy==2.x as required by inltk.
+echo "y" | conda install spacy=2.3.0

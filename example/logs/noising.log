@@ -1,0 +1,127 @@
+NoisingAugmentor
+	doc_count=30000
+	src_input_path=preprocessed/data.hi
+	tgt_input_path=preprocessed/data.en
+	src_lang=hi
+	tgt_lang=en
+	gamma0=0.1
+	mode=blank
+	random_state=1
+Note: Words are 0-indexed.
+------------------------------
+src_doc: 'वर्तमान में , 38 टीएसडीएफ में क्रमशः 17 एकीकृत टीएसडीएफ , 13 <unk> कोमन <unk> <unk> और 8 <unk> कोमन <unk> <unk> और 4 स्टेट्स / <unk> में उपलब्ध हैं ।'
+	Blanked word '<unk>' at index 21.
+tgt_doc: 'At present , 38 <unk> include 17 Integrated <unk> , 13 <unk> Common Secure <unk> and 8 <unk> Common <unk> are available in 10 <unk> and 4 <unk> respectively .'
+	Blanked word ',' at index 2.
+	Blanked word '13' at index 10.
+	Blanked word '8' at index 16.
+augmented_src_doc: 'वर्तमान में , 38 टीएसडीएफ में क्रमशः 17 एकीकृत टीएसडीएफ , 13 <unk> कोमन <unk> <unk> और 8 <unk> कोमन <unk> <blank> और 4 स्टेट्स / <unk> में उपलब्ध हैं'
+augmented_tgt_doc: 'At present <blank> 38 <unk> include 17 Integrated <unk> , <blank> <unk> Common Secure <unk> and <blank> <unk> Common <unk> are available in 10 <unk> and 4 <unk> respectively'
+------------------------------
+src_doc: 'ये राज्य / केंद्र शासित प्रदेश क्रमशः कुल देश के 8 % और देश में कुल खतरनाक अपशिष्ट कचरे के 88 । 19 % का योगदान करते हैं ।'
+	Blanked word 'के' at index 9.
+	Blanked word '%' at index 11.
+	Blanked word 'अपशिष्ट' at index 17.
+tgt_doc: 'These States <unk> contribute about <unk> % of total <unk> and <unk> % of total <unk> hazardous wastes generation in the country respectively .'
+	Blanked word 'States' at index 1.
+	Blanked word '<unk>' at index 5.
+	Blanked word 'and' at index 10.
+	Blanked word 'generation' at index 18.
+	Blanked word 'country' at index 21.
+augmented_src_doc: 'ये राज्य / केंद्र शासित प्रदेश क्रमशः कुल देश <blank> 8 <blank> और देश में कुल खतरनाक <blank> कचरे के 88 19 % का योगदान करते हैं'
+augmented_tgt_doc: 'These <blank> <unk> contribute about <blank> % of total <unk> <blank> <unk> % of total <unk> hazardous wastes <blank> in the <blank> respectively'
+------------------------------
+src_doc: '2013 - 14 के दौरान , देश भर में खतरनाक कचरे के लिए टीएसडीएफ की दो चालू / नई परियोजनाओं की स्थापना के लिए वित्तीय सहायता प्रदान की गई है ।'
+	Blanked word '2013' at index 0.
+	Blanked word 'के' at index 3.
+	Blanked word 'में' at index 8.
+	Blanked word 'के' at index 22.
+tgt_doc: 'During 2013-14 , financial assistance has been provided for setting up of two <unk> projects of <unk> for hazardous wastes across the country .'
+	Blanked word 'two' at index 12.
+	Blanked word 'wastes' at index 19.
+augmented_src_doc: '<blank> - 14 <blank> दौरान , देश भर <blank> खतरनाक कचरे के लिए टीएसडीएफ की दो चालू / नई परियोजनाओं की स्थापना <blank> लिए वित्तीय सहायता प्रदान की गई है'
+augmented_tgt_doc: 'During 2013-14 , financial assistance has been provided for setting up of <blank> <unk> projects of <unk> for hazardous <blank> across the country'
+------------------------------
+src_doc: 'ई - कचरा प्रबंधनः'
+tgt_doc: '<unk> Management :'
+augmented_src_doc: 'ई - कचरा प्रबंधनः'
+augmented_tgt_doc: '<unk> Management :'
+------------------------------
+src_doc: 'पर्यावरण और वन मंत्रालय ने मई 2011 में ई - कचरा नियमों को अधिसूचित किया है , जो 1 मई 2012 से प्रभावी हो गया है ।'
+	Blanked word 'वन' at index 2.
+	Blanked word '2012' at index 20.
+	Blanked word 'है' at index 25.
+tgt_doc: 'The Ministry of Environment and Forest , has notified <unk> Rules in May 2011 , which has come into force with effect from 1st May 2012 .'
+	Blanked word 'The' at index 0.
+	Blanked word 'and' at index 4.
+	Blanked word 'Forest' at index 5.
+	Blanked word 'has' at index 7.
+	Blanked word '2011' at index 13.
+	Blanked word ',' at index 14.
+	Blanked word 'has' at index 16.
+	Blanked word 'from' at index 22.
+augmented_src_doc: 'पर्यावरण और <blank> मंत्रालय ने मई 2011 में ई - कचरा नियमों को अधिसूचित किया है , जो 1 मई <blank> से प्रभावी हो गया <blank>'
+augmented_tgt_doc: '<blank> Ministry of Environment <blank> <blank> , <blank> notified <unk> Rules in May <blank> <blank> which <blank> come into force with effect <blank> 1st May 2012'
+------------------------------
+src_doc: 'इन नियमों में विस्तारित निर्माता जिम्मेदारी ( <unk> ) की अवधारणा को सुनिश्चित किया गया है ।'
+	Blanked word 'निर्माता' at index 4.
+	Blanked word ')' at index 8.
+tgt_doc: 'The concept of <unk> <unk> Responsibility ( <unk> ) has been enshrined in these rules .'
+	Blanked word 'in' at index 12.
+	Blanked word 'rules' at index 14.
+augmented_src_doc: 'इन नियमों में विस्तारित <blank> जिम्मेदारी ( <unk> <blank> की अवधारणा को सुनिश्चित किया गया है'
+augmented_tgt_doc: 'The concept of <unk> <unk> Responsibility ( <unk> ) has been enshrined <blank> these <blank>'
+------------------------------
+src_doc: 'इन नियमों के अनुसार , <unk> को संग्रह केंद्रों की स्थापना करके या व्यक्तिगत रूप से या सामूहिक रूप से सिस्टम वापस लेकर अपने उत्पादों के जीवन के अंत से उत्पन्न ई - कचरे को इकट्ठा करना आवश्यक है ।'
+	Blanked word 'नियमों' at index 1.
+	Blanked word 'लेकर' at index 22.
+	Blanked word 'से' at index 29.
+tgt_doc: 'As per these Rules the producers are required to collect <unk> generated from the end of life of their products by setting up collections centers or take back systems either individually or collectively .'
+	Blanked word 'required' at index 7.
+	Blanked word 'products' at index 19.
+	Blanked word 'by' at index 20.
+augmented_src_doc: 'इन <blank> के अनुसार , <unk> को संग्रह केंद्रों की स्थापना करके या व्यक्तिगत रूप से या सामूहिक रूप से सिस्टम वापस <blank> अपने उत्पादों के जीवन के अंत <blank> उत्पन्न ई - कचरे को इकट्ठा करना आवश्यक है'
+augmented_tgt_doc: 'As per these Rules the producers are <blank> to collect <unk> generated from the end of life of their <blank> <blank> setting up collections centers or take back systems either individually or collectively'
+------------------------------
+src_doc: 'ई - कचरे की <unk> को केवल राज्य प्रदूषण नियंत्रण बोर्डों / प्रदूषण नियंत्रण समिति ( पीसीसी ) के साथ अधिकृत और पंजीकृत सुविधाओं में ही किया जा सकता है ।'
+	Blanked word ')' at index 17.
+tgt_doc: '<unk> <unk> can be undertaken only in facilities authorized and registered with State Pollution Control <unk> Control Committee ( <unk> ) .'
+	Blanked word 'only' at index 5.
+	Blanked word 'authorized' at index 8.
+	Blanked word 'registered' at index 10.
+	Blanked word 'State' at index 12.
+augmented_src_doc: 'ई - कचरे की <unk> को केवल राज्य प्रदूषण नियंत्रण बोर्डों / प्रदूषण नियंत्रण समिति ( पीसीसी <blank> के साथ अधिकृत और पंजीकृत सुविधाओं में ही किया जा सकता है'
+augmented_tgt_doc: '<unk> <unk> can be undertaken <blank> in facilities <blank> and <blank> with <blank> Pollution Control <unk> Control Committee ( <unk> )'
+------------------------------
+src_doc: 'उत्पन्न कचरे को एक पंजीकृत या अधिकृत <unk> या फिर से <unk> को बेचा जाना चाहिए , जिसमें पर्यावरणीय रूप से ध्वनि की सुविधा हो ।'
+	Blanked word '<unk>' at index 7.
+tgt_doc: '<unk> generated are required to be sold to a registered or authorized <unk> or <unk> having environmentally sound facilities .'
+	Blanked word '<unk>' at index 0.
+	Blanked word 'be' at index 5.
+augmented_src_doc: 'उत्पन्न कचरे को एक पंजीकृत या अधिकृत <blank> या फिर से <unk> को बेचा जाना चाहिए , जिसमें पर्यावरणीय रूप से ध्वनि की सुविधा हो'
+augmented_tgt_doc: '<blank> generated are required to <blank> sold to a registered or authorized <unk> or <unk> having environmentally sound facilities'
+------------------------------
+src_doc: 'नियम में व्यक्तिगत रूप से या संयुक्त रूप से संग्रह केंद्र स्थापित करने का प्रावधान है ; या एक पंजीकृत समाज या एक नामित एजेंसी द्वारा ; या ई - कचरा एकत्र करने के लिए एक संघ द्वारा ।'
+	Blanked word 'या' at index 17.
+	Blanked word 'द्वारा' at index 25.
+	Blanked word ';' at index 26.
+	Blanked word 'ई' at index 28.
+	Blanked word 'के' at index 33.
+	Blanked word 'लिए' at index 34.
+	Blanked word 'द्वारा' at index 37.
+tgt_doc: 'The rule has provision for setting up of Collection Centre individually or jointly ; or by a registered society or a designated agency ; or by an association to collect <unk> .'
+	Blanked word 'Centre' at index 9.
+	Blanked word ';' at index 13.
+	Blanked word 'registered' at index 17.
+augmented_src_doc: 'नियम में व्यक्तिगत रूप से या संयुक्त रूप से संग्रह केंद्र स्थापित करने का प्रावधान है ; <blank> एक पंजीकृत समाज या एक नामित एजेंसी <blank> <blank> या <blank> - कचरा एकत्र करने <blank> <blank> एक संघ <blank>'
+augmented_tgt_doc: 'The rule has provision for setting up of Collection <blank> individually or jointly <blank> or by a <blank> society or a designated agency ; or by an association to collect <unk>'
+------------------------------
+src_doc: 'ये नियम ई - कचरे के पर्यावरणीय ध्वनि प्रबंधन को सुनिश्चित करने के लिए मुख्य साधन हैं ।'
+	Blanked word '-' at index 3.
+	Blanked word 'ध्वनि' at index 7.
+	Blanked word 'प्रबंधन' at index 8.
+	Blanked word 'सुनिश्चित' at index 10.
+tgt_doc: 'These rules are the main instrument to ensure environmentally sound management of <unk> .'
+augmented_src_doc: 'ये नियम ई <blank> कचरे के पर्यावरणीय <blank> <blank> को <blank> करने के लिए मुख्य साधन हैं'
+augmented_tgt_doc: 'These rules are the main instrument to ensure environmentally sound management of <unk>'
+------------------------------

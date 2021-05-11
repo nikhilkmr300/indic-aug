@@ -1,14 +1,19 @@
-import os
+from pathlib import Path
+import logging
 import subprocess
 import re
+import os
+import sys
 
 import pandas as pd
 import nltk
+import stanza
 from indicnlp.tokenize.sentence_tokenize import sentence_split
 from indicnlp.tokenize.indic_tokenize import trivial_tokenize
 
 from .globals import ERRORS, UNK_TOKEN, LANGS
 from .globals import PAD_TOKEN, UNK_TOKEN, SOS_TOKEN, EOS_TOKEN, BLANK_TOKEN
+from .log import logger
 
 def path2lang(path):
     """Returns language code from extension of path.
@@ -35,6 +40,9 @@ def stanza2list(stanza_sent):
 
     :param stanza_sent: Stanza sentence to be converted.
     :type stanza_sent: ``stanza.models.common.doc.Sentence``
+
+    :return: List of tokens in ``stanza`` sentence.
+    :rtype: list(str)
     """
 
     str_sent = list()
@@ -148,7 +156,7 @@ def doc2sents(doc, lang):
     :type lang: str
 
     :return: List of sentences in ``doc``.
-    :rtype: list
+    :rtype: list(str)
     """
 
     doc = doc.strip('\n\t ')
@@ -170,7 +178,7 @@ def doc2words(doc, lang):
     :type lang: str
 
     :return: List of words in ``doc``.
-    :rtype: list
+    :rtype: list(str)
     """
 
     doc = doc.strip('\n\t ')
@@ -208,3 +216,25 @@ def fix_split_special_tokens(doc):
             doc = re.sub(to_match, token, doc)
 
     return doc
+
+def load_stanza_pipeline(lang, stanza_dir=str(Path.home() / 'stanza_resources')):
+    """Loads a ``stanza`` pipeline. If ``stanza`` models are not downloaded,
+    first downloads the model to the ``stanza_dir`` directory then loads.
+
+    :param lang: Language for which to load the pipeline.
+    :type lang: ISO 639-1 language code
+    :param stanza_dir: Directory where to store ``stanza`` resources.
+    :type stanza_dir: str
+
+    :return: A ``stanza`` pipeline
+    :rtype: ``stanza.Pipeline``
+    """
+
+    try:
+        pipeline = stanza.Pipeline(lang, dir=stanza_dir, tokenize_pretokenized=True, verbose=False)
+    except (stanza.pipeline.core.ResourcesFileNotFoundError, stanza.pipeline.core.LanguageNotDownloadedError) as e:
+        stanza.resources.common.set_logging_level(None, True)       # To show download progress bar.
+        logger.info(f'Could not find stanza model at {stanza_dir}. Downloading model to {stanza_dir}...')
+        stanza.download(lang, model_dir=stanza_dir)
+        pipeline = stanza.Pipeline(lang, dir=stanza_dir, tokenize_pretokenized=True, verbose=False)
+    return pipeline

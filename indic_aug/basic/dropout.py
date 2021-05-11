@@ -1,8 +1,9 @@
-import re
+import textwrap
 
 import numpy as np
 
 from ..globals import Augmentor, ERRORS
+from ..log import logger, NUM_LOGGER_DASHES
 from ..utils import cyclic_read, path2lang, line_count, doc2words
 
 def dropout_aug(doc, p, lang):
@@ -21,8 +22,9 @@ def dropout_aug(doc, p, lang):
 
     augmented_doc = list()
 
-    for word in doc2words(doc, lang):
+    for idx, word in enumerate(doc2words(doc, lang)):
         if np.random.binomial(1, p):
+            logger.info(f'\tDropped word \'{word}\' at index {idx}.')
             # Dropping word with probability p.
             continue
         else:
@@ -75,16 +77,37 @@ class DropoutAugmentor(Augmentor):
 
         self.p = p
 
+        logger.info(textwrap.dedent(f'\
+            DropoutAugmentor\n\
+            \tdoc_count={self.doc_count}\n\
+            \tsrc_input_path={src_input_path}\n\
+            \ttgt_input_path={tgt_input_path}\n\
+            \tsrc_lang={self.src_lang}\n\
+            \ttgt_lang={self.tgt_lang}\n\
+            \tp={self.p}\n\
+            \trandom_state={random_state}\n\
+            Note: Words are 0-indexed.'
+        ))
+        logger.info('-' * NUM_LOGGER_DASHES)
+
     def __next__(self):
         # Returning original sentences as they are if self.augment is False.
         if not self.augment:
             return next(self.src_input_file).rstrip('\n'), next(self.tgt_input_file).rstrip('\n')
 
-        # Augmenting current document.
         src_doc = next(self.src_input_file)
+        logger.info(f'src_doc: \'{src_doc}\'')
+
         augmented_src_doc = dropout_aug(src_doc, self.p, self.src_lang)
+
         tgt_doc = next(self.tgt_input_file)
+        logger.info(f'tgt_doc: \'{tgt_doc}\'')
+
         augmented_tgt_doc = dropout_aug(tgt_doc, self.p, self.tgt_lang)
+
+        logger.info(f'augmented_src_doc: \'{augmented_src_doc}\'')
+        logger.info(f'augmented_tgt_doc: \'{augmented_tgt_doc}\'')
+        logger.info('-' * NUM_LOGGER_DASHES)
 
         return augmented_src_doc, augmented_tgt_doc
 

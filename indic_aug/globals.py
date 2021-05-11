@@ -57,6 +57,7 @@ Module to contain variables that are required in multiple places.
     Index corresponding to ``BLANK_TOKEN``.
 """
 
+import logging
 import os
 
 from abc import ABC, abstractmethod

@@ -1,12 +1,10 @@
 import csv
 import logging
+from pathlib import Path
 import subprocess
 import shutil
 import sys
 import os
-
-logging.basicConfig(level=logging.INFO, format='%(levelname)s:%(name)s: %(message)s', stream=sys.stdout)
-logger = logging.getLogger(__name__)
 
 import numpy as np
 import pandas as pd
@@ -21,7 +19,8 @@ from tqdm import tqdm
 from .globals import ERRORS, LANGS, INVALID_CHARS
 from .globals import UNK_TOKEN
 from .vocab import Vocab
-from .utils import path2lang, line_count
+from .log import logger
+from .utils import path2lang, line_count, load_stanza_pipeline
 
 class Preprocessor:
     """Class to perform the following:
@@ -31,13 +30,20 @@ class Preprocessor:
     3. Replace appropriate words in corpus by special tokens.
     """
 
-    def __init__(self, raw_src_path, raw_tgt_path):
+    def __init__(self, raw_src_path, raw_tgt_path, stanza_dir=str(Path.home() / 'stanza_resources')):
         """Constructor method.
 
         :param raw_src_path: Path to raw source portion of parallel corpus.
         :type raw_src_path: str
         :param raw_tgt_path: Path to raw target portion of parallel corpus.
         :type raw_tgt_path: str
+        :param stanza_dir: Directory where ``stanza`` resources are stored. If
+            you have not modified the location where ``stanza.download`` 
+            downloads its models, then you may leave this parameter untouched 
+            (in that case, you will find the ``stanza_resources`` directory in 
+            your home directory). Refer ``indic_aug.utils.load_stanza_pipeline``
+            for more information.
+        :type stanza_dir: str
         """
 
         self.raw_src_path = raw_src_path
@@ -46,7 +52,7 @@ class Preprocessor:
         self.src_lang = path2lang(self.raw_src_path)
         self.tgt_lang = path2lang(self.raw_tgt_path)
 
-        self.en_pipeline = stanza.Pipeline(lang='en', processors='tokenize,mwt,pos', verbose=False)
+        self.en_pipeline = load_stanza_pipeline('en', stanza_dir=stanza_dir)
 
     def pre_vocab(self, prevocab_src_path, prevocab_tgt_path, batch_size):
         """Processing before vocabulary is built ("prevocab processing").
@@ -90,7 +96,13 @@ class Preprocessor:
 
             if lang == 'en':
                 # doc = truecase(doc)   # Truecasing is too slow.
-                return ' '.join(nltk.word_tokenize(doc))
+                try:
+                    doc = ' '.join(nltk.word_tokenize(doc))
+                except LookupError as e:
+                    logger.info('Could not find nltk resource \'punkt\'. Downloading resource \'punkt\'...')
+                    nltk.download('punkt')
+                    doc = ' '.join(nltk.word_tokenize(doc))
+                return doc
             elif lang in set(LANGS) - {'en'}:
                 return ' '.join(trivial_tokenize_indic(doc))
             else:

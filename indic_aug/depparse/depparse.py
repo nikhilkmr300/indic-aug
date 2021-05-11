@@ -1,13 +1,13 @@
-import logging
-import os
+from pathlib import Path
+import textwrap
 import warnings
 
 import numpy as np
 from scipy.special import softmax
-import stanza
 
 from ..globals import Augmentor, VALID_AUG_MODES, ERRORS, PAD_TOKEN, UNK_TOKEN, SOS_TOKEN, EOS_TOKEN, BLANK_TOKEN
-from ..utils import path2lang, cyclic_read, stanza2list, closest_freq, line_count
+from ..log import logger, NUM_LOGGER_DASHES
+from ..utils import path2lang, cyclic_read, stanza2list, closest_freq, line_count, load_stanza_pipeline
 
 class DepParseTree:
     """Represents a dependency parsing tree."""
@@ -217,12 +217,16 @@ def depparse_aug(sent, mode, alpha, freq_dict=None):
             if mode == 'blank':
                 # Blanking with probability scores[idx].
                 sent[idx] = BLANK_TOKEN
+                logger.info(f'\tBlanked word \'{word}\' at index {idx}.')
             elif mode == 'dropout':
                 # Dropping word with probability scores[idx].
                 sent[idx] = ''
+                logger.info(f'\tDropped word \'{word}\' at index {idx}.')
             elif mode == 'replace_freq':
                 # Replacing word with probability scores[idx].
-                sent[idx] = closest_freq(word, freq_dict)
+                replacement = closest_freq(word, freq_dict)
+                sent[idx] = replacement
+                logger.info(f'\tReplaced word \'{word}\' at index {idx} with \'{replacement}\'.')
             else:
                 raise ValueError(f'Invalid value of parameter \'mode\'. Valid values for parameter \'mode\' to depparse_aug are values in {*VALID_AUG_MODES["depparse"],}.')
 
@@ -231,12 +235,12 @@ def depparse_aug(sent, mode, alpha, freq_dict=None):
 
     return ' '.join(sent)
 
-class DepParseAugmentor:
+class DepParseAugmentor(Augmentor):
     """Class to augment parallel corpora by dependency parsing technique (refer:
     :cite:t:`duan2020syntax`).
     """
 
-    def __init__(self, src_input_path, tgt_input_path, mode, alpha, src_freq_dict=None, tgt_freq_dict=None, stanza_dir=os.path.join('~', 'stanza_resources'), augment=True, random_state=1):
+    def __init__(self, src_input_path, tgt_input_path, mode, alpha, src_freq_dict=None, tgt_freq_dict=None, stanza_dir=str(Path.home() / 'stanza_resources'), augment=True, random_state=1):
         """Constructor method.
 
         :param src_input_path: Path to aligned source corpus.
@@ -290,52 +294,53 @@ class DepParseAugmentor:
         self.src_freq_dict = src_freq_dict
         self.tgt_freq_dict = tgt_freq_dict
 
-        # Loading stanza pipeline for source language to convert string to
-        # stanza.models.common.doc.Sentence.
-        try:
-            self.src_pipeline = stanza.Pipeline(src_lang, tokenize_pretokenized=True, verbose=False)
-        except (stanza.pipeline.core.ResourcesFileNotFoundError, stanza.pipeline.core.LanguageNotDownloadedError) as e:
-            logging.info(f'Could not find stanza model at {stanza_dir}. Downloading model...')
-            logging.info(f'If you have already downloaded the model, stop this process (Ctrl-C) and pass the path to the model to parameter stanza_dir.')
-            stanza.download(src_lang)
-            self.src_pipeline = stanza.Pipeline(src_lang, tokenize_pretokenized=True, verbose=False)
+        # Loading stanza pipeline for source and target languages to convert
+        # string to stanza.models.common.doc.Sentence.
+        self.src_pipeline = load_stanza_pipeline(src_lang, stanza_dir=stanza_dir)
+        self.tgt_pipeline = load_stanza_pipeline(tgt_lang, stanza_dir=stanza_dir)
 
-        # Loading stanza pipeline for target language to convert string to
-        # stanza.models.common.doc.Sentence.
-        try:
-            self.tgt_pipeline = stanza.Pipeline(tgt_lang, tokenize_pretokenized=True, verbose=False)
-        except (stanza.pipeline.core.ResourcesFileNotFoundError, stanza.pipeline.core.LanguageNotDownloadedError) as e:
-            logging.info(f'Could not find stanza model at {stanza_dir}. Downloading model...')
-            logging.info(f'If you have already downloaded the model, stop this process (Ctrl-C) and pass the path to the model to parameter stanza_dir.')
-            stanza.download(tgt_lang)
-            self.tgt_pipeline = stanza.Pipeline(tgt_lang, tokenize_pretokenized=True, verbose=False)
+        logger.info(textwrap.dedent(f'\
+            DepParseAugmentor\n\
+            \tdoc_count={self.doc_count}\n\
+            \tsrc_input_path={src_input_path}\n\
+            \ttgt_input_path={tgt_input_path}\n\
+            \tsrc_lang={src_lang}\n\
+            \ttgt_lang={tgt_lang}\n\
+            \tmode={self.mode}\n\
+            \talpha={self.alpha}\n\
+            \trandom_state={random_state}\n\
+            Note: Words are 0-indexed.'
+        ))
+        logger.info('-' * NUM_LOGGER_DASHES)
 
     def __next__(self):
         # Returning original sentences as they are if self.augment is False.
         if not self.augment:
             return next(self.src_input_file).rstrip('\n'), next(self.tgt_input_file).rstrip('\n')
 
-        # Converting sample (string of sentences) to
-        # stanza.models.common.doc.Document object, getting next document.
-        src_doc = self.src_pipeline(next(self.src_input_file).rstrip('\n'))
-        tgt_doc = self.tgt_pipeline(next(self.tgt_input_file).rstrip('\n'))
+        src_doc = next(self.src_input_file).rstrip('\n')
+        logger.info(f'src_doc: \'{src_doc}\'')
 
-        # Placeholder list to hold augmented document, will join all sentences
-        # in document before returning.
+        src_doc = self.src_pipeline(src_doc)
         augmented_src_doc = list()
-        augmented_tgt_doc = list()
-
-        # Iterating over sentences in current document. Using separate for loops
-        # (and not zipping) because source and target documents may have
-        # different number of sentences.
         for src_sent in src_doc.sentences:
             augmented_src_doc.append(depparse_aug(src_sent, self.mode, self.alpha, self.src_freq_dict))
+
+        tgt_doc = next(self.tgt_input_file).rstrip('\n')
+        logger.info(f'tgt_doc: \'{tgt_doc}\'')
+
+        tgt_doc = self.tgt_pipeline(tgt_doc)
+        augmented_tgt_doc = list()
         for tgt_sent in tgt_doc.sentences:
             augmented_tgt_doc.append(depparse_aug(tgt_sent, self.mode, self.alpha, self.tgt_freq_dict))
 
         # Joining all sentences in document.
         augmented_src_doc = ' '.join(augmented_src_doc)
         augmented_tgt_doc = ' '.join(augmented_tgt_doc)
+
+        logger.info(f'augmented_src_doc: \'{augmented_src_doc}\'')
+        logger.info(f'augmented_tgt_doc: \'{augmented_tgt_doc}\'')
+        logger.info('-' * NUM_LOGGER_DASHES)
 
         return augmented_src_doc, augmented_tgt_doc
 

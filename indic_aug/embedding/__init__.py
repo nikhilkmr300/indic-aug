@@ -1,5 +1,7 @@
 __all__ = [
-    'TDAugmentor'
+    'fetch_embeddings',
+    'ClosestEmbeddingAugmentor'
 ]
 
-from .tda import TDAugmentor
+from .common import fetch_embeddings
+from .closest import ClosestEmbeddingAugmentor
