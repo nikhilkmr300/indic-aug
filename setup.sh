@@ -31,6 +31,7 @@ conda_packages=(
     "sphinxcontrib-bibtex"
     "sphinx_rtd_theme"
     "jupyterlab"
+    "pyicu"
 )
 conda config --add channels conda-forge
 
@@ -40,13 +41,14 @@ pip_packages=(
     "polyglot"
     "indic-nlp-library"
     "inltk"
+    "pycld2"
 )
 
 # Installing conda packages.
 for conda_package in ${conda_packages[@]}; do
     conda list | grep "$conda_package" > /dev/null
     if [[ $? -eq 0 ]]; then
-        printf "%s already installed by conda.\n" "$conda_package"
+        printf "setup.sh: %s already installed by conda.\n" "$conda_package"
         continue
     fi
     echo "y" | conda install $conda_package
@@ -56,7 +58,7 @@ done
 for pip_package in ${pip_packages[@]}; do
     pip list | grep "$pip_package" > /dev/null
     if [[ $? -eq 0 ]]; then
-        printf "%s already installed by pip.\n" "$pip_package"
+        printf "setup.sh: %s already installed by pip.\n" "$pip_package"
         continue
     fi
     pip install $pip_package
@@ -69,5 +71,6 @@ echo "y" | conda install pytorch==1.3.0 -c pytorch
 
 # Removing spacy==3.x installed as dependency.
 echo "y" | pip uninstall spacy
+echo "y" | pip uninstall spacy-legacy
 # Installing spacy==2.x as required by inltk.
 echo "y" | conda install spacy=2.3.0

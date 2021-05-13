@@ -59,26 +59,33 @@ def cyclic_read(filepath):
     Using ``open`` to read a file will raise ``StopIteration`` once EOF is
     reached. ``cyclic_read`` will instead loop back to the start of file and
     continue reading indefinitely. Note that it also strips newline characters
-    (both '\\n' and '\\r') before returning the line.
+    (both '\\\\n' and '\\\\r') before returning the line.
 
     :param filepath: Path to input file.
     :type filepath: str
 
-    :usage: Say you have a file ``sample.txt`` which contains the text 'Line 1',
-        'Line 2' and 'Line 3' on three successive lines
+    :usage: Say you have a file ``sample.txt`` which contains the text
 
-    .. code-block: python
+        .. code-block:: text
 
-    >>> for line in cyclic_read('sample.txt'):
-    ...     print(line)
-    'Line 1'
-    'Line 2'
-    'Line 3'
-    'Line 1'
-    'Line 2'
-    'Line 3'
+            lorem
+            ipsum
+            dolor
 
-    and so on indefinitely.
+        then calling ``cyclic_read`` on ``sample.txt`` would look like:
+
+        .. code-block:: python
+
+            >>> for line in cyclic_read('sample.txt'):
+            ...     print(line)
+            lorem
+            ipsum
+            dolor
+            lorem
+            ipsum
+            dolor
+
+        and so on indefinitely.
     """
 
     while True:

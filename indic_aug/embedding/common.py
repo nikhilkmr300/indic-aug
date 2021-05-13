@@ -4,9 +4,7 @@ import os
 from polyglot.downloader import downloader
 from polyglot.mapping import Embedding
 
-from ..utils import get_logger
-
-logger = get_logger('common')
+from ..log import logger
 
 def fetch_embeddings(lang, polyglot_dir):
     embeddings_filepath = os.path.join(

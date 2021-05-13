@@ -191,7 +191,7 @@ class SynonymAugmentor(Augmentor):
     (refer: :cite:t:`wei2019eda`).
     """
 
-    def __init__(self, src_input_path, tgt_input_path, vocab_dir, p, stanza_dir=str(Path.home() / 'stanza_resources'), augment=True, random_state=1):
+    def __init__(self, src_input_path, tgt_input_path, vocab_dir, p, stanza_dir=None, augment=True, random_state=1):
         """Constructor method.
 
         :param src_input_path: Path to aligned source corpus.
@@ -220,6 +220,9 @@ class SynonymAugmentor(Augmentor):
 
         random.seed(random_state)                   # synonym_aug uses random from standard library.
         np.random.seed(random_state)
+
+        if stanza_dir is None:
+            stanza_dir = str(Path.home() / 'stanza_resources')
 
         self.src_lang = path2lang(src_input_path)
         self.tgt_lang = path2lang(tgt_input_path)

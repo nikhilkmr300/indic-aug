@@ -1,0 +1,441 @@
+TDAugmentor
+	doc_count=30000
+	src_input_path=preprocessed/data.hi
+	tgt_input_path=preprocessed/data.en
+	src_lang=hi
+	tgt_lang=en
+	vocab_dir=vocab
+Note: Words are 0-indexed.
+------------------------------
+src_doc='वर्तमान में , 38 टीएसडीएफ में क्रमशः 17 एकीकृत टीएसडीएफ , 13 <unk> कोमन <unk> <unk> और 8 <unk> कोमन <unk> <unk> और 4 स्टेट्स / <unk> में उपलब्ध हैं ।'
+tgt_doc='At present , 38 <unk> include 17 Integrated <unk> , 13 <unk> Common Secure <unk> and 8 <unk> Common <unk> are available in 10 <unk> and 4 <unk> respectively .'
+
+	Sampled word '38' at index 3 for replacement.
+		Word '38' does not have corresponding embedding.
+		alignment('38')=[(3, '38')].
+			Replaced target word '38' with '38', which is the translation/alignment of '38'.
+	Sampled word '17' at index 7 for replacement.
+		Word '17' does not have corresponding embedding.
+		alignment('17')=[(6, '17')].
+			Replaced target word '17' with '17', which is the translation/alignment of '17'.
+	Sampled word '<unk>' at index 12 for replacement.
+		Word '<unk>' does not have corresponding embedding.
+		alignment('<unk>')=[].
+	Sampled word '<unk>' at index 14 for replacement.
+		Word '<unk>' does not have corresponding embedding.
+		alignment('<unk>')=[].
+	Sampled word '<unk>' at index 20 for replacement.
+		Word '<unk>' does not have corresponding embedding.
+		alignment('<unk>')=[].
+	Sampled word '4' at index 23 for replacement.
+		Word '4' does not have corresponding embedding.
+		alignment('4')=[(26, '4')].
+			Replaced target word '4' with '4', which is the translation/alignment of '4'.
+	Sampled word '/' at index 25 for replacement.
+		Replaced source word '/' with its closest in-vocab neighbor 'तथा'.
+		alignment('/')=[].
+	Sampled word 'में' at index 27 for replacement.
+		Replaced source word 'में' with its closest in-vocab neighbor 'मे'.
+		alignment('में')=[(22, 'in')].
+			Replaced target word 'in' with '20-22', which is the translation/alignment of 'मे'.
+	Sampled word 'हैं' at index 29 for replacement.
+		Replaced source word 'हैं' with its closest in-vocab neighbor 'है'.
+		alignment('हैं')=[(20, 'are'), (13, 'Secure')].
+			Replaced target word 'are' with 'is', which is the translation/alignment of 'है'.
+			Replaced target word 'Secure' with 'is', which is the translation/alignment of 'है'.
+
+augmented_src_doc='वर्तमान में , 38 टीएसडीएफ में क्रमशः 17 एकीकृत टीएसडीएफ , 13 <unk> कोमन <unk> <unk> और 8 <unk> कोमन <unk> <unk> और 4 स्टेट्स / <unk> में उपलब्ध हैं ।'
+augmented_tgt_doc='At present , 38 <unk> include 17 Integrated <unk> , 13 <unk> Common is <unk> and 8 <unk> Common <unk> is available 20-22 10 <unk> and 4 <unk> respectively .'
+------------------------------
+src_doc='ये राज्य / केंद्र शासित प्रदेश क्रमशः कुल देश के 8 % और देश में कुल खतरनाक अपशिष्ट कचरे के 88 । 19 % का योगदान करते हैं ।'
+tgt_doc='These States <unk> contribute about <unk> % of total <unk> and <unk> % of total <unk> hazardous wastes generation in the country respectively .'
+
+	Sampled word '/' at index 2 for replacement.
+		Replaced source word '/' with its closest in-vocab neighbor 'तथा'.
+		alignment('/')=[(11, '<unk>'), (2, '<unk>'), (15, '<unk>'), (9, '<unk>'), (5, '<unk>')].
+			Replaced target word '<unk>' with 'and', which is the translation/alignment of 'तथा'.
+			Replaced target word '<unk>' with 'and', which is the translation/alignment of 'तथा'.
+			Replaced target word '<unk>' with 'and', which is the translation/alignment of 'तथा'.
+			Replaced target word '<unk>' with 'and', which is the translation/alignment of 'तथा'.
+			Replaced target word '<unk>' with 'and', which is the translation/alignment of 'तथा'.
+	Sampled word 'कुल' at index 15 for replacement.
+		Replaced source word 'कुल' with its closest in-vocab neighbor 'जनसंख्या'.
+		alignment('कुल')=[(8, 'total'), (14, 'total')].
+			Replaced target word 'total' with 'population', which is the translation/alignment of 'जनसंख्या'.
+			Replaced target word 'total' with 'population', which is the translation/alignment of 'जनसंख्या'.
+	Sampled word '88' at index 20 for replacement.
+		Word '88' does not have corresponding embedding.
+		alignment('88')=[].
+	Sampled word '%' at index 23 for replacement.
+		Replaced source word '%' with its closest in-vocab neighbor 'मिलियन'.
+		alignment('%')=[(6, '%'), (12, '%')].
+			Replaced target word '%' with 'million', which is the translation/alignment of 'मिलियन'.
+			Replaced target word '%' with 'million', which is the translation/alignment of 'मिलियन'.
+	Sampled word 'का' at index 24 for replacement.
+		Replaced source word 'का' with its closest in-vocab neighbor 'के'.
+		alignment('का')=[(7, 'of'), (13, 'of')].
+			Replaced target word 'of' with 'of', which is the translation/alignment of 'के'.
+			Replaced target word 'of' with 'of', which is the translation/alignment of 'के'.
+	Sampled word 'योगदान' at index 25 for replacement.
+		Replaced source word 'योगदान' with its closest in-vocab neighbor 'महत्व'.
+		alignment('योगदान')=[(3, 'contribute'), (1, 'States'), (18, 'generation')].
+			Replaced target word 'contribute' with 'importance', which is the translation/alignment of 'महत्व'.
+			Replaced target word 'States' with 'importance', which is the translation/alignment of 'महत्व'.
+			Replaced target word 'generation' with 'importance', which is the translation/alignment of 'महत्व'.
+	Sampled word '।' at index 28 for replacement.
+		Replaced source word '।' with its closest in-vocab neighbor '!'.
+		alignment('।')=[(16, 'hazardous'), (17, 'wastes'), (23, '.')].
+			Replaced target word 'hazardous' with '!', which is the translation/alignment of '!'.
+			Replaced target word 'wastes' with '!', which is the translation/alignment of '!'.
+			Replaced target word '.' with '!', which is the translation/alignment of '!'.
+
+augmented_src_doc='ये राज्य / केंद्र शासित प्रदेश क्रमशः कुल देश के 8 % और देश में कुल खतरनाक अपशिष्ट कचरे के 88 । 19 % का योगदान करते हैं ।'
+augmented_tgt_doc='These importance and importance about and million of population and and and million of population and ! ! importance in the country respectively !'
+------------------------------
+src_doc='2013 - 14 के दौरान , देश भर में खतरनाक कचरे के लिए टीएसडीएफ की दो चालू / नई परियोजनाओं की स्थापना के लिए वित्तीय सहायता प्रदान की गई है ।'
+tgt_doc='During 2013-14 , financial assistance has been provided for setting up of two <unk> projects of <unk> for hazardous wastes across the country .'
+
+	Sampled word '-' at index 1 for replacement.
+		Replaced source word '-' with its closest in-vocab neighbor 'और'.
+		alignment('-')=[].
+	Sampled word 'दौरान' at index 4 for replacement.
+		Replaced source word 'दौरान' with its closest in-vocab neighbor 'कारण'.
+		alignment('दौरान')=[(0, 'During')].
+			Replaced target word 'During' with 'due', which is the translation/alignment of 'कारण'.
+	Sampled word '/' at index 17 for replacement.
+		Replaced source word '/' with its closest in-vocab neighbor 'तथा'.
+		alignment('/')=[(13, '<unk>'), (16, '<unk>')].
+			Replaced target word '<unk>' with 'and', which is the translation/alignment of 'तथा'.
+			Replaced target word '<unk>' with 'and', which is the translation/alignment of 'तथा'.
+	Sampled word 'स्थापना' at index 21 for replacement.
+		Replaced source word 'स्थापना' with its closest in-vocab neighbor 'रचना'.
+		alignment('स्थापना')=[(10, 'up'), (9, 'setting')].
+			Replaced target word 'up' with 'unparalleled', which is the translation/alignment of 'रचना'.
+			Replaced target word 'setting' with 'unparalleled', which is the translation/alignment of 'रचना'.
+	Sampled word 'वित्तीय' at index 24 for replacement.
+		Replaced source word 'वित्तीय' with its closest in-vocab neighbor 'राजनीतिक'.
+		alignment('वित्तीय')=[(3, 'financial')].
+			Replaced target word 'financial' with 'political', which is the translation/alignment of 'राजनीतिक'.
+	Sampled word 'है' at index 29 for replacement.
+		Replaced source word 'है' with its closest in-vocab neighbor 'था'.
+		alignment('है')=[(5, 'has')].
+			Replaced target word 'has' with 'was', which is the translation/alignment of 'था'.
+
+augmented_src_doc='2013 - 14 के दौरान , देश भर में खतरनाक कचरे के लिए टीएसडीएफ की दो चालू / नई परियोजनाओं की स्थापना के लिए वित्तीय सहायता प्रदान की गई है ।'
+augmented_tgt_doc='due 2013-14 , political assistance was been provided for unparalleled unparalleled of two and projects of and for hazardous wastes across the country .'
+------------------------------
+src_doc='ई - कचरा प्रबंधनः'
+tgt_doc='<unk> Management :'
+
+	Sampled word 'ई' at index 0 for replacement.
+		Replaced source word 'ई' with its closest in-vocab neighbor 'मीटर'.
+		alignment('ई')=[(2, ':')].
+			Replaced target word ':' with 'with', which is the translation/alignment of 'मीटर'.
+	Sampled word '-' at index 1 for replacement.
+		Replaced source word '-' with its closest in-vocab neighbor 'और'.
+		alignment('-')=[].
+	Sampled word 'प्रबंधनः' at index 3 for replacement.
+		Word 'प्रबंधनः' does not have corresponding embedding.
+		alignment('प्रबंधनः')=[(1, 'Management')].
+			Replaced target word 'Management' with ':', which is the translation/alignment of 'प्रबंधनः'.
+
+augmented_src_doc='ई - कचरा प्रबंधनः'
+augmented_tgt_doc='<unk> : with'
+------------------------------
+src_doc='पर्यावरण और वन मंत्रालय ने मई 2011 में ई - कचरा नियमों को अधिसूचित किया है , जो 1 मई 2012 से प्रभावी हो गया है ।'
+tgt_doc='The Ministry of Environment and Forest , has notified <unk> Rules in May 2011 , which has come into force with effect from 1st May 2012 .'
+
+	Sampled word 'और' at index 1 for replacement.
+		Replaced source word 'और' with its closest in-vocab neighbor 'तथा'.
+		alignment('और')=[(4, 'and')].
+			Replaced target word 'and' with 'and', which is the translation/alignment of 'तथा'.
+	Sampled word 'ने' at index 4 for replacement.
+		Replaced source word 'ने' with its closest in-vocab neighbor 'द्वारा'.
+		alignment('ने')=[(0, 'The')].
+			Replaced target word 'The' with 'by', which is the translation/alignment of 'द्वारा'.
+	Sampled word 'मई' at index 5 for replacement.
+		Replaced source word 'मई' with its closest in-vocab neighbor 'दिसंबर'.
+		alignment('मई')=[].
+	Sampled word '-' at index 9 for replacement.
+		Replaced source word '-' with its closest in-vocab neighbor 'और'.
+		alignment('-')=[].
+	Sampled word 'नियमों' at index 11 for replacement.
+		Replaced source word 'नियमों' with its closest in-vocab neighbor 'उद्देश्यों'.
+		alignment('नियमों')=[(10, 'Rules')].
+			Replaced target word 'Rules' with 'objectives', which is the translation/alignment of 'उद्देश्यों'.
+	Sampled word 'को' at index 12 for replacement.
+		Replaced source word 'को' with its closest in-vocab neighbor 'द्वारा'.
+		alignment('को')=[].
+	Sampled word 'किया' at index 14 for replacement.
+		Replaced source word 'किया' with its closest in-vocab neighbor 'किए'.
+		alignment('किया')=[].
+	Sampled word 'है' at index 15 for replacement.
+		Replaced source word 'है' with its closest in-vocab neighbor 'था'.
+		alignment('है')=[].
+	Sampled word 'मई' at index 19 for replacement.
+		Replaced source word 'मई' with its closest in-vocab neighbor 'दिसंबर'.
+		alignment('मई')=[(24, 'May'), (12, 'May')].
+			Replaced target word 'May' with 'December', which is the translation/alignment of 'दिसंबर'.
+			Replaced target word 'May' with 'December', which is the translation/alignment of 'दिसंबर'.
+	Sampled word '2012' at index 20 for replacement.
+		Word '2012' does not have corresponding embedding.
+		alignment('2012')=[(21, 'effect')].
+			Replaced target word 'effect' with '2011-12', which is the translation/alignment of '2012'.
+	Sampled word 'हो' at index 23 for replacement.
+		Replaced source word 'हो' with its closest in-vocab neighbor 'नहीं'.
+		alignment('हो')=[].
+	Sampled word 'है' at index 25 for replacement.
+		Replaced source word 'है' with its closest in-vocab neighbor 'था'.
+		alignment('है')=[].
+
+augmented_src_doc='पर्यावरण और वन मंत्रालय ने मई 2011 में ई - कचरा नियमों को अधिसूचित किया है , जो 1 मई 2012 से प्रभावी हो गया है ।'
+augmented_tgt_doc='by Ministry of Environment and Forest , has notified <unk> objectives in December 2011 , which has come into force with 2011-12 from 1st December 2012 .'
+------------------------------
+src_doc='इन नियमों में विस्तारित निर्माता जिम्मेदारी ( <unk> ) की अवधारणा को सुनिश्चित किया गया है ।'
+tgt_doc='The concept of <unk> <unk> Responsibility ( <unk> ) has been enshrined in these rules .'
+
+	Sampled word 'विस्तारित' at index 3 for replacement.
+		Replaced source word 'विस्तारित' with its closest in-vocab neighbor 'स्वचालित'.
+		alignment('विस्तारित')=[].
+	Sampled word 'जिम्मेदारी' at index 5 for replacement.
+		Replaced source word 'जिम्मेदारी' with its closest in-vocab neighbor 'सहभागिता'.
+		alignment('जिम्मेदारी')=[].
+	Sampled word '<unk>' at index 7 for replacement.
+		Word '<unk>' does not have corresponding embedding.
+		alignment('<unk>')=[(4, '<unk>'), (7, '<unk>'), (3, '<unk>')].
+			Replaced target word '<unk>' with '<unk>', which is the translation/alignment of '<unk>'.
+			Replaced target word '<unk>' with '<unk>', which is the translation/alignment of '<unk>'.
+			Replaced target word '<unk>' with '<unk>', which is the translation/alignment of '<unk>'.
+	Sampled word 'की' at index 9 for replacement.
+		Replaced source word 'की' with its closest in-vocab neighbor 'जैसी'.
+		alignment('की')=[(2, 'of')].
+			Replaced target word 'of' with 'like', which is the translation/alignment of 'जैसी'.
+	Sampled word 'को' at index 11 for replacement.
+		Replaced source word 'को' with its closest in-vocab neighbor 'द्वारा'.
+		alignment('को')=[].
+	Sampled word 'किया' at index 13 for replacement.
+		Replaced source word 'किया' with its closest in-vocab neighbor 'किए'.
+		alignment('किया')=[(0, 'The')].
+			Replaced target word 'The' with 'the', which is the translation/alignment of 'किए'.
+	Sampled word 'है' at index 15 for replacement.
+		Replaced source word 'है' with its closest in-vocab neighbor 'था'.
+		alignment('है')=[(5, 'Responsibility')].
+			Replaced target word 'Responsibility' with 'was', which is the translation/alignment of 'था'.
+
+augmented_src_doc='इन नियमों में विस्तारित निर्माता जिम्मेदारी ( <unk> ) की अवधारणा को सुनिश्चित किया गया है ।'
+augmented_tgt_doc='the concept like <unk> <unk> was ( <unk> ) has been enshrined in these rules .'
+------------------------------
+src_doc='इन नियमों के अनुसार , <unk> को संग्रह केंद्रों की स्थापना करके या व्यक्तिगत रूप से या सामूहिक रूप से सिस्टम वापस लेकर अपने उत्पादों के जीवन के अंत से उत्पन्न ई - कचरे को इकट्ठा करना आवश्यक है ।'
+tgt_doc='As per these Rules the producers are required to collect <unk> generated from the end of life of their products by setting up collections centers or take back systems either individually or collectively .'
+
+	Sampled word 'इन' at index 0 for replacement.
+		Replaced source word 'इन' with its closest in-vocab neighbor 'दोनों'.
+		alignment('इन')=[(2, 'these')].
+			Replaced target word 'these' with 'both', which is the translation/alignment of 'दोनों'.
+	Sampled word 'नियमों' at index 1 for replacement.
+		Replaced source word 'नियमों' with its closest in-vocab neighbor 'उद्देश्यों'.
+		alignment('नियमों')=[(3, 'Rules')].
+			Replaced target word 'Rules' with 'objectives', which is the translation/alignment of 'उद्देश्यों'.
+	Sampled word 'के' at index 2 for replacement.
+		Replaced source word 'के' with its closest in-vocab neighbor 'का'.
+		alignment('के')=[].
+	Sampled word 'अनुसार' at index 3 for replacement.
+		Replaced source word 'अनुसार' with its closest in-vocab neighbor 'अधीन'.
+		alignment('अनुसार')=[(1, 'per')].
+			Replaced target word 'per' with 'under', which is the translation/alignment of 'अधीन'.
+	Sampled word 'को' at index 6 for replacement.
+		Replaced source word 'को' with its closest in-vocab neighbor 'द्वारा'.
+		alignment('को')=[].
+	Sampled word 'या' at index 12 for replacement.
+		Replaced source word 'या' with its closest in-vocab neighbor ','.
+		alignment('या')=[].
+	Sampled word 'व्यक्तिगत' at index 13 for replacement.
+		Replaced source word 'व्यक्तिगत' with its closest in-vocab neighbor 'निजी'.
+		alignment('व्यक्तिगत')=[(29, 'either')].
+			Replaced target word 'either' with 'private', which is the translation/alignment of 'निजी'.
+	Sampled word 'से' at index 15 for replacement.
+		Replaced source word 'से' with its closest in-vocab neighbor 'पर'.
+		alignment('से')=[].
+	Sampled word 'या' at index 16 for replacement.
+		Replaced source word 'या' with its closest in-vocab neighbor ','.
+		alignment('या')=[(25, 'or'), (31, 'or')].
+			Replaced target word 'or' with ',', which is the translation/alignment of ','.
+			Replaced target word 'or' with ',', which is the translation/alignment of ','.
+	Sampled word 'से' at index 19 for replacement.
+		Replaced source word 'से' with its closest in-vocab neighbor 'पर'.
+		alignment('से')=[].
+	Sampled word 'उत्पादों' at index 24 for replacement.
+		Replaced source word 'उत्पादों' with its closest in-vocab neighbor 'उपकरणों'.
+		alignment('उत्पादों')=[(19, 'products')].
+			Replaced target word 'products' with 'equipment', which is the translation/alignment of 'उपकरणों'.
+	Sampled word 'के' at index 27 for replacement.
+		Replaced source word 'के' with its closest in-vocab neighbor 'का'.
+		alignment('के')=[(15, 'of'), (4, 'the'), (17, 'of'), (13, 'the')].
+			Replaced target word 'of' with 'of', which is the translation/alignment of 'का'.
+			Replaced target word 'the' with 'of', which is the translation/alignment of 'का'.
+			Replaced target word 'of' with 'of', which is the translation/alignment of 'का'.
+			Replaced target word 'the' with 'of', which is the translation/alignment of 'का'.
+	Sampled word 'से' at index 29 for replacement.
+		Replaced source word 'से' with its closest in-vocab neighbor 'पर'.
+		alignment('से')=[].
+	Sampled word 'उत्पन्न' at index 30 for replacement.
+		Replaced source word 'उत्पन्न' with its closest in-vocab neighbor 'प्राप्त'.
+		alignment('उत्पन्न')=[].
+	Sampled word '-' at index 32 for replacement.
+		Replaced source word '-' with its closest in-vocab neighbor 'और'.
+		alignment('-')=[].
+	Sampled word 'करना' at index 36 for replacement.
+		Replaced source word 'करना' with its closest in-vocab neighbor 'करके'.
+		alignment('करना')=[(8, 'to')].
+			Replaced target word 'to' with 'by', which is the translation/alignment of 'करके'.
+	Sampled word '।' at index 39 for replacement.
+		Replaced source word '।' with its closest in-vocab neighbor '!'.
+		alignment('।')=[(33, '.'), (23, 'collections'), (30, 'individually'), (9, 'collect')].
+			Replaced target word '.' with '!', which is the translation/alignment of '!'.
+			Replaced target word 'collections' with '!', which is the translation/alignment of '!'.
+			Replaced target word 'individually' with '!', which is the translation/alignment of '!'.
+			Replaced target word 'collect' with '!', which is the translation/alignment of '!'.
+
+augmented_src_doc='इन नियमों के अनुसार , <unk> को संग्रह केंद्रों की स्थापना करके या व्यक्तिगत रूप से या सामूहिक रूप से सिस्टम वापस लेकर अपने उत्पादों के जीवन के अंत से उत्पन्न ई - कचरे को इकट्ठा करना आवश्यक है ।'
+augmented_tgt_doc='As under both objectives of producers are required by ! <unk> generated from of end of life of their equipment by setting up ! centers , take back systems private ! , collectively !'
+------------------------------
+src_doc='ई - कचरे की <unk> को केवल राज्य प्रदूषण नियंत्रण बोर्डों / प्रदूषण नियंत्रण समिति ( पीसीसी ) के साथ अधिकृत और पंजीकृत सुविधाओं में ही किया जा सकता है ।'
+tgt_doc='<unk> <unk> can be undertaken only in facilities authorized and registered with State Pollution Control <unk> Control Committee ( <unk> ) .'
+
+	Sampled word 'की' at index 3 for replacement.
+		Replaced source word 'की' with its closest in-vocab neighbor 'जैसी'.
+		alignment('की')=[].
+	Sampled word 'केवल' at index 6 for replacement.
+		Replaced source word 'केवल' with its closest in-vocab neighbor 'सिर्फ'.
+		alignment('केवल')=[(5, 'only')].
+			Replaced target word 'only' with 'only', which is the translation/alignment of 'सिर्फ'.
+	Sampled word 'राज्य' at index 7 for replacement.
+		Replaced source word 'राज्य' with its closest in-vocab neighbor 'देश'.
+		alignment('राज्य')=[(12, 'State')].
+			Replaced target word 'State' with 'country', which is the translation/alignment of 'देश'.
+	Sampled word 'प्रदूषण' at index 8 for replacement.
+		Replaced source word 'प्रदूषण' with its closest in-vocab neighbor 'तनाव'.
+		alignment('प्रदूषण')=[].
+	Sampled word 'प्रदूषण' at index 12 for replacement.
+		Replaced source word 'प्रदूषण' with its closest in-vocab neighbor 'तनाव'.
+		alignment('प्रदूषण')=[].
+	Sampled word 'समिति' at index 14 for replacement.
+		Replaced source word 'समिति' with its closest in-vocab neighbor 'परिषद'.
+		alignment('समिति')=[(17, 'Committee')].
+			Replaced target word 'Committee' with 'Council', which is the translation/alignment of 'परिषद'.
+	Sampled word '(' at index 15 for replacement.
+		Replaced source word '(' with its closest in-vocab neighbor 'या'.
+		alignment('(')=[(18, '(')].
+			Replaced target word '(' with 'or', which is the translation/alignment of 'या'.
+	Sampled word 'अधिकृत' at index 20 for replacement.
+		Replaced source word 'अधिकृत' with its closest in-vocab neighbor 'समर्थित'.
+		alignment('अधिकृत')=[].
+	Sampled word 'किया' at index 26 for replacement.
+		Replaced source word 'किया' with its closest in-vocab neighbor 'किए'.
+		alignment('किया')=[].
+	Sampled word 'जा' at index 27 for replacement.
+		Replaced source word 'जा' with its closest in-vocab neighbor 'जाने'.
+		alignment('जा')=[(3, 'be')].
+			Replaced target word 'be' with 'be', which is the translation/alignment of 'जाने'.
+
+augmented_src_doc='ई - कचरे की <unk> को केवल राज्य प्रदूषण नियंत्रण बोर्डों / प्रदूषण नियंत्रण समिति ( पीसीसी ) के साथ अधिकृत और पंजीकृत सुविधाओं में ही किया जा सकता है ।'
+augmented_tgt_doc='<unk> <unk> can be undertaken only in facilities authorized and registered with country Pollution Control <unk> Control Council or <unk> ) .'
+------------------------------
+src_doc='उत्पन्न कचरे को एक पंजीकृत या अधिकृत <unk> या फिर से <unk> को बेचा जाना चाहिए , जिसमें पर्यावरणीय रूप से ध्वनि की सुविधा हो ।'
+tgt_doc='<unk> generated are required to be sold to a registered or authorized <unk> or <unk> having environmentally sound facilities .'
+
+	Sampled word 'उत्पन्न' at index 0 for replacement.
+		Replaced source word 'उत्पन्न' with its closest in-vocab neighbor 'प्राप्त'.
+		alignment('उत्पन्न')=[].
+	Sampled word 'एक' at index 3 for replacement.
+		Replaced source word 'एक' with its closest in-vocab neighbor 'किसी'.
+		alignment('एक')=[(8, 'a')].
+			Replaced target word 'a' with 'any', which is the translation/alignment of 'किसी'.
+	Sampled word 'से' at index 10 for replacement.
+		Replaced source word 'से' with its closest in-vocab neighbor 'पर'.
+		alignment('से')=[].
+	Sampled word 'जिसमें' at index 17 for replacement.
+		Replaced source word 'जिसमें' with its closest in-vocab neighbor 'जिसे'.
+		alignment('जिसमें')=[(15, 'having')].
+			Replaced target word 'having' with 'which', which is the translation/alignment of 'जिसे'.
+	Sampled word 'पर्यावरणीय' at index 18 for replacement.
+		Replaced source word 'पर्यावरणीय' with its closest in-vocab neighbor 'संज्ञानात्मक'.
+		alignment('पर्यावरणीय')=[].
+	Sampled word 'से' at index 20 for replacement.
+		Replaced source word 'से' with its closest in-vocab neighbor 'पर'.
+		alignment('से')=[].
+	Sampled word 'ध्वनि' at index 21 for replacement.
+		Replaced source word 'ध्वनि' with its closest in-vocab neighbor 'हवा'.
+		alignment('ध्वनि')=[(17, 'sound')].
+			Replaced target word 'sound' with ';', which is the translation/alignment of 'हवा'.
+	Sampled word 'सुविधा' at index 23 for replacement.
+		Replaced source word 'सुविधा' with its closest in-vocab neighbor 'तकनीक'.
+		alignment('सुविधा')=[(18, 'facilities')].
+			Replaced target word 'facilities' with 'technology', which is the translation/alignment of 'तकनीक'.
+	Sampled word '।' at index 25 for replacement.
+		Replaced source word '।' with its closest in-vocab neighbor '!'.
+		alignment('।')=[(19, '.'), (16, 'environmentally'), (11, 'authorized')].
+			Replaced target word '.' with '!', which is the translation/alignment of '!'.
+			Replaced target word 'environmentally' with '!', which is the translation/alignment of '!'.
+			Replaced target word 'authorized' with '!', which is the translation/alignment of '!'.
+
+augmented_src_doc='उत्पन्न कचरे को एक पंजीकृत या अधिकृत <unk> या फिर से <unk> को बेचा जाना चाहिए , जिसमें पर्यावरणीय रूप से ध्वनि की सुविधा हो ।'
+augmented_tgt_doc='<unk> generated are required to be sold to any registered or ! <unk> or <unk> which ! ; technology !'
+------------------------------
+src_doc='नियम में व्यक्तिगत रूप से या संयुक्त रूप से संग्रह केंद्र स्थापित करने का प्रावधान है ; या एक पंजीकृत समाज या एक नामित एजेंसी द्वारा ; या ई - कचरा एकत्र करने के लिए एक संघ द्वारा ।'
+tgt_doc='The rule has provision for setting up of Collection Centre individually or jointly ; or by a registered society or a designated agency ; or by an association to collect <unk> .'
+
+	Sampled word 'नियम' at index 0 for replacement.
+		Replaced source word 'नियम' with its closest in-vocab neighbor 'सिद्धांत'.
+		alignment('नियम')=[].
+	Sampled word 'में' at index 1 for replacement.
+		Replaced source word 'में' with its closest in-vocab neighbor 'मे'.
+		alignment('में')=[].
+	Sampled word 'रूप' at index 3 for replacement.
+		Replaced source word 'रूप' with its closest in-vocab neighbor 'रुप'.
+		alignment('रूप')=[].
+	Sampled word 'संयुक्त' at index 6 for replacement.
+		Replaced source word 'संयुक्त' with its closest in-vocab neighbor 'स्वतंत्र'.
+		alignment('संयुक्त')=[(12, 'jointly')].
+			Replaced target word 'jointly' with 'Charge', which is the translation/alignment of 'स्वतंत्र'.
+	Sampled word 'रूप' at index 7 for replacement.
+		Replaced source word 'रूप' with its closest in-vocab neighbor 'रुप'.
+		alignment('रूप')=[].
+	Sampled word 'से' at index 8 for replacement.
+		Replaced source word 'से' with its closest in-vocab neighbor 'पर'.
+		alignment('से')=[].
+	Sampled word 'प्रावधान' at index 14 for replacement.
+		Replaced source word 'प्रावधान' with its closest in-vocab neighbor 'फायदे'.
+		alignment('प्रावधान')=[(3, 'provision')].
+			Replaced target word 'provision' with 'simply', which is the translation/alignment of 'फायदे'.
+	Sampled word 'है' at index 15 for replacement.
+		Replaced source word 'है' with its closest in-vocab neighbor 'था'.
+		alignment('है')=[(2, 'has')].
+			Replaced target word 'has' with 'was', which is the translation/alignment of 'था'.
+	Sampled word 'एजेंसी' at index 24 for replacement.
+		Replaced source word 'एजेंसी' with its closest in-vocab neighbor 'एसोसिएशन'.
+		alignment('एजेंसी')=[(22, 'agency')].
+			Replaced target word 'agency' with 'Association', which is the translation/alignment of 'एसोसिएशन'.
+	Sampled word 'करने' at index 32 for replacement.
+		Replaced source word 'करने' with its closest in-vocab neighbor 'होने'.
+		alignment('करने')=[(28, 'to')].
+			Replaced target word 'to' with 'to', which is the translation/alignment of 'होने'.
+	Sampled word 'के' at index 33 for replacement.
+		Replaced source word 'के' with its closest in-vocab neighbor 'का'.
+		alignment('के')=[(0, 'The')].
+			Replaced target word 'The' with 'of', which is the translation/alignment of 'का'.
+	Sampled word 'लिए' at index 34 for replacement.
+		Replaced source word 'लिए' with its closest in-vocab neighbor 'लिये'.
+		alignment('लिए')=[(4, 'for')].
+			Replaced target word 'for' with 'for', which is the translation/alignment of 'लिये'.
+	Sampled word '।' at index 38 for replacement.
+		Replaced source word '।' with its closest in-vocab neighbor '!'.
+		alignment('।')=[(10, 'individually'), (29, 'collect'), (8, 'Collection'), (31, '.')].
+			Replaced target word 'individually' with '!', which is the translation/alignment of '!'.
+			Replaced target word 'collect' with '!', which is the translation/alignment of '!'.
+			Replaced target word 'Collection' with '!', which is the translation/alignment of '!'.
+			Replaced target word '.' with '!', which is the translation/alignment of '!'.
+
+augmented_src_doc='नियम में व्यक्तिगत रूप से या संयुक्त रूप से संग्रह केंद्र स्थापित करने का प्रावधान है ; या एक पंजीकृत समाज या एक नामित एजेंसी द्वारा ; या ई - कचरा एकत्र करने के लिए एक संघ द्वारा ।'
+augmented_tgt_doc='of rule was simply for setting up of ! Centre ! or Charge ; or by a registered society or a designated Association ; or by an association to ! <unk> !'
+------------------------------

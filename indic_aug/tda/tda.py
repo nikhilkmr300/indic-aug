@@ -55,7 +55,28 @@ class TDAugmentor(Augmentor):
     (parallel) technique (refer: :cite:t:`fadaee2017data`).
     """
 
-    def __init__(self, src_input_path, tgt_input_path, aligner, rare_word_count, src_vocab_dir, augment=True):
+    def __init__(self, src_input_path, tgt_input_path, aligner, rare_word_count, vocab_dir, augment=True):
+        """Constructor method.
+
+        :param src_input_path: Path to aligned source corpus.
+        :type src_input_path: str
+        :param tgt_input_path: Path to aligned target corpus, corresponding to
+            the above source corpus.
+        :type tgt_input_path: str
+        :param aligner: Aligner to perform alignment between source and target
+            sentences.
+        :type aligner: ``indic_aug.align.Aligner``
+        :param rare_word_count: Bottom (least frequent) ``rare_word_count``
+            number of words are considered rare words.
+        :type rare_word_count: int
+        :param vocab_dir: As described in the docstring for
+            ``indic_aug.vocab.Vocab``.
+        :type vocab_dir: str
+        :param augment: Performs augmentation if ``True``, else returns original
+            pair of sentences.
+        :type augment: bool
+        """
+
         if line_count(src_input_path) != line_count(tgt_input_path):
             raise RuntimeError(ERRORS['corpus_shape'])
         self.doc_count = line_count(src_input_path)
@@ -65,7 +86,8 @@ class TDAugmentor(Augmentor):
 
         self.src_lm = lm_load(self.src_lang)        # Language model for source language.
 
-        self.rare_words = extract_rare_words(src_vocab_dir, self.src_lang, rare_word_count)
+        # Rare words in source vocab.
+        self.rare_words = extract_rare_words(vocab_dir, self.src_lang, rare_word_count)
 
         self.aligner = aligner
 
@@ -89,7 +111,7 @@ class TDAugmentor(Augmentor):
             \tsrc_lang={self.src_lang}\n\
             \ttgt_lang={self.tgt_lang}\n\
             \trare_word_count={rare_word_count}\n\
-            \tsrc_vocab_dir={src_vocab_dir}\n\
+            \tvocab_dir={vocab_dir}\n\
             Note:\n\
             * Words are 0-indexed.\n\
             * Context consists of all words before current word, but logs show only the last five words.\n\
@@ -112,7 +134,7 @@ class TDAugmentor(Augmentor):
         # in document before returning.
         augmented_src_doc = list()
         augmented_src_doc.append(src_doc[0])    # First word cannot be replaced as it has no context.
-        augmented_tgt_doc = tgt_doc.copy()      # Initializing augmented target document with original, replacing words where necessary.
+        augmented_tgt_doc = tgt_doc.copy()      # .copy() to avoid aliasing.
 
         for src_idx in range(1, len(src_doc)):
             context = ' '.join(src_doc[:src_idx])
@@ -122,11 +144,12 @@ class TDAugmentor(Augmentor):
             # Printing context, [current_word / prediction].
             logger.info(f'context=\'{" ".join(context.split(" ")[max(0, src_idx - 5):])}\' [\'{src_doc[src_idx]}\' / \'{lm_pred}\']')
 
+            # Generating alignment between source and target documents.
+            alignment = self.aligner.align(' '.join(src_doc), ' '.join(tgt_doc)).alignment
+
             if lm_pred in self.rare_words:
                 logger.info(f'\t\'{lm_pred}\' is a rare word.')
 
-                # Finding word corresponding to s_{i} in target sentence.
-                alignment = self.aligner.align(' '.join(src_doc), ' '.join(tgt_doc)).alignment
                 # Finding corresponding word to s_{i} in target sentence.
                 tgt_idxs = [t for t, s in alignment if s == src_idx]
 
@@ -139,7 +162,7 @@ class TDAugmentor(Augmentor):
                         alignment = self.aligner.src2tgt(lm_pred)
                         if not alignment is None:
                             augmented_tgt_doc[tgt_idx] = alignment
-                            logger.info(f'\t\tReplaced \'{tgt_doc[tgt_idx]}\' with \'{self.aligner.src2tgt(lm_pred)}\', which is the alignment of \'{lm_pred}\'.')
+                            logger.info(f'\t\tReplaced target word \'{tgt_doc[tgt_idx]}\' with \'{self.aligner.src2tgt(lm_pred)}\', which is the translation/alignment of \'{lm_pred}\'.')
                         else:
                             # Word not aligned.
                             augmented_tgt_doc[tgt_idx] = tgt_doc[tgt_idx]

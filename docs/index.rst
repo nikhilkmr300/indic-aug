@@ -7,13 +7,13 @@ Welcome to indic-aug's documentation!
 =====================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
    docs/indic_aug
 
-* :ref:`genindex`
-
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    docs/references
+
+* :ref:`genindex`
