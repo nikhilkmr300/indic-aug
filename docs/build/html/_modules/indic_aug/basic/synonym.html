@@ -1,0 +1,499 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>indic_aug.basic.synonym &mdash; indic-aug  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> indic-aug
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/indic_aug.html">indic_aug package</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/references.html">References</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">indic-aug</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>indic_aug.basic.synonym</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for indic_aug.basic.synonym</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">textwrap</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">nltk</span>
+<span class="kn">from</span> <span class="nn">nltk.corpus</span> <span class="kn">import</span> <span class="n">wordnet</span> <span class="k">as</span> <span class="n">wn</span>
+<span class="kn">import</span> <span class="nn">pyiwn</span>
+
+<span class="kn">from</span> <span class="nn">..globals</span> <span class="kn">import</span> <span class="n">Augmentor</span><span class="p">,</span> <span class="n">ERRORS</span><span class="p">,</span> <span class="n">SENTENCE_DELIMS</span>
+<span class="kn">from</span> <span class="nn">..vocab</span> <span class="kn">import</span> <span class="n">Vocab</span>
+<span class="kn">from</span> <span class="nn">..log</span> <span class="kn">import</span> <span class="n">logger</span><span class="p">,</span> <span class="n">NUM_LOGGER_DASHES</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">cyclic_read</span><span class="p">,</span> <span class="n">path2lang</span><span class="p">,</span> <span class="n">line_count</span><span class="p">,</span> <span class="n">doc2words</span><span class="p">,</span> <span class="n">load_stanza_pipeline</span>
+
+<span class="n">pyiwn</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;numexpr.utils&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARN</span><span class="p">)</span>
+
+<div class="viewcode-block" id="convert_pos"><a class="viewcode-back" href="../../../docs/indic_aug.basic.html#indic_aug.basic.convert_pos">[docs]</a><span class="k">def</span> <span class="nf">convert_pos</span><span class="p">(</span><span class="n">stanza_pos</span><span class="p">,</span> <span class="n">to</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Converts Universal Dependencies parts of speech to WordNet/IndoWordNet</span>
+<span class="sd">    parts of speech.</span>
+
+<span class="sd">    :param stanza_pos: POS defined by Universal Dependencies.</span>
+<span class="sd">    :type stanza_pos: str</span>
+<span class="sd">    :param to: POS to convert to, can be &#39;wn&#39; for WordNet and &#39;iwn&#39; for</span>
+<span class="sd">        IndoWordNet.</span>
+<span class="sd">    :type to: str</span>
+
+<span class="sd">    :return: POS in WordNet/IndoWordNet format.</span>
+<span class="sd">    :rtype: str if ``to`` is &#39;wn&#39;, ``pyiwn.iwn.PosTag`` if ``to`` is &#39;iwn&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">wn</span><span class="o">.</span><span class="n">ADJ</span>
+    <span class="k">except</span> <span class="ne">LookupError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Could not find nltk resource </span><span class="se">\&#39;</span><span class="s1">wordnet</span><span class="se">\&#39;</span><span class="s1">. Downloading resource </span><span class="se">\&#39;</span><span class="s1">wordnet</span><span class="se">\&#39;</span><span class="s1">...&#39;</span><span class="p">)</span>
+        <span class="n">nltk</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="s1">&#39;wordnet&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Map from Universal Dependencies POS to WordNet POS.</span>
+    <span class="n">ud2wn_map</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;ADJ&#39;</span><span class="p">:</span> <span class="n">wn</span><span class="o">.</span><span class="n">ADJ</span><span class="p">,</span>
+        <span class="s1">&#39;ADP&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s1">&#39;ADV&#39;</span><span class="p">:</span> <span class="n">wn</span><span class="o">.</span><span class="n">ADV</span><span class="p">,</span>
+        <span class="s1">&#39;AUX&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s1">&#39;CCONJ&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s1">&#39;DET&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s1">&#39;INTJ&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s1">&#39;NOUN&#39;</span><span class="p">:</span> <span class="n">wn</span><span class="o">.</span><span class="n">NOUN</span><span class="p">,</span>
+        <span class="s1">&#39;NUM&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s1">&#39;PART&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s1">&#39;PRON&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s1">&#39;PROPN&#39;</span><span class="p">:</span> <span class="n">wn</span><span class="o">.</span><span class="n">NOUN</span><span class="p">,</span>
+        <span class="s1">&#39;PUNCT&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s1">&#39;SCONJ&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s1">&#39;SYM&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s1">&#39;VERB&#39;</span><span class="p">:</span> <span class="n">wn</span><span class="o">.</span><span class="n">VERB</span><span class="p">,</span>
+        <span class="s1">&#39;X&#39;</span><span class="p">:</span> <span class="kc">None</span>
+    <span class="p">}</span>
+    <span class="c1"># Map from Universal Dependencies POS to IndoWordNet POS.</span>
+    <span class="n">ud2iwn_map</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;ADJ&#39;</span><span class="p">:</span> <span class="n">pyiwn</span><span class="o">.</span><span class="n">iwn</span><span class="o">.</span><span class="n">PosTag</span><span class="o">.</span><span class="n">ADJECTIVE</span><span class="p">,</span>
+        <span class="s1">&#39;ADP&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s1">&#39;ADV&#39;</span><span class="p">:</span> <span class="n">pyiwn</span><span class="o">.</span><span class="n">iwn</span><span class="o">.</span><span class="n">PosTag</span><span class="o">.</span><span class="n">ADVERB</span><span class="p">,</span>
+        <span class="s1">&#39;AUX&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s1">&#39;CCONJ&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s1">&#39;DET&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s1">&#39;INTJ&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s1">&#39;NOUN&#39;</span><span class="p">:</span> <span class="n">pyiwn</span><span class="o">.</span><span class="n">iwn</span><span class="o">.</span><span class="n">PosTag</span><span class="o">.</span><span class="n">NOUN</span><span class="p">,</span>
+        <span class="s1">&#39;NUM&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s1">&#39;PART&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s1">&#39;PRON&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s1">&#39;PROPN&#39;</span><span class="p">:</span> <span class="n">pyiwn</span><span class="o">.</span><span class="n">iwn</span><span class="o">.</span><span class="n">PosTag</span><span class="o">.</span><span class="n">NOUN</span><span class="p">,</span>
+        <span class="s1">&#39;PUNCT&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s1">&#39;SCONJ&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s1">&#39;SYM&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s1">&#39;VERB&#39;</span><span class="p">:</span> <span class="n">pyiwn</span><span class="o">.</span><span class="n">iwn</span><span class="o">.</span><span class="n">PosTag</span><span class="o">.</span><span class="n">VERB</span><span class="p">,</span>
+        <span class="s1">&#39;X&#39;</span><span class="p">:</span> <span class="kc">None</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">stanza_pos</span> <span class="ow">in</span> <span class="n">ud2iwn_map</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid value of parameter </span><span class="se">\&#39;</span><span class="s1">stanza_pos</span><span class="se">\&#39;</span><span class="s1">. Valid values for parameter </span><span class="se">\&#39;</span><span class="s1">stanza_pos</span><span class="se">\&#39;</span><span class="s1"> to convert_pos are values in </span><span class="si">{</span><span class="n">ud2iwn_map</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">to</span> <span class="o">==</span> <span class="s1">&#39;wn&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ud2wn_map</span><span class="p">[</span><span class="n">stanza_pos</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">to</span> <span class="o">==</span> <span class="s1">&#39;iwn&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ud2iwn_map</span><span class="p">[</span><span class="n">stanza_pos</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid value of parameter </span><span class="se">\&#39;</span><span class="s1">to</span><span class="se">\&#39;</span><span class="s1">. Valid values for parameter </span><span class="se">\&#39;</span><span class="s1">to</span><span class="se">\&#39;</span><span class="s1"> are values in (</span><span class="se">\&#39;</span><span class="s1">wn</span><span class="se">\&#39;</span><span class="s1">, </span><span class="se">\&#39;</span><span class="s1">iwn</span><span class="se">\&#39;</span><span class="s1">. Pass </span><span class="se">\&#39;</span><span class="s1">wn</span><span class="se">\&#39;</span><span class="s1"> to convert from Universal Dependencies POS to WordNet POS (for English) and </span><span class="se">\&#39;</span><span class="s1">iwn</span><span class="se">\&#39;</span><span class="s1"> to convert from Universal Dependencies POS to IndoWordNet POS (for Indian languages).&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="find_synonyms"><a class="viewcode-back" href="../../../docs/indic_aug.basic.html#indic_aug.basic.find_synonyms">[docs]</a><span class="k">def</span> <span class="nf">find_synonyms</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">,</span> <span class="n">net</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a list of synonyms of ``word``.</span>
+
+<span class="sd">    :param word: Word whose synonym is required.</span>
+<span class="sd">    :type word: str</span>
+<span class="sd">    :param pipeline: ``stanza.Pipeline`` corresponding to language of word.</span>
+<span class="sd">    :type pipeline: ``stanza.Pipeline``</span>
+<span class="sd">    :param net: Thesaurus (word net) to use. Use nltk.corpus.wordnet for English</span>
+<span class="sd">        and pyiwn.iwn.IndoWordNet() for Indian languages.</span>
+<span class="sd">    :type net: ``nltk.corpus.reader.wordnet.WordNetCorpusReader`` for English</span>
+<span class="sd">        and ``pyiwn.iwn.IndoWordNet`` for Indian languages.</span>
+
+<span class="sd">    :return: List of synonyms for ``word``.</span>
+<span class="sd">    :rtype: list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">word</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Parameter </span><span class="se">\&#39;</span><span class="s1">word</span><span class="se">\&#39;</span><span class="s1"> to find_synonyms must be a str with no spaces.&#39;</span><span class="p">)</span>
+
+    <span class="n">lang</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">lang</span>
+
+    <span class="c1"># POS of word whose synonyms are required in Universal Dependencies format,</span>
+    <span class="c1"># used by stanza.</span>
+    <span class="n">stanza_pos</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="n">word</span><span class="p">)</span><span class="o">.</span><span class="n">sentences</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upos</span>
+    <span class="c1"># POS of word whose synonyms are required in WordNet or IndoWordNet format,</span>
+    <span class="c1"># used by nltk/pyiwn.</span>
+    <span class="n">converted_pos</span> <span class="o">=</span> <span class="n">convert_pos</span><span class="p">(</span><span class="n">stanza_pos</span><span class="p">,</span> <span class="s1">&#39;wn&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">lang</span> <span class="o">==</span> <span class="s1">&#39;en&#39;</span> <span class="k">else</span> <span class="n">convert_pos</span><span class="p">(</span><span class="n">stanza_pos</span><span class="p">,</span> <span class="s1">&#39;iwn&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">converted_pos</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># If converted_pos is None, unknown POS, nltk/pyiwn cannot handle,</span>
+        <span class="c1"># returning empty list.</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">()</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Synonym sets corresponding to `word` and have the same POS as `word`.</span>
+        <span class="n">synsets</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">synsets</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">converted_pos</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="c1"># If word does not exist in IndoWordNet, returning empty list.</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">()</span>
+
+    <span class="n">synonyms</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+    <span class="c1"># Extracting synonyms which have the same POS as input word.</span>
+    <span class="k">for</span> <span class="n">synset</span> <span class="ow">in</span> <span class="n">synsets</span><span class="p">:</span>
+        <span class="n">synonyms</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">synset</span><span class="o">.</span><span class="n">lemma_names</span><span class="p">())</span>
+
+    <span class="c1"># Removing occurrences of word itself from its list of synonyms.</span>
+    <span class="n">synonyms</span> <span class="o">=</span> <span class="p">[</span><span class="n">synonym</span> <span class="k">for</span> <span class="n">synonym</span> <span class="ow">in</span> <span class="n">synonyms</span> <span class="k">if</span> <span class="n">synonym</span> <span class="o">!=</span> <span class="n">word</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">synonyms</span></div>
+
+<div class="viewcode-block" id="synonym_aug"><a class="viewcode-back" href="../../../docs/indic_aug.basic.html#indic_aug.basic.synonym_aug">[docs]</a><span class="k">def</span> <span class="nf">synonym_aug</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">,</span> <span class="n">net</span><span class="p">,</span> <span class="n">vocab</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Performs augmentation on a document by replacing with synonyms (refer:</span>
+<span class="sd">    :cite:t:`wei2019eda`).</span>
+
+<span class="sd">    :param doc: Document to be augmented.</span>
+<span class="sd">    :type doc: str</span>
+<span class="sd">    :param pipeline: Same as for ``find_synonyms``.</span>
+<span class="sd">    :type pipeline: ``stanza.Pipeline``</span>
+<span class="sd">    :param net: Same as for ``find_synonyms``.</span>
+<span class="sd">    :type net: ``nltk.corpus.reader.wordnet.WordNetCorpusReader`` for English</span>
+<span class="sd">        and ``pyiwn.iwn.IndoWordNet`` for Indian languages.</span>
+<span class="sd">    :param vocab: List of words in vocabulary.</span>
+<span class="sd">    :type vocab: list(str)</span>
+<span class="sd">    :param p: Probability of a word to be replaced by one of its synonyms.</span>
+<span class="sd">    :type p: float</span>
+
+<span class="sd">    :return: Augmented document.</span>
+<span class="sd">    :rtype: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">augmented_doc</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+    <span class="n">lang</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">lang</span>
+
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">word</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">doc2words</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">lang</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">word</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">,</span> <span class="n">SENTENCE_DELIMS</span><span class="p">)):</span>
+            <span class="c1"># Not replacing punctuations.</span>
+            <span class="k">continue</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">binomial</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Sampled word </span><span class="se">\&#39;</span><span class="si">{</span><span class="n">word</span><span class="si">}</span><span class="se">\&#39;</span><span class="s1"> at index </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s1"> as a potential candidate for synonym replacement.&#39;</span><span class="p">)</span>
+            <span class="c1"># Limiting synonym list to words in vocabulary.</span>
+            <span class="n">synonyms</span> <span class="o">=</span> <span class="p">[</span><span class="n">synonym</span> <span class="k">for</span> <span class="n">synonym</span> <span class="ow">in</span> <span class="n">find_synonyms</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">,</span> <span class="n">net</span><span class="p">)</span> <span class="k">if</span> <span class="n">synonym</span> <span class="ow">in</span> <span class="n">vocab</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">synonyms</span><span class="p">):</span>
+                <span class="c1"># If no synonyms found, replace word with itself.</span>
+                <span class="n">sampled_synonym</span> <span class="o">=</span> <span class="n">word</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t\t</span><span class="s1">No in-vocabulary synonym found for </span><span class="se">\&#39;</span><span class="si">{</span><span class="n">word</span><span class="si">}</span><span class="se">\&#39;</span><span class="s1">.&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Else replace word with a randomly sampled synonym.</span>
+                <span class="n">sampled_synonym</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">synonyms</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t\t</span><span class="s1">Replaced </span><span class="se">\&#39;</span><span class="si">{</span><span class="n">word</span><span class="si">}</span><span class="se">\&#39;</span><span class="s1"> with its WordNet/IndoWordNet synonym </span><span class="se">\&#39;</span><span class="si">{</span><span class="n">sampled_synonym</span><span class="si">}</span><span class="se">\&#39;</span><span class="s1">.&#39;</span><span class="p">)</span> 
+            <span class="n">augmented_doc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sampled_synonym</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">augmented_doc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">augmented_doc</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SynonymAugmentor"><a class="viewcode-back" href="../../../docs/indic_aug.basic.html#indic_aug.basic.SynonymAugmentor">[docs]</a><span class="k">class</span> <span class="nc">SynonymAugmentor</span><span class="p">(</span><span class="n">Augmentor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Class to augment parallel corpora by synonym augmentation technique</span>
+<span class="sd">    (refer: :cite:t:`wei2019eda`).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_input_path</span><span class="p">,</span> <span class="n">tgt_input_path</span><span class="p">,</span> <span class="n">vocab_dir</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">stanza_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">augment</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructor method.</span>
+
+<span class="sd">        :param src_input_path: Path to aligned source corpus.</span>
+<span class="sd">        :type src_input_path: str</span>
+<span class="sd">        :param tgt_input_path: Path to aligned target corpus, corresponding to</span>
+<span class="sd">            the above source corpus.</span>
+<span class="sd">        :type tgt_input_path: str</span>
+<span class="sd">        :param vocab_dir: As described in the docstring for</span>
+<span class="sd">            ``indic_aug.vocab.Vocab``.</span>
+<span class="sd">        :type vocab_dir: str</span>
+<span class="sd">        :param p: Same as for ``synonym_aug``.</span>
+<span class="sd">        :type p: float</span>
+<span class="sd">        :param stanza_dir: Path to directory containing stanza models (the</span>
+<span class="sd">            default is ``~/stanza_resources`` on doing a ``stanza.download``).</span>
+<span class="sd">        :type stanza_dir: str</span>
+<span class="sd">        :param augment: Performs augmentation if ``True``, else returns original</span>
+<span class="sd">            pair of sentences.</span>
+<span class="sd">        :type augment: bool</span>
+<span class="sd">        :param random_state: Seed for the random number generator.</span>
+<span class="sd">        :type random_state: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">line_count</span><span class="p">(</span><span class="n">src_input_path</span><span class="p">)</span> <span class="o">!=</span> <span class="n">line_count</span><span class="p">(</span><span class="n">tgt_input_path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">ERRORS</span><span class="p">[</span><span class="s1">&#39;corpus_shape&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">doc_count</span> <span class="o">=</span> <span class="n">line_count</span><span class="p">(</span><span class="n">src_input_path</span><span class="p">)</span>
+
+        <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">random_state</span><span class="p">)</span>                   <span class="c1"># synonym_aug uses random from standard library.</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">random_state</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">stanza_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">stanza_dir</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span> <span class="o">/</span> <span class="s1">&#39;stanza_resources&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">src_lang</span> <span class="o">=</span> <span class="n">path2lang</span><span class="p">(</span><span class="n">src_input_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tgt_lang</span> <span class="o">=</span> <span class="n">path2lang</span><span class="p">(</span><span class="n">tgt_input_path</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">src_vocab</span> <span class="o">=</span> <span class="n">Vocab</span><span class="o">.</span><span class="n">load_vocab</span><span class="p">(</span><span class="n">vocab_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">src_lang</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tgt_vocab</span> <span class="o">=</span> <span class="n">Vocab</span><span class="o">.</span><span class="n">load_vocab</span><span class="p">(</span><span class="n">vocab_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tgt_lang</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">augment</span> <span class="o">=</span> <span class="n">augment</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">augment</span><span class="p">:</span>
+            <span class="c1"># If augment is True, can perform arbitrary number of augmentations</span>
+            <span class="c1"># by cycling through all the sentences in the corpus repeatedly.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">src_input_file</span> <span class="o">=</span> <span class="n">cyclic_read</span><span class="p">(</span><span class="n">src_input_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tgt_input_file</span> <span class="o">=</span> <span class="n">cyclic_read</span><span class="p">(</span><span class="n">tgt_input_path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Else does one pass through the corpus and stops.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">src_input_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">src_input_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tgt_input_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">tgt_input_path</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span>
+
+        <span class="c1"># Setting up stanza pipelines for source and target languages, for use</span>
+        <span class="c1"># with synonym_aug.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">src_pipeline</span> <span class="o">=</span> <span class="n">load_stanza_pipeline</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">src_lang</span><span class="p">,</span> <span class="n">stanza_dir</span><span class="o">=</span><span class="n">stanza_dir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tgt_pipeline</span> <span class="o">=</span> <span class="n">load_stanza_pipeline</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tgt_lang</span><span class="p">,</span> <span class="n">stanza_dir</span><span class="o">=</span><span class="n">stanza_dir</span><span class="p">)</span>
+
+        <span class="c1"># Setting up objects to use WordNet/IndoWordNet.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">src_net</span> <span class="o">=</span> <span class="n">wn</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">src_lang</span> <span class="o">==</span> <span class="s1">&#39;en&#39;</span> <span class="k">else</span> <span class="n">pyiwn</span><span class="o">.</span><span class="n">IndoWordNet</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tgt_net</span> <span class="o">=</span> <span class="n">wn</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tgt_lang</span> <span class="o">==</span> <span class="s1">&#39;en&#39;</span> <span class="k">else</span> <span class="n">pyiwn</span><span class="o">.</span><span class="n">IndoWordNet</span><span class="p">()</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\</span>
+<span class="s1">            SynonymAugmentor</span><span class="se">\n\</span>
+<span class="s1">            </span><span class="se">\t</span><span class="s1">doc_count=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">doc_count</span><span class="si">}</span><span class="se">\n\</span>
+<span class="s1">            </span><span class="se">\t</span><span class="s1">src_input_path=</span><span class="si">{</span><span class="n">src_input_path</span><span class="si">}</span><span class="se">\n\</span>
+<span class="s1">            </span><span class="se">\t</span><span class="s1">tgt_input_path=</span><span class="si">{</span><span class="n">tgt_input_path</span><span class="si">}</span><span class="se">\n\</span>
+<span class="s1">            </span><span class="se">\t</span><span class="s1">src_lang=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">src_lang</span><span class="si">}</span><span class="se">\n\</span>
+<span class="s1">            </span><span class="se">\t</span><span class="s1">tgt_lang=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tgt_lang</span><span class="si">}</span><span class="se">\n\</span>
+<span class="s1">            </span><span class="se">\t</span><span class="s1">vocab_dir=</span><span class="si">{</span><span class="n">vocab_dir</span><span class="si">}</span><span class="se">\n\</span>
+<span class="s1">            </span><span class="se">\t</span><span class="s1">p=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="si">}</span><span class="se">\n\</span>
+<span class="s1">            </span><span class="se">\t</span><span class="s1">random_state=</span><span class="si">{</span><span class="n">random_state</span><span class="si">}</span><span class="se">\n\</span>
+<span class="s1">            Note: Words are 0-indexed.&#39;</span>
+        <span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;-&#39;</span> <span class="o">*</span> <span class="n">NUM_LOGGER_DASHES</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Returning original sentences as they are if self.augment is False.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">augment</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">src_input_file</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">),</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tgt_input_file</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">src_doc</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">src_input_file</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;src_doc: </span><span class="se">\&#39;</span><span class="si">{</span><span class="n">src_doc</span><span class="si">}</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">augmented_src_doc</span> <span class="o">=</span> <span class="n">synonym_aug</span><span class="p">(</span><span class="n">src_doc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">src_pipeline</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">src_net</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">src_vocab</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+
+        <span class="n">tgt_doc</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tgt_input_file</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;tgt_doc: </span><span class="se">\&#39;</span><span class="si">{</span><span class="n">tgt_doc</span><span class="si">}</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">augmented_tgt_doc</span> <span class="o">=</span> <span class="n">synonym_aug</span><span class="p">(</span><span class="n">tgt_doc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tgt_pipeline</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tgt_net</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tgt_vocab</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;augmented_src_doc: </span><span class="se">\&#39;</span><span class="si">{</span><span class="n">augmented_src_doc</span><span class="si">}</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;augmented_tgt_doc: </span><span class="se">\&#39;</span><span class="si">{</span><span class="n">augmented_tgt_doc</span><span class="si">}</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;-&#39;</span> <span class="o">*</span> <span class="n">NUM_LOGGER_DASHES</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">augmented_src_doc</span><span class="p">,</span> <span class="n">augmented_tgt_doc</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">doc_count</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Nikhil Kumar.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

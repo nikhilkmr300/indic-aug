@@ -1,0 +1,581 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>indic_aug.basic.noising &mdash; indic-aug  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> indic-aug
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/indic_aug.html">indic_aug package</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/references.html">References</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">indic-aug</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>indic_aug.basic.noising</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for indic_aug.basic.noising</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">textwrap</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">..globals</span> <span class="kn">import</span> <span class="n">Augmentor</span><span class="p">,</span> <span class="n">VALID_AUG_MODES</span><span class="p">,</span> <span class="n">BLANK_TOKEN</span><span class="p">,</span> <span class="n">ERRORS</span><span class="p">,</span> <span class="n">SENTENCE_DELIMS</span>
+<span class="kn">from</span> <span class="nn">..log</span> <span class="kn">import</span> <span class="n">logger</span><span class="p">,</span> <span class="n">NUM_LOGGER_DASHES</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">cyclic_read</span><span class="p">,</span> <span class="n">path2lang</span><span class="p">,</span> <span class="n">line_count</span><span class="p">,</span> <span class="n">doc2sents</span><span class="p">,</span> <span class="n">sent2words</span><span class="p">,</span> <span class="n">doc2words</span>
+
+<div class="viewcode-block" id="count_unigrams"><a class="viewcode-back" href="../../../docs/indic_aug.basic.html#indic_aug.basic.noising.count_unigrams">[docs]</a><span class="k">def</span> <span class="nf">count_unigrams</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the count of all the unigrams that appear in the corpus at</span>
+<span class="sd">    ``path``. Corpus at ``path`` must be formatted so that each line contains a</span>
+<span class="sd">    document, and each document may contain one or more sentences terminated</span>
+<span class="sd">    either by the fullstop character (\u002e) or the poorna virama character</span>
+<span class="sd">    (\u0964). Each sentence is made of space-separated tokens.</span>
+
+<span class="sd">    :param path: Path to input corpus.</span>
+<span class="sd">    :type path: str</span>
+
+<span class="sd">    :return: Map of unigram to number of occurrences of that unigram.</span>
+<span class="sd">    :rtype: dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">unigram_counts</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="n">lang</span> <span class="o">=</span> <span class="n">path2lang</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">sent</span> <span class="ow">in</span> <span class="n">doc2sents</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">lang</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">sent2words</span><span class="p">(</span><span class="n">sent</span><span class="p">,</span> <span class="n">lang</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">word</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                        <span class="c1"># &#39;&#39; is end of sentence, not counting it as unigram.</span>
+                        <span class="k">continue</span>
+                    <span class="k">if</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">unigram_counts</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                        <span class="n">unigram_counts</span><span class="p">[</span><span class="n">word</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">unigram_counts</span><span class="p">[</span><span class="n">word</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">unigram_counts</span></div>
+
+
+<div class="viewcode-block" id="sample_word"><a class="viewcode-back" href="../../../docs/indic_aug.basic.html#indic_aug.basic.noising.sample_word">[docs]</a><span class="k">def</span> <span class="nf">sample_word</span><span class="p">(</span><span class="n">unigram_counts</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Samples words from a probability distribution of words.</span>
+
+<span class="sd">    :param unigram_counts: Map of words (str) to their number of occurrences</span>
+<span class="sd">        (int), as returned by ``count_unigrams``.</span>
+<span class="sd">    :type: dict</span>
+
+<span class="sd">    :return: Word randomly sampled according to the probability distribution of</span>
+<span class="sd">        counts.</span>
+<span class="sd">    :rtype: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">total_count</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">unigram_counts</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>     <span class="c1"># Total number of words.</span>
+    <span class="c1"># Converting counts to frequencies in range [0, 1].</span>
+    <span class="n">words2probs</span> <span class="o">=</span> <span class="p">{</span><span class="n">word</span><span class="p">:</span> <span class="n">word_count</span> <span class="o">/</span> <span class="n">total_count</span> <span class="k">for</span> <span class="n">word</span><span class="p">,</span> <span class="n">word_count</span> <span class="ow">in</span> <span class="n">unigram_counts</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="c1"># Converting word_probs to a list of [key, val] so that order is maintained.</span>
+    <span class="n">words2probs</span> <span class="o">=</span> <span class="p">[[</span><span class="n">word</span><span class="p">,</span> <span class="n">word_count</span> <span class="o">/</span> <span class="n">total_count</span><span class="p">]</span> <span class="k">for</span> <span class="n">word</span><span class="p">,</span> <span class="n">word_count</span> <span class="ow">in</span> <span class="n">unigram_counts</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+
+    <span class="c1"># Extracting word probabilities to pass as probabilities to numpy.random.choice.</span>
+    <span class="n">word_probs</span> <span class="o">=</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">xs</span><span class="p">:</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xs</span><span class="p">])(</span><span class="n">words2probs</span><span class="p">)</span>
+
+    <span class="c1"># Sampling word index probability distribution word_probs.</span>
+    <span class="n">word_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">word_probs</span><span class="p">)),</span> <span class="n">p</span><span class="o">=</span><span class="n">word_probs</span><span class="p">)</span>
+
+    <span class="c1"># Returning the word corresponding to word_idx.</span>
+    <span class="k">return</span> <span class="n">words2probs</span><span class="p">[</span><span class="n">word_idx</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="count_bigrams"><a class="viewcode-back" href="../../../docs/indic_aug.basic.html#indic_aug.basic.noising.count_bigrams">[docs]</a><span class="k">def</span> <span class="nf">count_bigrams</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the count of all the bigrams that appear in the corpus at</span>
+<span class="sd">    ``path``. Corpus at ``path`` must be formatted so that each line contains a</span>
+<span class="sd">    document, and each document may contain one or more sentences terminated</span>
+<span class="sd">    either by the fullstop character (\u002e) or the poorna virama character</span>
+<span class="sd">    (\u0964). Each sentence is made of space-separated tokens.</span>
+
+<span class="sd">    :param path: Path to input corpus.</span>
+<span class="sd">    :type path: str</span>
+
+<span class="sd">    :return: Map of bigram (represented as a 2-tuple) to number of occurrences</span>
+<span class="sd">        of that bigram.</span>
+<span class="sd">    :rtype: dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">bigram_counts</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="n">lang</span> <span class="o">=</span> <span class="n">path2lang</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">sent</span> <span class="ow">in</span> <span class="n">doc2sents</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">lang</span><span class="p">):</span>
+                <span class="n">words</span> <span class="o">=</span> <span class="n">sent2words</span><span class="p">(</span><span class="n">sent</span><span class="p">,</span> <span class="n">lang</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">words</span><span class="p">[</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span> <span class="ow">in</span> <span class="n">bigram_counts</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                        <span class="n">bigram_counts</span><span class="p">[(</span><span class="n">words</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">words</span><span class="p">[</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])]</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">bigram_counts</span><span class="p">[(</span><span class="n">words</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">words</span><span class="p">[</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])]</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">bigram_counts</span></div>
+
+<div class="viewcode-block" id="find_next_sets"><a class="viewcode-back" href="../../../docs/indic_aug.basic.html#indic_aug.basic.noising.find_next_sets">[docs]</a><span class="k">def</span> <span class="nf">find_next_sets</span><span class="p">(</span><span class="n">bigram_counts</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the next set of first unigrams occurring in ``bigram_counts``.</span>
+
+<span class="sd">    Defining next set of a word as the set of second unigrams where that word is</span>
+<span class="sd">    the first unigram. For example, say we have the bigrams (&#39;hello&#39;, &#39;world&#39;),</span>
+<span class="sd">    (&#39;hello&#39;, &#39;alice&#39;) and (&#39;hello&#39;, &#39;bob&#39;), then the next set of &#39;hello&#39; would</span>
+<span class="sd">    be {&#39;world&#39;, &#39;alice&#39;, &#39;bob&#39;}.</span>
+
+<span class="sd">    Return value of this function is a dictionary of first unigram to its next</span>
+<span class="sd">    set pairs.</span>
+
+<span class="sd">    :param bigram_counts: Dictionary of bigram (2-tuple) to bigram count pairs,</span>
+<span class="sd">        as returned by ``count_bigrams``.</span>
+<span class="sd">    :type bigram_counts: dict</span>
+
+<span class="sd">    :return: Next sets of all first unigrams.</span>
+<span class="sd">    :rtype: dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">next_sets</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">first_word</span><span class="p">,</span> <span class="n">second_word</span> <span class="ow">in</span> <span class="n">bigram_counts</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">first_word</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="ow">or</span> <span class="n">second_word</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="c1"># &#39;&#39; represents end of sentence, don&#39;t count this bigram.</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">first_word</span> <span class="ow">in</span> <span class="n">next_sets</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">next_sets</span><span class="p">[</span><span class="n">first_word</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">second_word</span><span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">next_sets</span><span class="p">[</span><span class="n">first_word</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">second_word</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">next_sets</span></div>
+
+<div class="viewcode-block" id="find_prev_sets"><a class="viewcode-back" href="../../../docs/indic_aug.basic.html#indic_aug.basic.noising.find_prev_sets">[docs]</a><span class="k">def</span> <span class="nf">find_prev_sets</span><span class="p">(</span><span class="n">bigram_counts</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the prev set of second unigrams occurring in ``bigram_counts``.</span>
+
+<span class="sd">    Defining prev set of a word as the set of first unigrams where that word is</span>
+<span class="sd">    the second unigram.</span>
+<span class="sd">    For example, say we have the bigrams (&#39;red&#39;, &#39;flag&#39;), (&#39;green&#39;, &#39;flag&#39;),</span>
+<span class="sd">    (&#39;white&#39;, &#39;flag&#39;), then the prev set of &#39;flag&#39; would be {&#39;red&#39;, &#39;green&#39;,</span>
+<span class="sd">    &#39;flag&#39;}.</span>
+
+<span class="sd">    Return value of this function is a dictionary of first unigram to its next</span>
+<span class="sd">    set pairs.</span>
+
+<span class="sd">    :param bigram_counts: Dictionary of bigram (2-tuple) to bigram count pairs,</span>
+<span class="sd">        as returned by ``count_bigrams``.</span>
+<span class="sd">    :type bigram_counts: dict</span>
+
+<span class="sd">    :return: Next sets of all first unigrams.</span>
+<span class="sd">    :rtype: dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">prev_sets</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">first_word</span><span class="p">,</span> <span class="n">second_word</span> <span class="ow">in</span> <span class="n">bigram_counts</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">first_word</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="ow">or</span> <span class="n">second_word</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="c1"># &#39;&#39; represents end of sentence, don&#39;t count this bigram.</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">second_word</span> <span class="ow">in</span> <span class="n">prev_sets</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">prev_sets</span><span class="p">[</span><span class="n">second_word</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">first_word</span><span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">prev_sets</span><span class="p">[</span><span class="n">second_word</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">first_word</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">prev_sets</span></div>
+
+<div class="viewcode-block" id="noising_aug"><a class="viewcode-back" href="../../../docs/indic_aug.basic.html#indic_aug.basic.noising.noising_aug">[docs]</a><span class="k">def</span> <span class="nf">noising_aug</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">gamma0</span><span class="p">,</span> <span class="n">unigram_counts</span><span class="p">,</span> <span class="n">lang</span><span class="p">,</span> <span class="n">next_sets</span><span class="p">,</span> <span class="n">prev_sets</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Performs augmentation on a document by blanking/replacement (refer:</span>
+<span class="sd">    :cite:t:`xie2017data`).</span>
+
+<span class="sd">    Supports all the four modes specified in the paper:</span>
+<span class="sd">        * `blank`: Replaces token with ``BLANK_TOKEN`` with noising probability</span>
+<span class="sd">            ``gamma0``.</span>
+<span class="sd">        * `replace`: Replaces token with another token from the unigram</span>
+<span class="sd">            distribution with noising probability ``gamma0``.</span>
+<span class="sd">        * `absolute_discount`: Replaces token with another token from the</span>
+<span class="sd">            unigram distribution with absoute discounted probability obtained </span>
+<span class="sd">            from ``gamma0``.</span>
+<span class="sd">        * `kneser_ney`: Replaces token with another token from its prev set with</span>
+<span class="sd">            absoute discounted probability obtained from ``gamma0``, analogous </span>
+<span class="sd">            to Kneser-Ney smoothing.</span>
+
+<span class="sd">    :param doc: Document to be augmented.</span>
+<span class="sd">    :type doc: str</span>
+<span class="sd">    :param mode: One of the modes described above.</span>
+<span class="sd">    :type mode: str</span>
+<span class="sd">    :param gamma0: Noising probability. Values are clipped to range [0, 1].</span>
+<span class="sd">    :type gamma0: float</span>
+<span class="sd">    :param lang: ISO 639-1 language code of ``doc``.</span>
+<span class="sd">    :type lang: str</span>
+<span class="sd">    :param next_sets: Next sets of all tokens in corpus, as returned by</span>
+<span class="sd">        `find_next_sets`.</span>
+<span class="sd">    :type next_sets: dict</span>
+<span class="sd">    :param prev_sets: Prev sets of all tokens in corpus, as returned by</span>
+<span class="sd">        `find_next_sets`, optional. Required if ``mode`` is &#39;kneser_ney&#39;, else</span>
+<span class="sd">        ignored.</span>
+<span class="sd">    :type prev_sets: dict</span>
+
+<span class="sd">    :return: Augmented document.</span>
+<span class="sd">    :rtype: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">augmented_doc</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">word</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">doc2words</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">lang</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">word</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">,</span> <span class="n">SENTENCE_DELIMS</span><span class="p">)):</span>
+            <span class="c1"># Not noising punctuations.</span>
+            <span class="k">continue</span>
+
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;blank&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">binomial</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">gamma0</span><span class="p">):</span>
+                <span class="c1"># Blanking with probability gamma0.</span>
+                <span class="n">augmented_doc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">BLANK_TOKEN</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Blanked word </span><span class="se">\&#39;</span><span class="si">{</span><span class="n">word</span><span class="si">}</span><span class="se">\&#39;</span><span class="s1"> at index </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">augmented_doc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;replace&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">binomial</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">gamma0</span><span class="p">):</span>
+                <span class="n">sampled_word</span> <span class="o">=</span> <span class="n">sample_word</span><span class="p">(</span><span class="n">unigram_counts</span><span class="p">)</span>
+                <span class="c1"># Replacing from unigram distribution with probability gamma0.</span>
+                <span class="n">augmented_doc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sampled_word</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Replaced word </span><span class="se">\&#39;</span><span class="si">{</span><span class="n">word</span><span class="si">}</span><span class="se">\&#39;</span><span class="s1"> at index </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s1"> with </span><span class="se">\&#39;</span><span class="si">{</span><span class="n">sampled_word</span><span class="si">}</span><span class="se">\&#39;</span><span class="s1">.&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">augmented_doc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;absolute_discount&#39;</span><span class="p">:</span>
+            <span class="n">numer</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">next_sets</span><span class="p">[</span><span class="n">word</span><span class="p">])</span> <span class="k">if</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">next_sets</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">else</span> <span class="mi">0</span>
+            <span class="n">denom</span> <span class="o">=</span> <span class="n">unigram_counts</span><span class="p">[</span><span class="n">word</span><span class="p">]</span>
+            <span class="n">gammaAD</span> <span class="o">=</span> <span class="n">gamma0</span> <span class="o">*</span> <span class="n">numer</span> <span class="o">/</span> <span class="n">denom</span>     <span class="c1"># Absolute discounted gamma, refer Xie&#39;s paper.</span>
+
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">binomial</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">gammaAD</span><span class="p">):</span>
+                <span class="n">sampled_word</span> <span class="o">=</span> <span class="n">sample_word</span><span class="p">(</span><span class="n">unigram_counts</span><span class="p">)</span>
+                <span class="c1"># Replacing from unigram distribution with probability gammaAD.</span>
+                <span class="n">augmented_doc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sampled_word</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Replaced word </span><span class="se">\&#39;</span><span class="si">{</span><span class="n">word</span><span class="si">}</span><span class="se">\&#39;</span><span class="s1"> with </span><span class="se">\&#39;</span><span class="si">{</span><span class="n">sampled_word</span><span class="si">}</span><span class="se">\&#39;</span><span class="s1">.&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">augmented_doc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;kneser_ney&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">prev_sets</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">ERRORS</span><span class="p">[</span><span class="s1">&#39;prev_set_compulsory&#39;</span><span class="p">])</span>
+
+            <span class="n">numer</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">next_sets</span><span class="p">[</span><span class="n">word</span><span class="p">])</span> <span class="k">if</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">next_sets</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">else</span> <span class="mi">0</span>
+            <span class="n">denom</span> <span class="o">=</span> <span class="n">unigram_counts</span><span class="p">[</span><span class="n">word</span><span class="p">]</span>
+            <span class="n">gammaAD</span> <span class="o">=</span> <span class="n">gamma0</span> <span class="o">*</span> <span class="n">numer</span> <span class="o">/</span> <span class="n">denom</span>     <span class="c1"># Absolute discounted gamma, refer Xie&#39;s paper.</span>
+
+            <span class="c1"># Unigram counts of words in prev set of word, calling it Kneser-Ney</span>
+            <span class="c1"># distribution.</span>
+            <span class="n">kneser_ney_distr</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">prev_sets</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">first_word</span> <span class="ow">in</span> <span class="n">prev_sets</span><span class="p">[</span><span class="n">word</span><span class="p">]:</span>
+                    <span class="n">kneser_ney_distr</span><span class="p">[</span><span class="n">first_word</span><span class="p">]</span> <span class="o">=</span> <span class="n">unigram_counts</span><span class="p">[</span><span class="n">first_word</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">binomial</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">gammaAD</span><span class="p">):</span>
+                <span class="c1"># Replacing from Kneser-Ney distribution with probability</span>
+                <span class="c1"># gammaAD.</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">kneser_ney_distr</span><span class="p">):</span>
+                    <span class="c1"># If no words in prev set, replace word with itself.</span>
+                    <span class="n">sampled_word</span> <span class="o">=</span> <span class="n">word</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Otherwise sample from Kneser-Ney distribution.</span>
+                    <span class="n">sampled_word</span> <span class="o">=</span> <span class="n">sample_word</span><span class="p">(</span><span class="n">kneser_ney_distr</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Replaced word </span><span class="se">\&#39;</span><span class="si">{</span><span class="n">word</span><span class="si">}</span><span class="se">\&#39;</span><span class="s1"> [gammaAD=</span><span class="si">{</span><span class="n">gammaAD</span><span class="si">}</span><span class="s1">] with </span><span class="se">\&#39;</span><span class="si">{</span><span class="n">sampled_word</span><span class="si">}</span><span class="se">\&#39;</span><span class="s1">.&#39;</span><span class="p">)</span>
+                <span class="n">augmented_doc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sampled_word</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">augmented_doc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid value of parameter </span><span class="se">\&#39;</span><span class="s1">mode</span><span class="se">\&#39;</span><span class="s1">. Valid values for parameter </span><span class="se">\&#39;</span><span class="s1">mode</span><span class="se">\&#39;</span><span class="s1"> to noising_aug are values in </span><span class="si">{</span><span class="o">*</span><span class="n">VALID_AUG_MODES</span><span class="p">[</span><span class="s2">&quot;noising&quot;</span><span class="p">],</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">augmented_doc</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="NoisingAugmentor"><a class="viewcode-back" href="../../../docs/indic_aug.basic.html#indic_aug.basic.noising.NoisingAugmentor">[docs]</a><span class="k">class</span> <span class="nc">NoisingAugmentor</span><span class="p">(</span><span class="n">Augmentor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Class to augment parallel corpora by blanking/replacement (refer: :cite:t:`xie2017data`).&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_input_path</span><span class="p">,</span> <span class="n">tgt_input_path</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">gamma0</span><span class="p">,</span> <span class="n">augment</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructor method.</span>
+
+<span class="sd">        :param src_input_path: Path to aligned source corpus.</span>
+<span class="sd">        :type src_input_path: str</span>
+<span class="sd">        :param tgt_input_path: Path to aligned target corpus, corresponding to</span>
+<span class="sd">            the above source corpus.</span>
+<span class="sd">        :type tgt_input_path: str</span>
+<span class="sd">        :param mode: Same as for ``noising_aug``.</span>
+<span class="sd">        :type mode: str</span>
+<span class="sd">        :param gamma0: Same as for ``noising_aug``.</span>
+<span class="sd">        :type gamma0: float</span>
+<span class="sd">        :param augment: Performs augmentation if ``True``, else returns original</span>
+<span class="sd">            pair of sentences.</span>
+<span class="sd">        :type augment: bool</span>
+<span class="sd">        :param random_state: Seed for the random number generator.</span>
+<span class="sd">        :type random_state: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">line_count</span><span class="p">(</span><span class="n">src_input_path</span><span class="p">)</span> <span class="o">!=</span> <span class="n">line_count</span><span class="p">(</span><span class="n">tgt_input_path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">ERRORS</span><span class="p">[</span><span class="s1">&#39;corpus_shape&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">doc_count</span> <span class="o">=</span> <span class="n">line_count</span><span class="p">(</span><span class="n">src_input_path</span><span class="p">)</span>
+
+        <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">random_state</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">src_lang</span> <span class="o">=</span> <span class="n">path2lang</span><span class="p">(</span><span class="n">src_input_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tgt_lang</span> <span class="o">=</span> <span class="n">path2lang</span><span class="p">(</span><span class="n">tgt_input_path</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="ow">in</span> <span class="n">VALID_AUG_MODES</span><span class="p">[</span><span class="s1">&#39;noising&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid value of parameter </span><span class="se">\&#39;</span><span class="s1">mode</span><span class="se">\&#39;</span><span class="s1">. Valid values for parameter </span><span class="se">\&#39;</span><span class="s1">mode</span><span class="se">\&#39;</span><span class="s1"> to depparse_aug are values in </span><span class="si">{</span><span class="o">*</span><span class="n">VALID_AUG_MODES</span><span class="p">[</span><span class="s2">&quot;noising&quot;</span><span class="p">],</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">augment</span> <span class="o">=</span> <span class="n">augment</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">augment</span><span class="p">:</span>
+            <span class="c1"># If augment is True, can perform arbitrary number of augmentations</span>
+            <span class="c1"># by cycling through all the sentences in the corpus repeatedly.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">src_input_file</span> <span class="o">=</span> <span class="n">cyclic_read</span><span class="p">(</span><span class="n">src_input_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tgt_input_file</span> <span class="o">=</span> <span class="n">cyclic_read</span><span class="p">(</span><span class="n">tgt_input_path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Else does one pass through the corpus and stops.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">src_input_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">src_input_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tgt_input_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">tgt_input_path</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">gamma0</span> <span class="o">=</span> <span class="n">gamma0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">src_unigram_counts</span> <span class="o">=</span> <span class="n">count_unigrams</span><span class="p">(</span><span class="n">src_input_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tgt_unigram_counts</span> <span class="o">=</span> <span class="n">count_unigrams</span><span class="p">(</span><span class="n">tgt_input_path</span><span class="p">)</span>
+        <span class="n">src_bigram_counts</span> <span class="o">=</span> <span class="n">count_bigrams</span><span class="p">(</span><span class="n">src_input_path</span><span class="p">)</span>
+        <span class="n">tgt_bigram_counts</span> <span class="o">=</span> <span class="n">count_bigrams</span><span class="p">(</span><span class="n">tgt_input_path</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">src_next_sets</span> <span class="o">=</span> <span class="n">find_next_sets</span><span class="p">(</span><span class="n">src_bigram_counts</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tgt_next_sets</span> <span class="o">=</span> <span class="n">find_next_sets</span><span class="p">(</span><span class="n">tgt_bigram_counts</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;kneser_ney&#39;</span><span class="p">:</span>
+            <span class="c1"># Only Kneser-Ney noising requires previous sets.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">src_prev_sets</span> <span class="o">=</span> <span class="n">find_prev_sets</span><span class="p">(</span><span class="n">src_bigram_counts</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tgt_prev_sets</span> <span class="o">=</span> <span class="n">find_prev_sets</span><span class="p">(</span><span class="n">tgt_bigram_counts</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">src_prev_sets</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tgt_prev_sets</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\</span>
+<span class="s1">            NoisingAugmentor</span><span class="se">\n\</span>
+<span class="s1">            </span><span class="se">\t</span><span class="s1">doc_count=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">doc_count</span><span class="si">}</span><span class="se">\n\</span>
+<span class="s1">            </span><span class="se">\t</span><span class="s1">src_input_path=</span><span class="si">{</span><span class="n">src_input_path</span><span class="si">}</span><span class="se">\n\</span>
+<span class="s1">            </span><span class="se">\t</span><span class="s1">tgt_input_path=</span><span class="si">{</span><span class="n">tgt_input_path</span><span class="si">}</span><span class="se">\n\</span>
+<span class="s1">            </span><span class="se">\t</span><span class="s1">src_lang=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">src_lang</span><span class="si">}</span><span class="se">\n\</span>
+<span class="s1">            </span><span class="se">\t</span><span class="s1">tgt_lang=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tgt_lang</span><span class="si">}</span><span class="se">\n\</span>
+<span class="s1">            </span><span class="se">\t</span><span class="s1">gamma0=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">gamma0</span><span class="si">}</span><span class="se">\n\</span>
+<span class="s1">            </span><span class="se">\t</span><span class="s1">mode=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="si">}</span><span class="se">\n\</span>
+<span class="s1">            </span><span class="se">\t</span><span class="s1">random_state=</span><span class="si">{</span><span class="n">random_state</span><span class="si">}</span><span class="se">\n\</span>
+<span class="s1">            Note: Words are 0-indexed.&#39;</span>
+        <span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;-&#39;</span> <span class="o">*</span> <span class="n">NUM_LOGGER_DASHES</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Returning original sentences as they are if self.augment is False.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">augment</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">src_input_file</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">),</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tgt_input_file</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">src_doc</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">src_input_file</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;src_doc: </span><span class="se">\&#39;</span><span class="si">{</span><span class="n">src_doc</span><span class="si">}</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">augmented_src_doc</span> <span class="o">=</span> <span class="n">noising_aug</span><span class="p">(</span><span class="n">src_doc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamma0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">src_unigram_counts</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">src_lang</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">src_next_sets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">src_prev_sets</span><span class="p">)</span>
+
+        <span class="n">tgt_doc</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tgt_input_file</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;tgt_doc: </span><span class="se">\&#39;</span><span class="si">{</span><span class="n">tgt_doc</span><span class="si">}</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">augmented_tgt_doc</span> <span class="o">=</span> <span class="n">noising_aug</span><span class="p">(</span><span class="n">tgt_doc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamma0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tgt_unigram_counts</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tgt_lang</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tgt_next_sets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tgt_prev_sets</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;augmented_src_doc: </span><span class="se">\&#39;</span><span class="si">{</span><span class="n">augmented_src_doc</span><span class="si">}</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;augmented_tgt_doc: </span><span class="se">\&#39;</span><span class="si">{</span><span class="n">augmented_tgt_doc</span><span class="si">}</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;-&#39;</span> <span class="o">*</span> <span class="n">NUM_LOGGER_DASHES</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">augmented_src_doc</span><span class="p">,</span> <span class="n">augmented_tgt_doc</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">doc_count</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Nikhil Kumar.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,322 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>indic_aug.basic.dropout &mdash; indic-aug  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> indic-aug
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/indic_aug.html">indic_aug package</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/references.html">References</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">indic-aug</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>indic_aug.basic.dropout</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for indic_aug.basic.dropout</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">textwrap</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">..globals</span> <span class="kn">import</span> <span class="n">Augmentor</span><span class="p">,</span> <span class="n">ERRORS</span>
+<span class="kn">from</span> <span class="nn">..log</span> <span class="kn">import</span> <span class="n">logger</span><span class="p">,</span> <span class="n">NUM_LOGGER_DASHES</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">cyclic_read</span><span class="p">,</span> <span class="n">path2lang</span><span class="p">,</span> <span class="n">line_count</span><span class="p">,</span> <span class="n">doc2words</span>
+
+<div class="viewcode-block" id="dropout_aug"><a class="viewcode-back" href="../../../docs/indic_aug.basic.html#indic_aug.basic.dropout.dropout_aug">[docs]</a><span class="k">def</span> <span class="nf">dropout_aug</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">lang</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Performs augmentation on a document by dropout (refer: :cite:t:`iyyer2015deep`).</span>
+
+<span class="sd">    :param doc: Document to be augmented.</span>
+<span class="sd">    :type doc: str</span>
+<span class="sd">    :param p: Probability of a word to be dropped.</span>
+<span class="sd">    :type p: float</span>
+<span class="sd">    :param lang: ISO 639-1 language code of ``doc``.</span>
+<span class="sd">    :type lang: str</span>
+
+<span class="sd">    :return: Augmented document.</span>
+<span class="sd">    :rtype: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">augmented_doc</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">word</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">doc2words</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">lang</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">binomial</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Dropped word </span><span class="se">\&#39;</span><span class="si">{</span><span class="n">word</span><span class="si">}</span><span class="se">\&#39;</span><span class="s1"> at index </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+            <span class="c1"># Dropping word with probability p.</span>
+            <span class="k">continue</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">augmented_doc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">augmented_doc</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DropoutAugmentor"><a class="viewcode-back" href="../../../docs/indic_aug.basic.html#indic_aug.basic.dropout.DropoutAugmentor">[docs]</a><span class="k">class</span> <span class="nc">DropoutAugmentor</span><span class="p">(</span><span class="n">Augmentor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Class to augment parallel corpora by dropout (refer:</span>
+<span class="sd">    :cite:t:`iyyer2015deep`).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_input_path</span><span class="p">,</span> <span class="n">tgt_input_path</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">augment</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructor method.</span>
+
+<span class="sd">        :param src_input_path: Path to aligned source corpus.</span>
+<span class="sd">        :type src_input_path: str</span>
+<span class="sd">        :param tgt_input_path: Path to aligned target corpus, corresponding to</span>
+<span class="sd">            the above source corpus.</span>
+<span class="sd">        :type tgt_input_path: str</span>
+<span class="sd">        :param p: Same as for ``dropout_aug``.</span>
+<span class="sd">        :type p: float</span>
+<span class="sd">        :param augment: Performs augmentation if ``True``, else returns original</span>
+<span class="sd">            pair of sentences.</span>
+<span class="sd">        :type augment: bool</span>
+<span class="sd">        :param random_state: Seed for the random number generator.</span>
+<span class="sd">        :type random_state: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">line_count</span><span class="p">(</span><span class="n">src_input_path</span><span class="p">)</span> <span class="o">!=</span> <span class="n">line_count</span><span class="p">(</span><span class="n">tgt_input_path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">ERRORS</span><span class="p">[</span><span class="s1">&#39;corpus_shape&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">doc_count</span> <span class="o">=</span> <span class="n">line_count</span><span class="p">(</span><span class="n">src_input_path</span><span class="p">)</span>
+
+        <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">random_state</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">src_lang</span> <span class="o">=</span> <span class="n">path2lang</span><span class="p">(</span><span class="n">src_input_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tgt_lang</span> <span class="o">=</span> <span class="n">path2lang</span><span class="p">(</span><span class="n">tgt_input_path</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">augment</span> <span class="o">=</span> <span class="n">augment</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">augment</span><span class="p">:</span>
+            <span class="c1"># If augment is True, can perform arbitrary number of augmentations</span>
+            <span class="c1"># by cycling through all the sentences in the corpus repeatedly.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">src_input_file</span> <span class="o">=</span> <span class="n">cyclic_read</span><span class="p">(</span><span class="n">src_input_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tgt_input_file</span> <span class="o">=</span> <span class="n">cyclic_read</span><span class="p">(</span><span class="n">tgt_input_path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Else does one pass through the corpus and stops.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">src_input_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">src_input_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tgt_input_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">tgt_input_path</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\</span>
+<span class="s1">            DropoutAugmentor</span><span class="se">\n\</span>
+<span class="s1">            </span><span class="se">\t</span><span class="s1">doc_count=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">doc_count</span><span class="si">}</span><span class="se">\n\</span>
+<span class="s1">            </span><span class="se">\t</span><span class="s1">src_input_path=</span><span class="si">{</span><span class="n">src_input_path</span><span class="si">}</span><span class="se">\n\</span>
+<span class="s1">            </span><span class="se">\t</span><span class="s1">tgt_input_path=</span><span class="si">{</span><span class="n">tgt_input_path</span><span class="si">}</span><span class="se">\n\</span>
+<span class="s1">            </span><span class="se">\t</span><span class="s1">src_lang=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">src_lang</span><span class="si">}</span><span class="se">\n\</span>
+<span class="s1">            </span><span class="se">\t</span><span class="s1">tgt_lang=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tgt_lang</span><span class="si">}</span><span class="se">\n\</span>
+<span class="s1">            </span><span class="se">\t</span><span class="s1">p=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="si">}</span><span class="se">\n\</span>
+<span class="s1">            </span><span class="se">\t</span><span class="s1">random_state=</span><span class="si">{</span><span class="n">random_state</span><span class="si">}</span><span class="se">\n\</span>
+<span class="s1">            Note: Words are 0-indexed.&#39;</span>
+        <span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;-&#39;</span> <span class="o">*</span> <span class="n">NUM_LOGGER_DASHES</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Returning original sentences as they are if self.augment is False.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">augment</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">src_input_file</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">),</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tgt_input_file</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">src_doc</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">src_input_file</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;src_doc: </span><span class="se">\&#39;</span><span class="si">{</span><span class="n">src_doc</span><span class="si">}</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">augmented_src_doc</span> <span class="o">=</span> <span class="n">dropout_aug</span><span class="p">(</span><span class="n">src_doc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">src_lang</span><span class="p">)</span>
+
+        <span class="n">tgt_doc</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tgt_input_file</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;tgt_doc: </span><span class="se">\&#39;</span><span class="si">{</span><span class="n">tgt_doc</span><span class="si">}</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">augmented_tgt_doc</span> <span class="o">=</span> <span class="n">dropout_aug</span><span class="p">(</span><span class="n">tgt_doc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tgt_lang</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;augmented_src_doc: </span><span class="se">\&#39;</span><span class="si">{</span><span class="n">augmented_src_doc</span><span class="si">}</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;augmented_tgt_doc: </span><span class="se">\&#39;</span><span class="si">{</span><span class="n">augmented_tgt_doc</span><span class="si">}</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;-&#39;</span> <span class="o">*</span> <span class="n">NUM_LOGGER_DASHES</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">augmented_src_doc</span><span class="p">,</span> <span class="n">augmented_tgt_doc</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">doc_count</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Nikhil Kumar.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

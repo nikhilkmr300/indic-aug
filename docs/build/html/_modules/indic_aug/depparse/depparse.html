@@ -1,0 +1,555 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>indic_aug.depparse.depparse &mdash; indic-aug  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> indic-aug
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/indic_aug.html">indic_aug package</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/references.html">References</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">indic-aug</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>indic_aug.depparse.depparse</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for indic_aug.depparse.depparse</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">textwrap</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.special</span> <span class="kn">import</span> <span class="n">softmax</span>
+
+<span class="kn">from</span> <span class="nn">..globals</span> <span class="kn">import</span> <span class="n">Augmentor</span><span class="p">,</span> <span class="n">VALID_AUG_MODES</span><span class="p">,</span> <span class="n">ERRORS</span><span class="p">,</span> <span class="n">PAD_TOKEN</span><span class="p">,</span> <span class="n">UNK_TOKEN</span><span class="p">,</span> <span class="n">SOS_TOKEN</span><span class="p">,</span> <span class="n">EOS_TOKEN</span><span class="p">,</span> <span class="n">BLANK_TOKEN</span>
+<span class="kn">from</span> <span class="nn">..log</span> <span class="kn">import</span> <span class="n">logger</span><span class="p">,</span> <span class="n">NUM_LOGGER_DASHES</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">path2lang</span><span class="p">,</span> <span class="n">cyclic_read</span><span class="p">,</span> <span class="n">stanza2list</span><span class="p">,</span> <span class="n">closest_freq</span><span class="p">,</span> <span class="n">line_count</span><span class="p">,</span> <span class="n">load_stanza_pipeline</span>
+
+<div class="viewcode-block" id="DepParseTree"><a class="viewcode-back" href="../../../docs/indic_aug.depparse.html#indic_aug.depparse.DepParseTree">[docs]</a><span class="k">class</span> <span class="nc">DepParseTree</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Represents a dependency parsing tree.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="DepParseTree.Root"><a class="viewcode-back" href="../../../docs/indic_aug.depparse.html#indic_aug.depparse.DepParseTree.Root">[docs]</a>    <span class="k">class</span> <span class="nc">Root</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Representation of &lt;root&gt; as class with static attribute text for</span>
+<span class="sd">        compatibility with ``stanza.models.common.doc.Word``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;&lt;root&gt;&#39;</span></div>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sent</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructor method.</span>
+
+<span class="sd">        :param sent: Sentence for which dependency parse tree is to be created.</span>
+<span class="sd">            Do NOT pass a `str`.</span>
+<span class="sd">        :type sent: ``stanza.models.common.doc.Sentence``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">words</span> <span class="o">=</span> <span class="n">sent</span><span class="o">.</span><span class="n">words</span>                 <span class="c1"># Words in sentence</span>
+        <span class="c1"># Appending a dummy root as stanza uses 1-based indexing for words in sentence.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">words</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">Root</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">words</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">depths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_depth</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">words</span><span class="p">))])</span>
+
+        <span class="c1"># Sanity check</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">depths</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">words</span><span class="p">)</span>
+
+        <span class="c1"># self.q_probs, self.softmaxed_probs and self.scores are unpopulated until self.score has been called.</span>
+
+    <span class="k">def</span> <span class="nf">_get_depth</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns depth of node in dependency parse tree.</span>
+
+<span class="sd">        :param idx: Index of word in ``self.words`` whose depth is to be found.</span>
+<span class="sd">        :type idx: int</span>
+
+<span class="sd">        :return: Depth of node.</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">idx</span><span class="p">:</span>
+            <span class="c1"># Authors consider depth of root to be 1, so q probability for root is 0.</span>
+            <span class="k">return</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_depth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">words</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DepParseTree.score"><a class="viewcode-back" href="../../../docs/indic_aug.depparse.html#indic_aug.depparse.DepParseTree.score">[docs]</a>    <span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculates score of node in dependency parse tree in accordance with</span>
+<span class="sd">        :cite:t:`duan2020syntax`.</span>
+
+<span class="sd">        :param alpha: Hyperparameter which controls likelihood of changing,</span>
+<span class="sd">            defaults to 0.1.</span>
+<span class="sd">        :type alpha: float, optional</span>
+
+<span class="sd">        :return: Score of node.</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Calculating q-probabilities as defined in the paper.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q_probs</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.</span> <span class="o">**</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">depths</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="c1"># Applying softmax to generate the probability distribution.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">softmaxed_probs</span> <span class="o">=</span> <span class="n">softmax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">q_probs</span><span class="p">)</span>
+        <span class="c1"># Sanity check, sum of softmax probabilities must be 1.</span>
+        <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">softmaxed_probs</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Converting softmax output to scores (note that scores need not sum to 1).</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">softmaxed_probs</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">words</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Equation given in the paper allows values greater than 1.</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Raw score out of range [0, 1]. You might want to consider reducing alpha. Clipping scores to range [0, 1].&#39;</span><span class="p">)</span>
+        <span class="c1"># Clipping values to range [0, 1] as score is used as a probability.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Sanity check</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">depths</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">words</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DepParseTree.save_tree"><a class="viewcode-back" href="../../../docs/indic_aug.depparse.html#indic_aug.depparse.DepParseTree.save_tree">[docs]</a>    <span class="k">def</span> <span class="nf">save_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_path</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="s1">&#39;box&#39;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s1">&#39;filled&#39;</span><span class="p">,</span> <span class="n">fillcolor</span><span class="o">=</span><span class="s1">&#39;mediumorchid&#39;</span><span class="p">,</span> <span class="n">fontname</span><span class="o">=</span><span class="s1">&#39;Courier&#39;</span><span class="p">,</span> <span class="n">fontcolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Saves dependency parse tree to a GraphViz DOT format file.</span>
+
+<span class="sd">        :param output_path: Path to output DOT file.</span>
+<span class="sd">        :type output_path: str</span>
+<span class="sd">        :param shape: Shape of boundary box of node, defaults to &#39;box&#39;. Refer</span>
+<span class="sd">            GraphViz docs for allowed values.</span>
+<span class="sd">        :type shape: str</span>
+<span class="sd">        :param style: Style of node, defaults to &#39;filled&#39;. Refer GraphViz docs</span>
+<span class="sd">            for allowed values.</span>
+<span class="sd">        :type style: str</span>
+<span class="sd">        :param fillcolor: Fill color of node, defaults to &#39;mediumorchid&#39;.</span>
+<span class="sd">            Allowed values are X11 color strings.</span>
+<span class="sd">        :type fillcolor: str</span>
+<span class="sd">        :param fontname: Font to use for node labels, defaults to &#39;Courier&#39;.</span>
+<span class="sd">            Refer GraphViz docs for allowed values.</span>
+<span class="sd">        :type fontname: str</span>
+<span class="sd">        :param fontcolor: Color of font for node labels, defaults to &#39;black&#39;.</span>
+<span class="sd">            Allowed values are X11 color strings.</span>
+<span class="sd">        :type fontcolor: str</span>
+<span class="sd">        :param edgecolor: Color of edges, defaults to &#39;black&#39;. Allowed values</span>
+<span class="sd">            are X11 color strings.</span>
+<span class="sd">        :type edgecolor: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;digraph G {</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+                <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">node&#39;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s1">&#39;[shape=</span><span class="si">{</span><span class="n">shape</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s1">&#39;style=</span><span class="si">{</span><span class="n">style</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s1">&#39;fillcolor=</span><span class="si">{</span><span class="n">fillcolor</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s1">&#39;fontname=</span><span class="si">{</span><span class="n">fontname</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s1">&#39;fontcolor=</span><span class="si">{</span><span class="n">fontcolor</span><span class="si">}</span><span class="s1">];</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="p">]))</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">edge [color=</span><span class="si">{</span><span class="n">edgecolor</span><span class="si">}</span><span class="s1">];</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">word_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">words</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="n">word_idx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="c1"># Root has no parent.</span>
+                    <span class="k">continue</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">words</span><span class="p">[</span><span class="n">word_idx</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="si">}</span><span class="s1"> -&gt; </span><span class="si">{</span><span class="n">word_idx</span><span class="si">}</span><span class="s1">;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">word_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">words</span><span class="p">)):</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="si">{</span><span class="n">word_idx</span><span class="si">}</span><span class="s1"> [label=&quot;</span><span class="si">{</span><span class="n">word_idx</span><span class="si">}</span><span class="s1">:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">index2word</span><span class="p">(</span><span class="n">word_idx</span><span class="p">)</span><span class="si">}</span><span class="s1">&quot;];</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;}&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DepParseTree.index2word"><a class="viewcode-back" href="../../../docs/indic_aug.depparse.html#indic_aug.depparse.DepParseTree.index2word">[docs]</a>    <span class="k">def</span> <span class="nf">index2word</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns word corresponding to an index.</span>
+
+<span class="sd">        :param idx: Index for array ``self.words``.</span>
+<span class="sd">        :type idx: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">words</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">text</span></div>
+
+<div class="viewcode-block" id="DepParseTree.depths2list"><a class="viewcode-back" href="../../../docs/indic_aug.depparse.html#indic_aug.depparse.DepParseTree.depths2list">[docs]</a>    <span class="k">def</span> <span class="nf">depths2list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns depths of all nodes in tree as a list. Each element in the</span>
+<span class="sd">        list is itself a list in the format [&lt;word_index&gt;, &lt;word&gt;, &lt;depth&gt;].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="p">[[</span><span class="n">idx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">index2word</span><span class="p">(</span><span class="n">idx</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">depths</span><span class="p">[</span><span class="n">idx</span><span class="p">]]</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">words</span><span class="p">))]</span></div>
+
+<div class="viewcode-block" id="DepParseTree.qprobs2list"><a class="viewcode-back" href="../../../docs/indic_aug.depparse.html#indic_aug.depparse.DepParseTree.qprobs2list">[docs]</a>    <span class="k">def</span> <span class="nf">qprobs2list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns q-probabilities (refer :cite:t:`duan2020syntax`) of all nodes</span>
+<span class="sd">        in tree as a list. Each element in the list is itself a list in the</span>
+<span class="sd">        format [&lt;word_index&gt;, &lt;word&gt;, &lt;q_probability&gt;].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="p">[[</span><span class="n">idx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">index2word</span><span class="p">(</span><span class="n">idx</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">q_probs</span><span class="p">[</span><span class="n">idx</span><span class="p">]]</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">words</span><span class="p">))]</span></div>
+
+<div class="viewcode-block" id="DepParseTree.softmax2list"><a class="viewcode-back" href="../../../docs/indic_aug.depparse.html#indic_aug.depparse.DepParseTree.softmax2list">[docs]</a>    <span class="k">def</span> <span class="nf">softmax2list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns softmax output (refer :cite:t:`duan2020syntax`) of all nodes</span>
+<span class="sd">        in tree as a list. Each element in the list is itself a list in the</span>
+<span class="sd">        format [&lt;word_index&gt;, &lt;word&gt;, &lt;softmax_output&gt;].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="p">[[</span><span class="n">idx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">index2word</span><span class="p">(</span><span class="n">idx</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">softmaxed_probs</span><span class="p">[</span><span class="n">idx</span><span class="p">]]</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">words</span><span class="p">))]</span></div>
+
+<div class="viewcode-block" id="DepParseTree.scores2list"><a class="viewcode-back" href="../../../docs/indic_aug.depparse.html#indic_aug.depparse.DepParseTree.scores2list">[docs]</a>    <span class="k">def</span> <span class="nf">scores2list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns score (refer :cite:t:`duan2020syntax`) of all nodes in tree</span>
+<span class="sd">        as a list. Each element in the list is itself a list in the format</span>
+<span class="sd">        [&lt;word_index&gt;, &lt;word&gt;, &lt;score&gt;].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="p">[[</span><span class="n">idx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">index2word</span><span class="p">(</span><span class="n">idx</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="p">[</span><span class="n">idx</span><span class="p">]]</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">words</span><span class="p">))]</span></div></div>
+
+<div class="viewcode-block" id="depparse_aug"><a class="viewcode-back" href="../../../docs/indic_aug.depparse.html#indic_aug.depparse.depparse_aug">[docs]</a><span class="k">def</span> <span class="nf">depparse_aug</span><span class="p">(</span><span class="n">sent</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">freq_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Performs augmentation on one sentence (and NOT a document of sentences,</span>
+<span class="sd">    as some of the other augmentorss) by dependency parsing (refer</span>
+<span class="sd">    :cite:t:`duan2020syntax`).</span>
+
+<span class="sd">    ``freq_dict`` is required only if ``mode`` is &#39;replace&#39;, it is ignored</span>
+<span class="sd">    otherwise.</span>
+
+<span class="sd">    :param sent: Sentence to be augmented. Do NOT pass a str or a list of str.</span>
+<span class="sd">    :type sent: ``stanza.models.common.doc.Sentence``</span>
+<span class="sd">    :param mode: Action to perform after scores are extracted. Valid values are</span>
+<span class="sd">        given in globals.py.</span>
+<span class="sd">    :type mode: str</span>
+<span class="sd">    :param alpha: Same as for ``DepParseTree.score``.</span>
+<span class="sd">    :type alpha: float</span>
+<span class="sd">    :param freq_dict: Dictionary of word-frequency pairs as returned by</span>
+<span class="sd">        ``vocab.score2freq_vocab``, defaults to None.</span>
+<span class="sd">    :type freq_dict: dict, optional</span>
+
+<span class="sd">    :return: Augmented sentence.</span>
+<span class="sd">    :rtype: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;replace_freq&#39;</span> <span class="ow">and</span> <span class="n">freq_dict</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">ERRORS</span><span class="p">[</span><span class="s1">&#39;freq_dict_compulsory&#39;</span><span class="p">])</span>
+
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">DepParseTree</span><span class="p">(</span><span class="n">sent</span><span class="p">)</span>                   <span class="c1"># Dependency parse tree for sentence.</span>
+    <span class="n">tree</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">)</span>
+
+    <span class="c1"># Converting stanza sentence to simple list as we no longer need the extra</span>
+    <span class="c1"># stuff.</span>
+    <span class="n">sent</span> <span class="o">=</span> <span class="n">stanza2list</span><span class="p">(</span><span class="n">sent</span><span class="p">)</span>
+
+    <span class="n">scores</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">scores</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>                    <span class="c1"># Dropping score related to root as it is not required.</span>
+    <span class="c1"># Sanity check</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">sent</span><span class="p">)</span>             <span class="c1"># After removing score for &lt;root&gt;, lengths should match.</span>
+
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">word</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sent</span><span class="p">):</span>
+        <span class="c1"># Not replacing special tokens.</span>
+        <span class="k">if</span> <span class="n">word</span> <span class="ow">in</span> <span class="p">{</span><span class="n">UNK_TOKEN</span><span class="p">,</span> <span class="n">PAD_TOKEN</span><span class="p">,</span> <span class="n">SOS_TOKEN</span><span class="p">,</span> <span class="n">EOS_TOKEN</span><span class="p">,</span> <span class="n">BLANK_TOKEN</span><span class="p">}:</span>
+            <span class="k">continue</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">binomial</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">scores</span><span class="p">[</span><span class="n">idx</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;blank&#39;</span><span class="p">:</span>
+                <span class="c1"># Blanking with probability scores[idx].</span>
+                <span class="n">sent</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">BLANK_TOKEN</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Blanked word </span><span class="se">\&#39;</span><span class="si">{</span><span class="n">word</span><span class="si">}</span><span class="se">\&#39;</span><span class="s1"> at index </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;dropout&#39;</span><span class="p">:</span>
+                <span class="c1"># Dropping word with probability scores[idx].</span>
+                <span class="n">sent</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Dropped word </span><span class="se">\&#39;</span><span class="si">{</span><span class="n">word</span><span class="si">}</span><span class="se">\&#39;</span><span class="s1"> at index </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;replace_freq&#39;</span><span class="p">:</span>
+                <span class="c1"># Replacing word with probability scores[idx].</span>
+                <span class="n">replacement</span> <span class="o">=</span> <span class="n">closest_freq</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="n">freq_dict</span><span class="p">)</span>
+                <span class="n">sent</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">replacement</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Replaced word </span><span class="se">\&#39;</span><span class="si">{</span><span class="n">word</span><span class="si">}</span><span class="se">\&#39;</span><span class="s1"> at index </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s1"> with </span><span class="se">\&#39;</span><span class="si">{</span><span class="n">replacement</span><span class="si">}</span><span class="se">\&#39;</span><span class="s1">.&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid value of parameter </span><span class="se">\&#39;</span><span class="s1">mode</span><span class="se">\&#39;</span><span class="s1">. Valid values for parameter </span><span class="se">\&#39;</span><span class="s1">mode</span><span class="se">\&#39;</span><span class="s1"> to depparse_aug are values in </span><span class="si">{</span><span class="o">*</span><span class="n">VALID_AUG_MODES</span><span class="p">[</span><span class="s2">&quot;depparse&quot;</span><span class="p">],</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Stripping any extra whitespace that has been introduced by dropout.</span>
+    <span class="n">sent</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">sent</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sent</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DepParseAugmentor"><a class="viewcode-back" href="../../../docs/indic_aug.depparse.html#indic_aug.depparse.DepParseAugmentor">[docs]</a><span class="k">class</span> <span class="nc">DepParseAugmentor</span><span class="p">(</span><span class="n">Augmentor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Class to augment parallel corpora by dependency parsing technique (refer:</span>
+<span class="sd">    :cite:t:`duan2020syntax`).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_input_path</span><span class="p">,</span> <span class="n">tgt_input_path</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">src_freq_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tgt_freq_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stanza_dir</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span> <span class="o">/</span> <span class="s1">&#39;stanza_resources&#39;</span><span class="p">),</span> <span class="n">augment</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructor method.</span>
+
+<span class="sd">        :param src_input_path: Path to aligned source corpus.</span>
+<span class="sd">        :type src_input_path: str</span>
+<span class="sd">        :param tgt_input_path: Path to aligned target corpus, corresponding to</span>
+<span class="sd">            the above source corpus.</span>
+<span class="sd">        :type tgt_input_path: str</span>
+<span class="sd">        :param mode: Same as for ``depparse_aug``.</span>
+<span class="sd">        :type mode: str</span>
+<span class="sd">        :param alpha: Same as for ``DepParseTree``.</span>
+<span class="sd">        :type alpha: float</span>
+<span class="sd">        :param src_freq_dict: Same as for ``freq_dict`` in</span>
+<span class="sd">            ``transforms.depparse_aug``.</span>
+<span class="sd">        :type src_freq_dict: dict</span>
+<span class="sd">        :param tgt_freq_dict: Same as for ``freq_dict`` in</span>
+<span class="sd">            ``transforms.depparse_aug``.</span>
+<span class="sd">        :type tgt_freq_dict: dict</span>
+<span class="sd">        :param stanza_dir: Path to directory containing stanza models (the</span>
+<span class="sd">            default is ``~/stanza_resources`` on doing a ``stanza.download``).</span>
+<span class="sd">        :type stanza_dir: str</span>
+<span class="sd">        :param augment: Performs augmentation if ``True``, else returns original</span>
+<span class="sd">            pair of sentences.</span>
+<span class="sd">        :type augment: bool</span>
+<span class="sd">        :param random_state: Seed for the random number generator.</span>
+<span class="sd">        :type random_state: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">line_count</span><span class="p">(</span><span class="n">src_input_path</span><span class="p">)</span> <span class="o">!=</span> <span class="n">line_count</span><span class="p">(</span><span class="n">tgt_input_path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">ERRORS</span><span class="p">[</span><span class="s1">&#39;corpus_shape&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">doc_count</span> <span class="o">=</span> <span class="n">line_count</span><span class="p">(</span><span class="n">src_input_path</span><span class="p">)</span>
+
+        <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">random_state</span><span class="p">)</span>
+
+        <span class="n">src_lang</span> <span class="o">=</span> <span class="n">path2lang</span><span class="p">(</span><span class="n">src_input_path</span><span class="p">)</span>
+        <span class="n">tgt_lang</span> <span class="o">=</span> <span class="n">path2lang</span><span class="p">(</span><span class="n">tgt_input_path</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">augment</span> <span class="o">=</span> <span class="n">augment</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">augment</span><span class="p">:</span>
+            <span class="c1"># If augment is True, can perform arbitrary number of augmentations</span>
+            <span class="c1"># by cycling through all the sentences in the corpus repeatedly.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">src_input_file</span> <span class="o">=</span> <span class="n">cyclic_read</span><span class="p">(</span><span class="n">src_input_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tgt_input_file</span> <span class="o">=</span> <span class="n">cyclic_read</span><span class="p">(</span><span class="n">tgt_input_path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Else does one pass through the corpus and stops.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">src_input_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">src_input_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tgt_input_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">tgt_input_path</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">src_freq_dict</span> <span class="o">=</span> <span class="n">src_freq_dict</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tgt_freq_dict</span> <span class="o">=</span> <span class="n">tgt_freq_dict</span>
+
+        <span class="c1"># Loading stanza pipeline for source and target languages to convert</span>
+        <span class="c1"># string to stanza.models.common.doc.Sentence.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">src_pipeline</span> <span class="o">=</span> <span class="n">load_stanza_pipeline</span><span class="p">(</span><span class="n">src_lang</span><span class="p">,</span> <span class="n">stanza_dir</span><span class="o">=</span><span class="n">stanza_dir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tgt_pipeline</span> <span class="o">=</span> <span class="n">load_stanza_pipeline</span><span class="p">(</span><span class="n">tgt_lang</span><span class="p">,</span> <span class="n">stanza_dir</span><span class="o">=</span><span class="n">stanza_dir</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\</span>
+<span class="s1">            DepParseAugmentor</span><span class="se">\n\</span>
+<span class="s1">            </span><span class="se">\t</span><span class="s1">doc_count=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">doc_count</span><span class="si">}</span><span class="se">\n\</span>
+<span class="s1">            </span><span class="se">\t</span><span class="s1">src_input_path=</span><span class="si">{</span><span class="n">src_input_path</span><span class="si">}</span><span class="se">\n\</span>
+<span class="s1">            </span><span class="se">\t</span><span class="s1">tgt_input_path=</span><span class="si">{</span><span class="n">tgt_input_path</span><span class="si">}</span><span class="se">\n\</span>
+<span class="s1">            </span><span class="se">\t</span><span class="s1">src_lang=</span><span class="si">{</span><span class="n">src_lang</span><span class="si">}</span><span class="se">\n\</span>
+<span class="s1">            </span><span class="se">\t</span><span class="s1">tgt_lang=</span><span class="si">{</span><span class="n">tgt_lang</span><span class="si">}</span><span class="se">\n\</span>
+<span class="s1">            </span><span class="se">\t</span><span class="s1">mode=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="si">}</span><span class="se">\n\</span>
+<span class="s1">            </span><span class="se">\t</span><span class="s1">alpha=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="si">}</span><span class="se">\n\</span>
+<span class="s1">            </span><span class="se">\t</span><span class="s1">random_state=</span><span class="si">{</span><span class="n">random_state</span><span class="si">}</span><span class="se">\n\</span>
+<span class="s1">            Note: Words are 0-indexed.&#39;</span>
+        <span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;-&#39;</span> <span class="o">*</span> <span class="n">NUM_LOGGER_DASHES</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Returning original sentences as they are if self.augment is False.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">augment</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">src_input_file</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">),</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tgt_input_file</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">src_doc</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">src_input_file</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;src_doc: </span><span class="se">\&#39;</span><span class="si">{</span><span class="n">src_doc</span><span class="si">}</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">src_doc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">src_pipeline</span><span class="p">(</span><span class="n">src_doc</span><span class="p">)</span>
+        <span class="n">augmented_src_doc</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">src_sent</span> <span class="ow">in</span> <span class="n">src_doc</span><span class="o">.</span><span class="n">sentences</span><span class="p">:</span>
+            <span class="n">augmented_src_doc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">depparse_aug</span><span class="p">(</span><span class="n">src_sent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">src_freq_dict</span><span class="p">))</span>
+
+        <span class="n">tgt_doc</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tgt_input_file</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;tgt_doc: </span><span class="se">\&#39;</span><span class="si">{</span><span class="n">tgt_doc</span><span class="si">}</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">tgt_doc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tgt_pipeline</span><span class="p">(</span><span class="n">tgt_doc</span><span class="p">)</span>
+        <span class="n">augmented_tgt_doc</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">tgt_sent</span> <span class="ow">in</span> <span class="n">tgt_doc</span><span class="o">.</span><span class="n">sentences</span><span class="p">:</span>
+            <span class="n">augmented_tgt_doc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">depparse_aug</span><span class="p">(</span><span class="n">tgt_sent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tgt_freq_dict</span><span class="p">))</span>
+
+        <span class="c1"># Joining all sentences in document.</span>
+        <span class="n">augmented_src_doc</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">augmented_src_doc</span><span class="p">)</span>
+        <span class="n">augmented_tgt_doc</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">augmented_tgt_doc</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;augmented_src_doc: </span><span class="se">\&#39;</span><span class="si">{</span><span class="n">augmented_src_doc</span><span class="si">}</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;augmented_tgt_doc: </span><span class="se">\&#39;</span><span class="si">{</span><span class="n">augmented_tgt_doc</span><span class="si">}</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;-&#39;</span> <span class="o">*</span> <span class="n">NUM_LOGGER_DASHES</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">augmented_src_doc</span><span class="p">,</span> <span class="n">augmented_tgt_doc</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">doc_count</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Nikhil Kumar.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

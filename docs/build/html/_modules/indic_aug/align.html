@@ -1,0 +1,441 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>indic_aug.align &mdash; indic-aug  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> indic-aug
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../docs/indic_aug.html">indic_aug package</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../docs/references.html">References</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">indic-aug</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>indic_aug.align</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for indic_aug.align</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">dill</span> <span class="k">as</span> <span class="nn">pickle</span>
+<span class="kn">from</span> <span class="nn">nltk.translate</span> <span class="kn">import</span> <span class="n">AlignedSent</span><span class="p">,</span> <span class="n">Alignment</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+
+<span class="kn">from</span> <span class="nn">.globals</span> <span class="kn">import</span> <span class="n">ERRORS</span><span class="p">,</span> <span class="n">UNK_TOKEN</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">path2lang</span><span class="p">,</span> <span class="n">line_count</span><span class="p">,</span> <span class="n">doc2words</span>
+
+<span class="n">ALIGNER_MODELS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;ibm1&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ibm2&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ibm3&#39;</span>
+<span class="p">]</span>
+
+<div class="viewcode-block" id="Aligner"><a class="viewcode-back" href="../../docs/indic_aug.html#indic_aug.align.Aligner">[docs]</a><span class="k">class</span> <span class="nc">Aligner</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Class to perform bitext word alignment using the IBM Models.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_type</span><span class="p">,</span> <span class="n">iters</span><span class="p">,</span> <span class="n">max_tokens</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructor method.</span>
+
+<span class="sd">        :param model_type: Variant of IBM Model to use, one of </span>
+<span class="sd">            (&#39;ibm1&#39;, &#39;ibm2&#39;, &#39;ibm3&#39;). </span>
+<span class="sd">        :type model_type: str</span>
+<span class="sd">        :param iters: Number of iterations to train the model.</span>
+<span class="sd">        :type iters: int</span>
+<span class="sd">        :param max_tokens: Documents with number of tokens greater than</span>
+<span class="sd">            ``max_tokens`` will not be used for training, pass ``None`` to use</span>
+<span class="sd">            all documents, defaults to ``None``.</span>
+<span class="sd">        :type max_tokens: int, optional</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">model_type</span> <span class="ow">in</span> <span class="n">ALIGNER_MODELS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;model_type must be one of the values in </span><span class="si">{</span><span class="o">*</span><span class="n">ALIGNER_MODELS</span><span class="p">,</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">=</span> <span class="n">model_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iters</span> <span class="o">=</span> <span class="n">iters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_tokens</span> <span class="o">=</span> <span class="n">max_tokens</span>
+
+    <span class="k">def</span> <span class="nf">_load_bitext</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Loads documents in source and target corpora as</span>
+<span class="sd">        ``nltk.translate.AlignedSent`` objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">line_count</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">src_input_path</span><span class="p">)</span> <span class="o">!=</span> <span class="n">line_count</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tgt_input_path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">ERRORS</span><span class="p">[</span><span class="s1">&#39;corpus_shape&#39;</span><span class="p">])</span>
+
+        <span class="n">bitext</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+        <span class="n">src_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">src_input_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">tgt_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tgt_input_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">src_doc</span><span class="p">,</span> <span class="n">tgt_doc</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">src_file</span><span class="p">,</span> <span class="n">tgt_file</span><span class="p">):</span>
+            <span class="n">src_words</span> <span class="o">=</span> <span class="n">doc2words</span><span class="p">(</span><span class="n">src_doc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">src_lang</span><span class="p">)</span>
+            <span class="n">tgt_words</span> <span class="o">=</span> <span class="n">doc2words</span><span class="p">(</span><span class="n">tgt_doc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tgt_lang</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_tokens</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">bitext</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">AlignedSent</span><span class="p">(</span><span class="n">tgt_words</span><span class="p">,</span> <span class="n">src_words</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">src_words</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_tokens</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">tgt_words</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_tokens</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Dropping parallel documents with </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">src_words</span><span class="p">)</span><span class="si">}</span><span class="s1"> source tokens and </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">tgt_words</span><span class="p">)</span><span class="si">}</span><span class="s1"> target tokens.&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">bitext</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">AlignedSent</span><span class="p">(</span><span class="n">tgt_words</span><span class="p">,</span> <span class="n">src_words</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">bitext</span>
+
+<div class="viewcode-block" id="Aligner.train"><a class="viewcode-back" href="../../docs/indic_aug.html#indic_aug.align.Aligner.train">[docs]</a>    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_input_path</span><span class="p">,</span> <span class="n">tgt_input_path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Runs training iterations of IBM Model.</span>
+
+<span class="sd">        :param src_input_path: Path to source parallel corpus.</span>
+<span class="sd">        :type src_input_path: str</span>
+<span class="sd">        :param tgt_input_path: Path to target parallel corpus corresponding to</span>
+<span class="sd">            above source corpus.</span>
+<span class="sd">        :type tgt_input_path: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">src_input_path</span> <span class="o">=</span> <span class="n">src_input_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tgt_input_path</span> <span class="o">=</span> <span class="n">tgt_input_path</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">src_lang</span> <span class="o">=</span> <span class="n">path2lang</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">src_input_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tgt_lang</span> <span class="o">=</span> <span class="n">path2lang</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tgt_input_path</span><span class="p">)</span>
+
+        <span class="n">bitext</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_bitext</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s1">&#39;ibm1&#39;</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">nltk.translate.ibm1</span> <span class="kn">import</span> <span class="n">IBMModel1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">IBMModel1</span><span class="p">(</span><span class="n">bitext</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">iters</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s1">&#39;ibm2&#39;</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">nltk.translate.ibm2</span> <span class="kn">import</span> <span class="n">IBMModel2</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">IBMModel2</span><span class="p">(</span><span class="n">bitext</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">iters</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s1">&#39;ibm3&#39;</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">nltk.translate.ibm3</span> <span class="kn">import</span> <span class="n">IBMModel3</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">IBMModel3</span><span class="p">(</span><span class="n">bitext</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">iters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Aligner.tgt2src"><a class="viewcode-back" href="../../docs/indic_aug.html#indic_aug.align.Aligner.tgt2src">[docs]</a>    <span class="k">def</span> <span class="nf">tgt2src</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tgt_word</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the word in source corpus which has the highest alignment</span>
+<span class="sd">        score corresponding to ``tgt_word`` in target corpus.</span>
+
+<span class="sd">        :param tgt_word: Word in target corpus whose corresponding aligned word</span>
+<span class="sd">            in source corpus is to be found.</span>
+<span class="sd">        :type word: str</span>
+
+<span class="sd">        :return: Best aligned word in source corpus.</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">aligned</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">max_score</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">translation_table</span><span class="p">[</span><span class="n">tgt_word</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="n">ERRORS</span><span class="p">[</span><span class="s1">&#39;call_train&#39;</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">aligned_candidate</span><span class="p">,</span> <span class="n">score</span> <span class="ow">in</span> <span class="n">scores</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">score</span> <span class="o">&gt;</span> <span class="n">max_score</span><span class="p">:</span>
+                <span class="n">max_score</span> <span class="o">=</span> <span class="n">score</span>
+                <span class="n">aligned</span> <span class="o">=</span> <span class="n">aligned_candidate</span>
+
+        <span class="k">return</span> <span class="n">aligned</span></div>
+
+<div class="viewcode-block" id="Aligner.src2tgt"><a class="viewcode-back" href="../../docs/indic_aug.html#indic_aug.align.Aligner.src2tgt">[docs]</a>    <span class="k">def</span> <span class="nf">src2tgt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_word</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a word in target corpus which has the highest alignment</span>
+<span class="sd">        score corresponding to ``src_word`` in source corpus.</span>
+
+<span class="sd">        :param src_word: Word in source corpus whose corresponding aligned word</span>
+<span class="sd">            in target corpus is to be found.</span>
+<span class="sd">        :type word: str</span>
+
+<span class="sd">        :return: Best aligned word in target corpus.</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">aligned</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">max_score</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">tgt_word</span><span class="p">,</span> <span class="n">src_words</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">translation_table</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">src_word</span> <span class="ow">in</span> <span class="n">src_words</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">translation_table</span><span class="p">[</span><span class="n">tgt_word</span><span class="p">][</span><span class="n">src_word</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">score</span> <span class="o">&gt;</span> <span class="n">max_score</span><span class="p">:</span>
+                    <span class="n">max_score</span> <span class="o">=</span> <span class="n">score</span>
+                    <span class="n">aligned</span> <span class="o">=</span> <span class="n">tgt_word</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+        <span class="k">return</span> <span class="n">aligned</span></div>
+
+<div class="viewcode-block" id="Aligner.align"><a class="viewcode-back" href="../../docs/indic_aug.html#indic_aug.align.Aligner.align">[docs]</a>    <span class="k">def</span> <span class="nf">align</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_sent</span><span class="p">,</span> <span class="n">tgt_sent</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Given a sentence in the source language and a sentence in the target</span>
+<span class="sd">        language, outputs the values of the alignment function from words in the</span>
+<span class="sd">        target sentence to words in the source sentence.</span>
+
+<span class="sd">        :param src_sent: Source sentence</span>
+<span class="sd">        :type src_sent: str</span>
+<span class="sd">        :param tgt_sent: Target sentence</span>
+<span class="sd">        :type tgt_sent: str</span>
+
+<span class="sd">        :return: Aligned sentences</span>
+<span class="sd">        :rtype: ``nltk.translate.AlignedSent``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">sentence_pair</span> <span class="o">=</span> <span class="n">AlignedSent</span><span class="p">(</span><span class="n">tgt_sent</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">),</span> <span class="n">src_sent</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">align</span><span class="p">(</span><span class="n">sentence_pair</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">sentence_pair</span></div>
+
+<div class="viewcode-block" id="Aligner.plot_alignment"><a class="viewcode-back" href="../../docs/indic_aug.html#indic_aug.align.Aligner.plot_alignment">[docs]</a>    <span class="k">def</span> <span class="nf">plot_alignment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_sent</span><span class="p">,</span> <span class="n">tgt_sent</span><span class="p">,</span> <span class="n">font_family</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">5</span><span class="p">)):</span>
+        <span class="sd">&quot;&quot;&quot;Given a sentence in the source language and a sentence in the target</span>
+<span class="sd">        language, plots the values of the alignment function from words in the</span>
+<span class="sd">        target sentence to words in the source sentence as a heatmap.</span>
+
+<span class="sd">        :param src_sent: Source sentence</span>
+<span class="sd">        :type src_sent: str</span>
+<span class="sd">        :param tgt_sent: Target sentence</span>
+<span class="sd">        :type tgt_sent: str</span>
+<span class="sd">        :param font_family: Font family to be passed to ``seaborn.set_theme``.</span>
+<span class="sd">            Recommended are any of the relevant Sangam MN fonts for MacOS.</span>
+<span class="sd">        :type font_family: str</span>
+<span class="sd">        :param figsize: Size of generated heatmap.</span>
+<span class="sd">        :type figsize: 2-tuple</span>
+
+<span class="sd">        :return: Aligned sentences</span>
+<span class="sd">        :rtype: ``nltk.translate.AlignedSent``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">translation_table</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="n">ERRORS</span><span class="p">[</span><span class="s1">&#39;call_train&#39;</span><span class="p">])</span>
+
+        <span class="n">src_words</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">+</span> <span class="n">src_sent</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>    <span class="c1"># Prepending None for target words not aligned to any word.</span>
+        <span class="n">tgt_words</span> <span class="o">=</span> <span class="n">tgt_sent</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+
+        <span class="n">sns</span><span class="o">.</span><span class="n">set_theme</span><span class="p">(</span><span class="n">font</span><span class="o">=</span><span class="n">font_family</span><span class="p">)</span>
+
+        <span class="n">alignment_matrix</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">tgt_words</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">src_words</span><span class="p">))),</span> <span class="n">index</span><span class="o">=</span><span class="n">tgt_words</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">src_words</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">tgt_word</span> <span class="ow">in</span> <span class="n">tgt_words</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">src_word</span> <span class="ow">in</span> <span class="n">src_words</span><span class="p">:</span>
+                <span class="n">alignment_matrix</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">tgt_word</span><span class="p">,</span> <span class="n">src_word</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">translation_table</span><span class="p">[</span><span class="n">tgt_word</span><span class="p">][</span><span class="n">src_word</span><span class="p">]</span>
+
+        <span class="c1"># Changing index None to &#39;None&#39; so it is visible in the heatmap.</span>
+        <span class="n">alignment_matrix</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;None&#39;</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">alignment_matrix</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Aligner.serialize"><a class="viewcode-back" href="../../docs/indic_aug.html#indic_aug.align.Aligner.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Saves this object to disk. Use ``dill`` to save serialized object,</span>
+<span class="sd">        not ``pickle``.</span>
+
+<span class="sd">        :param path: Path where to save object.</span>
+<span class="sd">        :type path: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Aligner.load"><a class="viewcode-back" href="../../docs/indic_aug.html#indic_aug.align.Aligner.load">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Loads object from disk. Use ``dill`` to save serialized object, not</span>
+<span class="sd">        ``pickle``.</span>
+
+<span class="sd">        :param path: Path from where to load object.</span>
+<span class="sd">        :type path: str</span>
+
+<span class="sd">        :return: Aligner object stored at path.</span>
+<span class="sd">        :rtype: ``align.Aligner``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Nikhil Kumar.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

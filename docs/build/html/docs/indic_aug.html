@@ -1,0 +1,932 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>indic_aug package &mdash; indic-aug  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="indic_aug.basic package" href="indic_aug.basic.html" />
+    <link rel="prev" title="Welcome to indic-aug’s documentation!" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> indic-aug
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">indic_aug package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="indic_aug.basic.html">indic_aug.basic package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="indic_aug.depparse.html">indic_aug.depparse package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="indic_aug.embedding.html">indic_aug.embedding package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="indic_aug.lm.html">indic_aug.lm package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="indic_aug.tda.html">indic_aug.tda package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-indic_aug.align">indic_aug.align module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-indic_aug.globals">indic_aug.globals module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-indic_aug.preprocess">indic_aug.preprocess module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-indic_aug.utils">indic_aug.utils module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-indic_aug.vocab">indic_aug.vocab module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">indic-aug</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>indic_aug package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/docs/indic_aug.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="indic-aug-package">
+<h1>indic_aug package<a class="headerlink" href="#indic-aug-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="indic_aug.basic.html">indic_aug.basic package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="indic_aug.basic.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="indic_aug.basic.html#module-indic_aug.basic.dropout">indic_aug.basic.dropout module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="indic_aug.basic.html#module-indic_aug.basic.noising">indic_aug.basic.noising module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="indic_aug.basic.html#module-indic_aug.basic.synonym">indic_aug.basic.synonym module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="indic_aug.depparse.html">indic_aug.depparse package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="indic_aug.depparse.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="indic_aug.depparse.html#module-indic_aug.depparse.depparse">indic_aug.depparse.depparse module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="indic_aug.embedding.html">indic_aug.embedding package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="indic_aug.lm.html">indic_aug.lm package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="indic_aug.lm.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="indic_aug.lm.html#module-indic_aug.lm.load">indic_aug.lm.load module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="indic_aug.tda.html">indic_aug.tda package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="indic_aug.tda.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="indic_aug.tda.html#module-indic_aug.tda.tda">indic_aug.tda.tda module</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-indic_aug.align">
+<span id="indic-aug-align-module"></span><h3>indic_aug.align module<a class="headerlink" href="#module-indic_aug.align" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="indic_aug.align.Aligner">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">indic_aug.align.</span></span><span class="sig-name descname"><span class="pre">Aligner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_tokens</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/indic_aug/align.html#Aligner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.align.Aligner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class to perform bitext word alignment using the IBM Models.</p>
+<p>Constructor method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_type</strong> (<em>str</em>) – Variant of IBM Model to use, one of 
+(‘ibm1’, ‘ibm2’, ‘ibm3’).</p></li>
+<li><p><strong>iters</strong> (<em>int</em>) – Number of iterations to train the model.</p></li>
+<li><p><strong>max_tokens</strong> (<em>int</em><em>, </em><em>optional</em>) – Documents with number of tokens greater than
+<code class="docutils literal notranslate"><span class="pre">max_tokens</span></code> will not be used for training, pass <code class="docutils literal notranslate"><span class="pre">None</span></code> to use
+all documents, defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="indic_aug.align.Aligner.align">
+<span class="sig-name descname"><span class="pre">align</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src_sent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tgt_sent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/indic_aug/align.html#Aligner.align"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.align.Aligner.align" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a sentence in the source language and a sentence in the target
+language, outputs the values of the alignment function from words in the
+target sentence to words in the source sentence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src_sent</strong> (<em>str</em>) – Source sentence</p></li>
+<li><p><strong>tgt_sent</strong> (<em>str</em>) – Target sentence</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Aligned sentences</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">nltk.translate.AlignedSent</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="indic_aug.align.Aligner.load">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/indic_aug/align.html#Aligner.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.align.Aligner.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads object from disk. Use <code class="docutils literal notranslate"><span class="pre">dill</span></code> to save serialized object, not
+<code class="docutils literal notranslate"><span class="pre">pickle</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>path</strong> (<em>str</em>) – Path from where to load object.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Aligner object stored at path.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">align.Aligner</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="indic_aug.align.Aligner.plot_alignment">
+<span class="sig-name descname"><span class="pre">plot_alignment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src_sent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tgt_sent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_family</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(7,</span> <span class="pre">5)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/indic_aug/align.html#Aligner.plot_alignment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.align.Aligner.plot_alignment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a sentence in the source language and a sentence in the target
+language, plots the values of the alignment function from words in the
+target sentence to words in the source sentence as a heatmap.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src_sent</strong> (<em>str</em>) – Source sentence</p></li>
+<li><p><strong>tgt_sent</strong> (<em>str</em>) – Target sentence</p></li>
+<li><p><strong>font_family</strong> (<em>str</em>) – Font family to be passed to <code class="docutils literal notranslate"><span class="pre">seaborn.set_theme</span></code>.
+Recommended are any of the relevant Sangam MN fonts for MacOS.</p></li>
+<li><p><strong>figsize</strong> (<em>2-tuple</em>) – Size of generated heatmap.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Aligned sentences</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">nltk.translate.AlignedSent</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="indic_aug.align.Aligner.serialize">
+<span class="sig-name descname"><span class="pre">serialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/indic_aug/align.html#Aligner.serialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.align.Aligner.serialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves this object to disk. Use <code class="docutils literal notranslate"><span class="pre">dill</span></code> to save serialized object,
+not <code class="docutils literal notranslate"><span class="pre">pickle</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>path</strong> (<em>str</em>) – Path where to save object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="indic_aug.align.Aligner.src2tgt">
+<span class="sig-name descname"><span class="pre">src2tgt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src_word</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/indic_aug/align.html#Aligner.src2tgt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.align.Aligner.src2tgt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a word in target corpus which has the highest alignment
+score corresponding to <code class="docutils literal notranslate"><span class="pre">src_word</span></code> in source corpus.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>src_word</strong> – Word in source corpus whose corresponding aligned word
+in target corpus is to be found.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Best aligned word in target corpus.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="indic_aug.align.Aligner.tgt2src">
+<span class="sig-name descname"><span class="pre">tgt2src</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tgt_word</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/indic_aug/align.html#Aligner.tgt2src"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.align.Aligner.tgt2src" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the word in source corpus which has the highest alignment
+score corresponding to <code class="docutils literal notranslate"><span class="pre">tgt_word</span></code> in target corpus.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>tgt_word</strong> – Word in target corpus whose corresponding aligned word
+in source corpus is to be found.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Best aligned word in source corpus.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="indic_aug.align.Aligner.train">
+<span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src_input_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tgt_input_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/indic_aug/align.html#Aligner.train"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.align.Aligner.train" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs training iterations of IBM Model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src_input_path</strong> (<em>str</em>) – Path to source parallel corpus.</p></li>
+<li><p><strong>tgt_input_path</strong> (<em>str</em>) – Path to target parallel corpus corresponding to
+above source corpus.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-indic_aug.globals">
+<span id="indic-aug-globals-module"></span><h3>indic_aug.globals module<a class="headerlink" href="#module-indic_aug.globals" title="Permalink to this headline">¶</a></h3>
+<p>Module to contain variables that are required in multiple places.</p>
+<dl class="py data">
+<dt class="sig sig-object py" id="indic_aug.globals.LANGS">
+<span class="sig-prename descclassname"><span class="pre">indic_aug.globals.</span></span><span class="sig-name descname"><span class="pre">LANGS</span></span><a class="headerlink" href="#indic_aug.globals.LANGS" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of supported languages.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="indic_aug.globals.INVALID_CHARS">
+<span class="sig-prename descclassname"><span class="pre">indic_aug.globals.</span></span><span class="sig-name descname"><span class="pre">INVALID_CHARS</span></span><a class="headerlink" href="#indic_aug.globals.INVALID_CHARS" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of characters that need to be removed from the raw corpus before using 
+any augmentation. Remove all tabs and double quotes as they clash with the 
+implementation.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="indic_aug.globals.SENTENCE_DELIMS">
+<span class="sig-prename descclassname"><span class="pre">indic_aug.globals.</span></span><span class="sig-name descname"><span class="pre">SENTENCE_DELIMS</span></span><a class="headerlink" href="#indic_aug.globals.SENTENCE_DELIMS" title="Permalink to this definition">¶</a></dt>
+<dd><p>String of pipe (|) separated characters on which to split a document into 
+sentences.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="indic_aug.globals.PAD_TOKEN">
+<span class="sig-prename descclassname"><span class="pre">indic_aug.globals.</span></span><span class="sig-name descname"><span class="pre">PAD_TOKEN</span></span><a class="headerlink" href="#indic_aug.globals.PAD_TOKEN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Token to use for padding sentences.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="indic_aug.globals.PAD_ID">
+<span class="sig-prename descclassname"><span class="pre">indic_aug.globals.</span></span><span class="sig-name descname"><span class="pre">PAD_ID</span></span><a class="headerlink" href="#indic_aug.globals.PAD_ID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Index corresponding to <code class="docutils literal notranslate"><span class="pre">PAD_TOKEN</span></code>.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="indic_aug.globals.UNK_TOKEN">
+<span class="sig-prename descclassname"><span class="pre">indic_aug.globals.</span></span><span class="sig-name descname"><span class="pre">UNK_TOKEN</span></span><a class="headerlink" href="#indic_aug.globals.UNK_TOKEN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Token to use for unknown words.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="indic_aug.globals.UNK_ID">
+<span class="sig-prename descclassname"><span class="pre">indic_aug.globals.</span></span><span class="sig-name descname"><span class="pre">UNK_ID</span></span><a class="headerlink" href="#indic_aug.globals.UNK_ID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Index corresponding to <code class="docutils literal notranslate"><span class="pre">UNK_TOKEN</span></code>.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="indic_aug.globals.SOS_TOKEN">
+<span class="sig-prename descclassname"><span class="pre">indic_aug.globals.</span></span><span class="sig-name descname"><span class="pre">SOS_TOKEN</span></span><a class="headerlink" href="#indic_aug.globals.SOS_TOKEN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Token to use for start of sentence.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="indic_aug.globals.SOS_ID">
+<span class="sig-prename descclassname"><span class="pre">indic_aug.globals.</span></span><span class="sig-name descname"><span class="pre">SOS_ID</span></span><a class="headerlink" href="#indic_aug.globals.SOS_ID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Index corresponding to <code class="docutils literal notranslate"><span class="pre">SOS_TOKEN</span></code>.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="indic_aug.globals.EOS_TOKEN">
+<span class="sig-prename descclassname"><span class="pre">indic_aug.globals.</span></span><span class="sig-name descname"><span class="pre">EOS_TOKEN</span></span><a class="headerlink" href="#indic_aug.globals.EOS_TOKEN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Token to use for end of sentence.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="indic_aug.globals.EOS_ID">
+<span class="sig-prename descclassname"><span class="pre">indic_aug.globals.</span></span><span class="sig-name descname"><span class="pre">EOS_ID</span></span><a class="headerlink" href="#indic_aug.globals.EOS_ID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Index corresponding to <code class="docutils literal notranslate"><span class="pre">EOS_TOKEN</span></code>.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="indic_aug.globals.BLANK_TOKEN">
+<span class="sig-prename descclassname"><span class="pre">indic_aug.globals.</span></span><span class="sig-name descname"><span class="pre">BLANK_TOKEN</span></span><a class="headerlink" href="#indic_aug.globals.BLANK_TOKEN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Token to use for blanking words for some augmentation algorithms.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="indic_aug.globals.BLANK_ID">
+<span class="sig-prename descclassname"><span class="pre">indic_aug.globals.</span></span><span class="sig-name descname"><span class="pre">BLANK_ID</span></span><a class="headerlink" href="#indic_aug.globals.BLANK_ID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Index corresponding to <code class="docutils literal notranslate"><span class="pre">BLANK_TOKEN</span></code>.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="indic_aug.globals.Augmentor">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">indic_aug.globals.</span></span><span class="sig-name descname"><span class="pre">Augmentor</span></span><a class="reference internal" href="../_modules/indic_aug/globals.html#Augmentor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.globals.Augmentor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>Abstract base class for all augmentor classes.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-indic_aug.preprocess">
+<span id="indic-aug-preprocess-module"></span><h3>indic_aug.preprocess module<a class="headerlink" href="#module-indic_aug.preprocess" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="indic_aug.preprocess.Preprocessor">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">indic_aug.preprocess.</span></span><span class="sig-name descname"><span class="pre">Preprocessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_src_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_tgt_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stanza_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'C:\\Users\\Deepak\\stanza_resources'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/indic_aug/preprocess.html#Preprocessor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.preprocess.Preprocessor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class to perform the following:
+1. Preprocess input (tokenizing, normalizing) before feeding to
+sentencepiece.
+2. Generate the vocabulary.
+3. Replace appropriate words in corpus by special tokens.</p>
+<p>Constructor method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>raw_src_path</strong> (<em>str</em>) – Path to raw source portion of parallel corpus.</p></li>
+<li><p><strong>raw_tgt_path</strong> (<em>str</em>) – Path to raw target portion of parallel corpus.</p></li>
+<li><p><strong>stanza_dir</strong> (<em>str</em>) – Directory where <code class="docutils literal notranslate"><span class="pre">stanza</span></code> resources are stored. If
+you have not modified the location where <code class="docutils literal notranslate"><span class="pre">stanza.download</span></code> 
+downloads its models, then you may leave this parameter untouched 
+(in that case, you will find the <code class="docutils literal notranslate"><span class="pre">stanza_resources</span></code> directory in 
+your home directory). Refer <code class="docutils literal notranslate"><span class="pre">indic_aug.utils.load_stanza_pipeline</span></code>
+for more information.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="indic_aug.preprocess.Preprocessor.build_vocab">
+<span class="sig-name descname"><span class="pre">build_vocab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src_vocab_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tgt_vocab_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vocab_dir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/indic_aug/preprocess.html#Preprocessor.build_vocab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.preprocess.Preprocessor.build_vocab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates vocabulary for source and target parallel corpus.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src_vocab_size</strong> (<em>int</em>) – Number of words in source vocabulary.</p></li>
+<li><p><strong>tgt_vocab_size</strong> (<em>int</em>) – Number of words in target vocabulary.</p></li>
+<li><p><strong>vocab_dir</strong> (<em>str</em>) – Path to where <code class="docutils literal notranslate"><span class="pre">sentencepiece</span></code> *.model and *.vocab
+files to be saved (described in detail in <code class="docutils literal notranslate"><span class="pre">vocab.py</span></code>).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="indic_aug.preprocess.Preprocessor.post_vocab">
+<span class="sig-name descname"><span class="pre">post_vocab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out_src_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_tgt_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/indic_aug/preprocess.html#Preprocessor.post_vocab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.preprocess.Preprocessor.post_vocab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replaces out-of-vocabulary words with <code class="docutils literal notranslate"><span class="pre">UNK_TOKEN</span></code> (“postvocab
+processing”).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>out_src_path</strong> (<em>str</em>) – Path to output source corpus after postvocab
+processing.</p></li>
+<li><p><strong>out_tgt_path</strong> (<em>str</em>) – Path to output target corpus after postvocab
+processing.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="indic_aug.preprocess.Preprocessor.pre_vocab">
+<span class="sig-name descname"><span class="pre">pre_vocab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prevocab_src_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prevocab_tgt_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/indic_aug/preprocess.html#Preprocessor.pre_vocab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.preprocess.Preprocessor.pre_vocab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Processing before vocabulary is built (“prevocab processing”).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prevocab_src_path</strong> (<em>str</em>) – Path to output source corpus after prevocab
+processing.</p></li>
+<li><p><strong>prevocab_tgt_path</strong> (<em>str</em>) – Path to output target corpus after prevocab
+processing.</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em>) – Number of documents to bring into memory at once.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-indic_aug.utils">
+<span id="indic-aug-utils-module"></span><h3>indic_aug.utils module<a class="headerlink" href="#module-indic_aug.utils" title="Permalink to this headline">¶</a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="indic_aug.utils.closest_freq">
+<span class="sig-prename descclassname"><span class="pre">indic_aug.utils.</span></span><span class="sig-name descname"><span class="pre">closest_freq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">word</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/indic_aug/utils.html#closest_freq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.utils.closest_freq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the word in <code class="docutils literal notranslate"><span class="pre">freq_dict</span></code> that has the closest frequency to that
+of <code class="docutils literal notranslate"><span class="pre">word</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>word</strong> (<em>str</em>) – Word whose closest frequency word is to be found.</p></li>
+<li><p><strong>freq_dict</strong> (<em>dict</em>) – Word to frequency mapping as returned by
+<code class="docutils literal notranslate"><span class="pre">vocab.freq2dict_vocab</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Word with closest frequency to that of <code class="docutils literal notranslate"><span class="pre">word</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="indic_aug.utils.cyclic_read">
+<span class="sig-prename descclassname"><span class="pre">indic_aug.utils.</span></span><span class="sig-name descname"><span class="pre">cyclic_read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/indic_aug/utils.html#cyclic_read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.utils.cyclic_read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a generator which can read the same file line by line (lazily) arbitrary number of times.</p>
+<p>Using <code class="docutils literal notranslate"><span class="pre">open</span></code> to read a file will raise <code class="docutils literal notranslate"><span class="pre">StopIteration</span></code> once EOF is
+reached. <code class="docutils literal notranslate"><span class="pre">cyclic_read</span></code> will instead loop back to the start of file and
+continue reading indefinitely. Note that it also strips newline characters
+(both ‘\n’ and ‘\r’) before returning the line.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filepath</strong> (<em>str</em>) – Path to input file.</p>
+</dd>
+<dt class="field-even">Usage</dt>
+<dd class="field-even"><p>Say you have a file <code class="docutils literal notranslate"><span class="pre">sample.txt</span></code> which contains the text</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>lorem
+ipsum
+dolor
+</pre></div>
+</div>
+<p>then calling <code class="docutils literal notranslate"><span class="pre">cyclic_read</span></code> on <code class="docutils literal notranslate"><span class="pre">sample.txt</span></code> would look like:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">cyclic_read</span><span class="p">(</span><span class="s1">&#39;sample.txt&#39;</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+<span class="go">lorem</span>
+<span class="go">ipsum</span>
+<span class="go">dolor</span>
+<span class="go">lorem</span>
+<span class="go">ipsum</span>
+<span class="go">dolor</span>
+</pre></div>
+</div>
+<p>and so on indefinitely.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="indic_aug.utils.doc2sents">
+<span class="sig-prename descclassname"><span class="pre">indic_aug.utils.</span></span><span class="sig-name descname"><span class="pre">doc2sents</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/indic_aug/utils.html#doc2sents"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.utils.doc2sents" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits a document into sentences. Wrapper around <code class="docutils literal notranslate"><span class="pre">nltk.sent_tokenize</span></code>
+and <code class="docutils literal notranslate"><span class="pre">indicnlp.tokenize.sentence_tokenize.sentence_split</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>doc</strong> (<em>str</em>) – Document to be split into sentences.</p></li>
+<li><p><strong>lang</strong> (<em>str</em>) – ISO 639-1 language code of <code class="docutils literal notranslate"><span class="pre">doc</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of sentences in <code class="docutils literal notranslate"><span class="pre">doc</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list(str)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="indic_aug.utils.doc2words">
+<span class="sig-prename descclassname"><span class="pre">indic_aug.utils.</span></span><span class="sig-name descname"><span class="pre">doc2words</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/indic_aug/utils.html#doc2words"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.utils.doc2words" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits a document into words. Wrapper around <code class="docutils literal notranslate"><span class="pre">nltk.word_tokenize</span></code> and
+<code class="docutils literal notranslate"><span class="pre">indicnlp.tokenize.indic_tokenize.trivial_tokenize</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>doc</strong> (<em>str</em>) – Document to be split into words.</p></li>
+<li><p><strong>lang</strong> (<em>str</em>) – ISO 639-1 language code of <code class="docutils literal notranslate"><span class="pre">doc</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of words in <code class="docutils literal notranslate"><span class="pre">doc</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list(str)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="indic_aug.utils.fix_split_special_tokens">
+<span class="sig-prename descclassname"><span class="pre">indic_aug.utils.</span></span><span class="sig-name descname"><span class="pre">fix_split_special_tokens</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/indic_aug/utils.html#fix_split_special_tokens"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.utils.fix_split_special_tokens" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tokenizing adds space within special tokens (so ‘&lt;unk&gt;’ becomes ‘&lt; unk
+&gt;’). This function restores modified special tokens to their normal form.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>doc</strong> (<em>str</em>) – Document in which special tokens are to be fixed.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Document with special tokens fixed.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="indic_aug.utils.line_count">
+<span class="sig-prename descclassname"><span class="pre">indic_aug.utils.</span></span><span class="sig-name descname"><span class="pre">line_count</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/indic_aug/utils.html#line_count"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.utils.line_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the number of lines in a file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>path</strong> (<em>str</em>) – Path to file.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Number of lines in file.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="indic_aug.utils.load_stanza_pipeline">
+<span class="sig-prename descclassname"><span class="pre">indic_aug.utils.</span></span><span class="sig-name descname"><span class="pre">load_stanza_pipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stanza_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'C:\\Users\\Deepak\\stanza_resources'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/indic_aug/utils.html#load_stanza_pipeline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.utils.load_stanza_pipeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a <code class="docutils literal notranslate"><span class="pre">stanza</span></code> pipeline. If <code class="docutils literal notranslate"><span class="pre">stanza</span></code> models are not downloaded,
+first downloads the model to the <code class="docutils literal notranslate"><span class="pre">stanza_dir</span></code> directory then loads.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lang</strong> (<em>ISO 639-1 language code</em>) – Language for which to load the pipeline.</p></li>
+<li><p><strong>stanza_dir</strong> (<em>str</em>) – Directory where to store <code class="docutils literal notranslate"><span class="pre">stanza</span></code> resources.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A <code class="docutils literal notranslate"><span class="pre">stanza</span></code> pipeline</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">stanza.Pipeline</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="indic_aug.utils.path2lang">
+<span class="sig-prename descclassname"><span class="pre">indic_aug.utils.</span></span><span class="sig-name descname"><span class="pre">path2lang</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/indic_aug/utils.html#path2lang"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.utils.path2lang" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns language code from extension of path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>path</strong> (<em>str</em>) – File whose language code is to be extracted. Note that the file
+must have extension as language code, for example, train.en for English.
+Refer globals.py for language codes.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Language code.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="indic_aug.utils.sent2words">
+<span class="sig-prename descclassname"><span class="pre">indic_aug.utils.</span></span><span class="sig-name descname"><span class="pre">sent2words</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/indic_aug/utils.html#sent2words"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.utils.sent2words" title="Permalink to this definition">¶</a></dt>
+<dd><p>Same as <code class="docutils literal notranslate"><span class="pre">doc2words</span></code>, however have kept separate for readability reasons
+(document vs sentence).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="indic_aug.utils.stanza2list">
+<span class="sig-prename descclassname"><span class="pre">indic_aug.utils.</span></span><span class="sig-name descname"><span class="pre">stanza2list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stanza_sent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/indic_aug/utils.html#stanza2list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.utils.stanza2list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts <code class="docutils literal notranslate"><span class="pre">stanza.models.common.doc.Sentence</span></code> to a list of str tokens,
+by stripping away all the extra stuff.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>stanza_sent</strong> (<code class="docutils literal notranslate"><span class="pre">stanza.models.common.doc.Sentence</span></code>) – Stanza sentence to be converted.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of tokens in <code class="docutils literal notranslate"><span class="pre">stanza</span></code> sentence.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list(str)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-indic_aug.vocab">
+<span id="indic-aug-vocab-module"></span><h3>indic_aug.vocab module<a class="headerlink" href="#module-indic_aug.vocab" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="indic_aug.vocab.Vocab">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">indic_aug.vocab.</span></span><span class="sig-name descname"><span class="pre">Vocab</span></span><a class="reference internal" href="../_modules/indic_aug/vocab.html#Vocab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.vocab.Vocab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Utility class for vocabulary-related functions.</p>
+<p><code class="docutils literal notranslate"><span class="pre">vocab_dir</span></code> is a directory containing *.model and *.vocab files as
+generated by <code class="docutils literal notranslate"><span class="pre">sentencepiece</span></code> or <code class="docutils literal notranslate"><span class="pre">Vocab.build</span></code>. The files in this
+directory must be named as <code class="docutils literal notranslate"><span class="pre">&lt;lang_code&gt;.model</span></code> and <code class="docutils literal notranslate"><span class="pre">&lt;lang_code&gt;.vocab</span></code>
+(automatically done if you use <code class="docutils literal notranslate"><span class="pre">Vocab.build</span></code>), where <code class="docutils literal notranslate"><span class="pre">lang_code</span></code> is the
+ISO 639-1 code for that language. For example, if you were translating
+between English and Hindi, the directory would be structured as:</p>
+<p>&lt;vocab_dir&gt;
+├── en.model
+├── en.vocab
+├── hi.model
+└── hi.vocab</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="indic_aug.vocab.Vocab.build">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">build</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tgt_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src_vocab_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tgt_vocab_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vocab_dir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/indic_aug/vocab.html#Vocab.build"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.vocab.Vocab.build" title="Permalink to this definition">¶</a></dt>
+<dd><p>Trains a <code class="docutils literal notranslate"><span class="pre">sentencepiece</span></code> model and generates the vocabulary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src_path</strong> (<em>str</em>) – Path to source portion of parallel corpus.</p></li>
+<li><p><strong>tgt_path</strong> (<em>str</em>) – Path to target portion of parallel corpus.</p></li>
+<li><p><strong>src_vocab_size</strong> (<em>int</em>) – Number of tokens in source vocabulary.</p></li>
+<li><p><strong>tgt_vocab_size</strong> (<em>int</em>) – Number of tokens in targert vocabulary.</p></li>
+<li><p><strong>vocab_dir</strong> (<em>str</em>) – As described in the docstring for this class.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="indic_aug.vocab.Vocab.load_model">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">load_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vocab_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/indic_aug/vocab.html#Vocab.load_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.vocab.Vocab.load_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns contents of <code class="docutils literal notranslate"><span class="pre">sentencepiece</span></code> *.model file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vocab_dir</strong> (<em>str</em>) – As described in the docstring for this class.</p></li>
+<li><p><strong>lang</strong> (<em>str</em>) – ISO 631-9 code for language.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">sentencepiece</span></code> model.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">sentencepiece.SentencePieceProcessor</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="indic_aug.vocab.Vocab.load_vocab">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">load_vocab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vocab_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/indic_aug/vocab.html#Vocab.load_vocab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.vocab.Vocab.load_vocab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns vocabulary in <code class="docutils literal notranslate"><span class="pre">sentencepiece</span></code> *.vocab file as a list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vocab_dir</strong> (<em>str</em>) – As described in the docstring for this class.</p></li>
+<li><p><strong>lang</strong> (<em>str</em>) – ISO 631-9 code for language.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of words in vocabulary.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="indic_aug.vocab.Vocab.read_bottomn">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">read_bottomn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vocab_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/indic_aug/vocab.html#Vocab.read_bottomn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.vocab.Vocab.read_bottomn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads the <code class="docutils literal notranslate"><span class="pre">n</span></code> least frequent tokens in vocabulary into a list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vocab_dir</strong> (<em>str</em>) – As described in docstring for this class.</p></li>
+<li><p><strong>lang</strong> (<em>str</em>) – ISO 631-9 code for language.</p></li>
+<li><p><strong>n</strong> (<em>int</em>) – Number of words.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">n</span></code> least frequent tokens</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="indic_aug.vocab.Vocab.read_topn">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">read_topn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vocab_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/indic_aug/vocab.html#Vocab.read_topn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.vocab.Vocab.read_topn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads the <code class="docutils literal notranslate"><span class="pre">n</span></code> most frequent tokens in vocabulary into a list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vocab_dir</strong> (<em>str</em>) – As described in docstring for this class.</p></li>
+<li><p><strong>lang</strong> (<em>str</em>) – ISO 631-9 code for language.</p></li>
+<li><p><strong>n</strong> (<em>int</em>) – Number of words.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">n</span></code> most frequent tokens</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="indic_aug.vocab.Vocab.score2freq">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">score2freq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vocab_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/indic_aug/vocab.html#Vocab.score2freq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#indic_aug.vocab.Vocab.score2freq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns frequencies of all words in the vocabulary, reverse
+calculated from <code class="docutils literal notranslate"><span class="pre">sentencepiece</span></code> score (negative log likelihood).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vocab_dir</strong> (<em>str</em>) – As described in docstring for this class.</p></li>
+<li><p><strong>lang</strong> (<em>str</em>) – ISO 631-9 code for language.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Map of word in vocabulary to its frequency.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="indic_aug.basic.html" class="btn btn-neutral float-right" title="indic_aug.basic package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../index.html" class="btn btn-neutral float-left" title="Welcome to indic-aug’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Nikhil Kumar.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

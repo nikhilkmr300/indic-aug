@@ -1,0 +1,354 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>indic_aug.globals &mdash; indic-aug  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> indic-aug
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../docs/indic_aug.html">indic_aug package</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../docs/references.html">References</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">indic-aug</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>indic_aug.globals</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for indic_aug.globals</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Module to contain variables that are required in multiple places.</span>
+
+<span class="sd">.. data:: LANGS</span>
+
+<span class="sd">    List of supported languages.</span>
+
+<span class="sd">.. data:: INVALID_CHARS</span>
+
+<span class="sd">    List of characters that need to be removed from the raw corpus before using </span>
+<span class="sd">    any augmentation. Remove all tabs and double quotes as they clash with the </span>
+<span class="sd">    implementation.</span>
+
+<span class="sd">.. data:: SENTENCE_DELIMS</span>
+
+<span class="sd">    String of pipe (|) separated characters on which to split a document into </span>
+<span class="sd">    sentences.</span>
+
+<span class="sd">.. data:: PAD_TOKEN</span>
+
+<span class="sd">    Token to use for padding sentences.</span>
+
+<span class="sd">.. data:: PAD_ID</span>
+
+<span class="sd">    Index corresponding to ``PAD_TOKEN``.</span>
+
+<span class="sd">.. data:: UNK_TOKEN</span>
+
+<span class="sd">    Token to use for unknown words.</span>
+
+<span class="sd">.. data:: UNK_ID</span>
+
+<span class="sd">    Index corresponding to ``UNK_TOKEN``.</span>
+
+<span class="sd">.. data:: SOS_TOKEN</span>
+
+<span class="sd">    Token to use for start of sentence.</span>
+
+<span class="sd">.. data:: SOS_ID</span>
+
+<span class="sd">    Index corresponding to ``SOS_TOKEN``.</span>
+
+<span class="sd">.. data:: EOS_TOKEN</span>
+
+<span class="sd">    Token to use for end of sentence.</span>
+
+<span class="sd">.. data:: EOS_ID</span>
+
+<span class="sd">    Index corresponding to ``EOS_TOKEN``.</span>
+
+<span class="sd">.. data:: BLANK_TOKEN</span>
+
+<span class="sd">    Token to use for blanking words for some augmentation algorithms.</span>
+
+<span class="sd">.. data:: BLANK_ID</span>
+
+<span class="sd">    Index corresponding to ``BLANK_TOKEN``.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+
+<div class="viewcode-block" id="Augmentor"><a class="viewcode-back" href="../../docs/indic_aug.html#indic_aug.globals.Augmentor">[docs]</a><span class="k">class</span> <span class="nc">Augmentor</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Abstract base class for all augmentor classes.&quot;&quot;&quot;</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<span class="c1"># Supported languages.</span>
+<span class="n">LANGS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;en&#39;</span><span class="p">,</span>   <span class="c1"># English</span>
+    <span class="s1">&#39;hi&#39;</span><span class="p">,</span>   <span class="c1"># Hindi</span>
+    <span class="s1">&#39;mr&#39;</span><span class="p">,</span>   <span class="c1"># Marathi</span>
+    <span class="s1">&#39;ta&#39;</span><span class="p">,</span>   <span class="c1"># Tamil</span>
+    <span class="s1">&#39;te&#39;</span><span class="p">,</span>   <span class="c1"># Telugu</span>
+<span class="p">]</span>
+
+<span class="c1"># Make sure raw input corpora are rid of these characters.</span>
+<span class="n">INVALID_CHARS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span>                               <span class="c1"># Tabs clash with sep argument used in pandas.read_csv.</span>
+    <span class="s2">&quot;&#39;&quot;</span><span class="p">,</span>                                <span class="c1"># Clashes with Python single quotes.</span>
+    <span class="s1">&#39;&quot;&#39;</span>                                 <span class="c1"># Clashes with Python double quotes.</span>
+<span class="p">]</span>
+
+<span class="n">SENTENCE_DELIMS</span> <span class="o">=</span> <span class="s1">&#39;\.|\?|!|</span><span class="se">\u0964</span><span class="s1">&#39;</span>      <span class="c1"># Characters on which to split sentences in a document.</span>
+
+<span class="c1"># Special tokens and their IDs.</span>
+<span class="n">PAD_TOKEN</span> <span class="o">=</span> <span class="s1">&#39;&lt;pad&gt;&#39;</span><span class="p">;</span> <span class="n">PAD_ID</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">UNK_TOKEN</span> <span class="o">=</span> <span class="s1">&#39;&lt;unk&gt;&#39;</span><span class="p">;</span> <span class="n">UNK_ID</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">SOS_TOKEN</span> <span class="o">=</span> <span class="s1">&#39;&lt;s&gt;&#39;</span><span class="p">;</span> <span class="n">SOS_ID</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">EOS_TOKEN</span> <span class="o">=</span> <span class="s1">&#39;&lt;/s&gt;&#39;</span><span class="p">;</span> <span class="n">EOS_ID</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">BLANK_TOKEN</span> <span class="o">=</span> <span class="s1">&#39;&lt;blank&gt;&#39;</span><span class="p">;</span>                <span class="c1"># sentencepiece will assign the next available ID to &lt;blank&gt;.</span>
+
+<span class="c1"># Valid augmentation modes for each type of augmentation.</span>
+<span class="n">VALID_AUG_MODES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;noising&#39;</span><span class="p">:</span> <span class="p">[</span>                        <span class="c1"># Valid modes for noising (Xie paper) augmentation.</span>
+        <span class="s1">&#39;blank&#39;</span><span class="p">,</span>                        <span class="c1"># Replaces word with &lt;blank&gt;.</span>
+        <span class="s1">&#39;replace&#39;</span><span class="p">,</span>                      <span class="c1"># Replaces word with another word from the unigram distribution.</span>
+        <span class="s1">&#39;absolute_discount&#39;</span><span class="p">,</span>            <span class="c1"># Adaptively generates replacement probability using absolute discounting.</span>
+        <span class="s1">&#39;kneser_ney&#39;</span>                    <span class="c1"># Uses absolute discounting while restricting replacement words to a smaller set.</span>
+    <span class="p">],</span>
+    <span class="s1">&#39;depparse&#39;</span><span class="p">:</span> <span class="p">[</span>                       <span class="c1"># Valid modes for dependency parsing augmentation.</span>
+        <span class="s1">&#39;blank&#39;</span><span class="p">,</span>                        <span class="c1"># Replaces word with &lt;blank&gt;.</span>
+        <span class="s1">&#39;dropout&#39;</span><span class="p">,</span>                      <span class="c1"># Deletes word.</span>
+        <span class="s1">&#39;replace_freq&#39;</span>                  <span class="c1"># Replaces word with another word with most similar unigram frequency.</span>
+    <span class="p">],</span>
+    <span class="s1">&#39;embedding&#39;</span><span class="p">:</span> <span class="p">[</span>                      <span class="c1"># Valid modes for embedding augmentation.</span>
+        <span class="s1">&#39;replace&#39;</span>                       <span class="c1"># Replaces word with another word with most similar embedding.</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+
+<span class="n">ERRORS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c1"># Invalid language code.</span>
+    <span class="s1">&#39;lang&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">lang</span><span class="se">\&#39;</span><span class="s1"> must be one of the language codes in </span><span class="si">{</span><span class="o">*</span><span class="n">LANGS</span><span class="p">,</span><span class="si">}</span><span class="s1">. Ensure file extension of corpus files is a language code (for example, </span><span class="se">\&#39;</span><span class="s1">train.en</span><span class="se">\&#39;</span><span class="s1"> is a valid filename for an English corpus).&#39;</span><span class="p">,</span>
+
+    <span class="c1"># Mismatch in number of source and target sentences in corpus.</span>
+    <span class="s1">&#39;corpus_shape&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;Shape of source and target corpora do not match. Check that raw input corpora do not contain any characters among </span><span class="si">{</span><span class="o">*</span><span class="n">INVALID_CHARS</span><span class="p">,</span><span class="si">}</span><span class="s1"> nor any empty lines.&#39;</span><span class="p">,</span>
+
+    <span class="c1"># Mismatch in number of source and target sentences in a preprocessing batch.</span>
+    <span class="s1">&#39;batch_shape&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;Shape of source and target batches do not match. Check that raw input corpora do not contain any characters among </span><span class="si">{</span><span class="o">*</span><span class="n">INVALID_CHARS</span><span class="p">,</span><span class="si">}</span><span class="s1"> nor any empty lines.&#39;</span><span class="p">,</span>
+
+    <span class="c1"># Ensure that root is at index 0 for dependency parsing tree.</span>
+    <span class="s1">&#39;root_at_0&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;&lt;root&gt; must be at index 0. Ensure that you have prepended dummy &lt;root&gt; to the list of words returned by stanza.models.common.doc.Sentence.words to account for stanza using 1-based indexing for words in sentence.&#39;</span><span class="p">,</span>
+
+    <span class="c1"># Word not found.</span>
+    <span class="s1">&#39;word_not_found&#39;</span><span class="p">:</span> <span class="s1">&#39;Word not found in vocabulary.&#39;</span><span class="p">,</span>
+
+    <span class="c1"># Frequency dictionary compulsory with mode &#39;replace_freq&#39; of &#39;depparse_aug&#39;.</span>
+    <span class="s1">&#39;freq_dict_compulsory&#39;</span><span class="p">:</span> <span class="s1">&#39;Passing freq_dict is compulsory with mode=</span><span class="se">\&#39;</span><span class="s1">replace_freq</span><span class="se">\&#39;</span><span class="s1"> of depparse_aug.&#39;</span><span class="p">,</span>
+
+    <span class="c1"># Prev set compulsory with mode &#39;kneser_ney&#39; of &#39;noising_aug&#39;.</span>
+    <span class="s1">&#39;prev_set_compulsory&#39;</span><span class="p">:</span> <span class="s1">&#39;Passing prev_sets is compulsory with mode=</span><span class="se">\&#39;</span><span class="s1">kneser_ney</span><span class="se">\&#39;</span><span class="s1"> of noising_aug.&#39;</span><span class="p">,</span>
+    
+    <span class="c1"># Cannot generate vocabulary without first preprocessing.</span>
+    <span class="s1">&#39;call_preprocess&#39;</span><span class="p">:</span> <span class="s1">&#39;Attribute </span><span class="se">\&#39;</span><span class="s1">prevocab_src_path</span><span class="se">\&#39;</span><span class="s1"> of Preprocessor object does not exist yet. Call </span><span class="se">\&#39;</span><span class="s1">run_pipeline  </span><span class="se">\&#39;</span><span class="s1"> on Preprocessor object first.&#39;</span><span class="p">,</span>
+
+    <span class="c1"># Cannot retrieve alignment without first calling train.</span>
+    <span class="s1">&#39;call_train&#39;</span><span class="p">:</span> <span class="s1">&#39;Attribute </span><span class="se">\&#39;</span><span class="s1">model</span><span class="se">\&#39;</span><span class="s1"> of Aligner object does not exist yet. Call </span><span class="se">\&#39;</span><span class="s1">train</span><span class="se">\&#39;</span><span class="s1"> on Aligner object first.&#39;</span>
+<span class="p">}</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Nikhil Kumar.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
