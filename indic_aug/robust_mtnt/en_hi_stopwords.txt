@@ -1,0 +1,123 @@
+मैं	i
+मुझे	me
+मेरे	my
+खुद	myself
+हम	we
+हमारी	our
+हमारा	ours
+हम स्वयं	ourselves
+आप	you
+आपका	your
+आपका अपना	yours
+स्वयं	yourself
+स्वयं	yourselves
+वह	he
+उसे	him
+उनके	his
+वह स्वयं	himself
+वह	she
+उसकी	her
+उसकी	hers
+स्वयं	herself
+यह	it
+इसका	its
+अपने आप	itself
+वे	they
+उन्हें	them
+उनका	their
+उन लोगों के	theirs
+खुद	themselves
+क्या	what
+कौन कौन से	which
+who	who
+किसको	whom
+यह	this
+वह	that
+इन	these
+वे	those
+पूर्वाह्न	am
+है	is
+हैं	are
+था	was
+थे	were
+होना	be
+गया	been
+हो रहा	being
+पास होना	have
+है	has
+था	had
+होना	having
+करना	do
+करता है	does
+किया था	did
+करते हुए	doing
+ए	a
+एक	an
+तथा	and
+लेकिन	but
+अगर	if
+या	or
+इसलिये	because
+जैसा	as
+जब तक	until
+जबकि	while
+का	of
+पर	at
+द्वारा	by
+के लिए	for
+साथ	with
+के बारे में	about
+के खिलाफ	against
+के बीच	between
+में	into
+के माध्यम से	through
+दौरान	during
+इससे पहले	before
+बाद में	after
+के ऊपर	above
+नीचे	below
+प्रति	to
+से	from
+नीचे	down
+में	in
+बाहर	out
+पर	on
+बंद	off
+ऊपर	over
+अंतर्गत	under
+फिर	again
+आगे	further
+फिर	then
+एक बार	once
+यहां	here
+वहां	there
+कब	when
+कहाँ पे	where
+क्यों	why
+कैसे	how
+सब	all
+कोई	any
+दोनों	both
+प्रत्येक	each
+कुछ	few
+अधिक	more
+अधिकांश	most
+अन्य	other
+कुछ	some
+ऐसा	such
+ना	no
+और न	nor
+नहीं	not
+केवल	only
+अपना	own
+वैसा ही	same
+इसलिए	so
+से	than
+बहुत	too
+बहुत	very
+कर सकते हैं	can
+मर्जी	will
+अभी - अभी	just
+अगुआ	don
+चाहिए	should
+अभी	now
